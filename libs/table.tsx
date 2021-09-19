@@ -150,7 +150,7 @@ export const divTable = (csvArray, options) => {
         width={sumLeft(fixedPoint.x + 1)}
         height={sumTop(maxCol) - topOffset + 1}
         left={0}
-        top={topOffset + 1}>
+        top={topOffset + p.y}>
         {csvArray.map((v, y) =>
           rowArray
             .map((_, x) => {
