@@ -3,6 +3,19 @@ body {
   padding: 0;
 }
 
-.tableBase {
+.csv-table {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  left: 0;
+  top: 0;
   display: inline-block;
+  overflow: auto;
+}
+
+.csv-table-cell {
+  border-top: solid 1px;
+  border-left: solid 1px;
+  border-right: solid 1px;
+  border-bottom: solid 1px;
 }

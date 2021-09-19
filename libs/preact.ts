@@ -26,6 +26,7 @@ export function factory(tag, props, ...children) {
               .map(([k, v]) => {
                 const _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
                 if (k === "zIndex") return `${_k}: ${v}`;
+                if (k === "opacity") return `${_k}: ${v}`;
                 return `${_k}: ${typeof v === "number" ? `${v}px` : v}`;
               })
               .join("; ");

@@ -27,8 +27,13 @@ export const TableCell = (props: any) => {
   );
 };
 
-export const divTable = (csvArray, options) => {
-  const { browser } = options;
+export const CsvTable = ({
+  data = [],
+  id = "csv-table",
+  top = 50,
+  left = 0,
+}) => {
+  const csvArray = data;
   const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
   const maxCol = csvArray.length;
   const rowArray = new Array(maxRow).fill(0);
@@ -38,7 +43,6 @@ export const divTable = (csvArray, options) => {
   rowWidth[0] = 50;
   rowWidth[1] = 50;
   const fixedPoint = { x: 1, y: 1 };
-  let count = maxRow * maxCol;
   const sumTop = y =>
     colHeight.reduce((a, v, i) => {
       if (i < y) a += v;
@@ -54,20 +58,17 @@ export const divTable = (csvArray, options) => {
     const left = sumLeft(cell.x);
     return (
       <TableCell
-        className="tableCell"
+        className="csv-table-cell"
         data={{
           x: cell.x,
           y: cell.y,
           top,
           left,
         }}
-        zIndex={count--}
         left={left + cell.ox}
         top={top + cell.oy}
-        width={rowWidth[cell.x]}
-        height={colHeight[cell.y]}
-        borderRight="solid 1px"
-        borderBottom="solid 1px"
+        width={rowWidth[cell.x] - 1}
+        height={colHeight[cell.y] - 1}
         {...props}>
         <div style={{ marginLeft: 10 }}>{escapeHtml(cell.value)}</div>
       </TableCell>
@@ -77,35 +78,20 @@ export const divTable = (csvArray, options) => {
     rowWidth.reduce((a, v, i) => (i <= fixedPoint.x ? a + v : a), 0) * 2;
   const topOffset =
     colHeight.reduce((a, v, i) => (i <= fixedPoint.y ? a + v : a), 0) * 2;
-  const p = (() => {
-    switch (browser) {
-      case "safari":
-        return { x: 1, y: 1 };
-      case "chrome":
-      default:
-        return { x: 0, y: 0 };
-    }
-  })();
   return (
     <div
-      id="scrollTest"
+      id={id}
+      className="csv-table"
       style={{
-        margin: 0,
-        padding: 0,
-        position: "relative",
-        left: 0,
-        top: 50,
-        borderTop: "solid 1px",
-        borderLeft: "solid 1px",
-        display: "inline-block",
-        overflow: "auto",
+        left,
+        top,
         height: sumTop(maxCol),
         width: sumLeft(maxRow),
       }}>
       <TableCell
-        className="tableLeftTop"
+        className="table-top-left"
         position="sticky"
-        zIndex={count + 300}
+        zIndex={30}
         width={sumLeft(fixedPoint.x + 1)}
         height={sumTop(fixedPoint.y + 1)}
         left={0}
@@ -116,17 +102,18 @@ export const divTable = (csvArray, options) => {
               return { ...(v[x] || { value: "" }), x, y: y, ox: 0, oy: 0 };
             })
             .filter(cell => cell.x <= fixedPoint.x && cell.y <= fixedPoint.y)
-            .map(cell => DataCell(cell, { backgroundColor: "pink" }))
+            .map(cell => DataCell(cell, { backgroundColor: "lightgray" }))
         )}
       </TableCell>
       <TableCell
-        className="tableTop"
+        className="table-top"
         position="sticky"
-        zIndex={count + 100}
+        pointerEvents="none"
+        zIndex={10}
         width={sumLeft(maxRow) + 2}
         height={sumTop(fixedPoint.y + 1)}
-        left={p.x}
-        top={leftOffset}>
+        left={0}
+        top={topOffset}>
         {csvArray.map((v, y) =>
           rowArray
             .map((_, x) => {
@@ -134,23 +121,28 @@ export const divTable = (csvArray, options) => {
                 ...(v[x] || { value: "" }),
                 x,
                 y: y,
-                ox: -p.x,
-                oy: -leftOffset,
+                ox: -0,
+                oy: -topOffset,
               };
             })
             .filter(cell => cell.x > fixedPoint.x && cell.y <= fixedPoint.y)
             .map(cell => ({ ...cell }))
-            .map(cell => DataCell(cell, { backgroundColor: "lightgray" }))
+            .map(cell =>
+              DataCell(cell, {
+                backgroundColor: "lightgray",
+                pointerEvents: "auto",
+              })
+            )
         )}
       </TableCell>
       <TableCell
-        className="tableLeft"
+        className="table-left"
         position="sticky"
-        zIndex={count + 200}
+        zIndex={20}
         width={sumLeft(fixedPoint.x + 1)}
         height={sumTop(maxCol) - topOffset + 1}
         left={0}
-        top={topOffset + p.y}>
+        top={topOffset}>
         {csvArray.map((v, y) =>
           rowArray
             .map((_, x) => {
@@ -159,11 +151,11 @@ export const divTable = (csvArray, options) => {
                 x,
                 y,
                 ox: 0,
-                oy: -topOffset - p.y,
+                oy: -topOffset,
               };
             })
             .filter(cell => cell.x <= fixedPoint.x && cell.y > fixedPoint.y)
-            .map(cell => DataCell(cell, { backgroundColor: "white" }))
+            .map(cell => DataCell(cell, { backgroundColor: "lightgray" }))
         )}
       </TableCell>
       <TableCell
@@ -190,24 +182,3 @@ export const divTable = (csvArray, options) => {
     </div>
   );
 };
-
-export const simpleTable = csvArray => (
-  <table class="topCsvDom">
-    <thead>
-      <tr>
-        {csvArray[0].map((cell, j) => (
-          <th class="fileNameBG">{escapeHtml(cell.value)}</th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {[...csvArray].slice(1).map(v => (
-        <tr>
-          {v.map(v => (
-            <td>{escapeHtml(v.value)}</td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
-);

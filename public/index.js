@@ -1,7 +1,7 @@
-function main(tableId) {
+function CsvTable(tableId) {
   const element = document.getElementById(tableId);
-  const tableCell = element.querySelectorAll(".tableCell");
-  const borderThick = 2;
+  const tableCell = element.querySelectorAll(".csv-table-cell");
+  const borderThick = 1;
 
   function ajustTableSize() {
     const top = parseInt(element.style.top, 10);
@@ -24,8 +24,13 @@ function main(tableId) {
         element.getAttribute("data-x"),
         element.getAttribute("data-y")
       );
+      if (element.style["background-color"] === "pink") {
+        element.style.setProperty("background-color", "white");
+      } else {
+        element.style.setProperty("background-color", "pink");
+      }
     });
   });
 }
 
-main("scrollTest");
+const csvtable = new CsvTable("csv-table");
