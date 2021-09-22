@@ -30,19 +30,25 @@ export const TableCell = (props: any) => {
 export const CsvTable = ({
   data = [],
   id = "csv-table",
+  dataname = "",
+  fixedPoint = { x: 1, y: 1 },
+  defaultCellSize = { width: 50, height: 18 },
   top = 50,
   left = 0,
+  rowSize = [],
 }) => {
   const csvArray = data;
   const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
   const maxCol = csvArray.length;
   const rowArray = new Array(maxRow).fill(0);
   const colArray = new Array(maxCol).fill(0);
-  const rowWidth = rowArray.map(v => 100);
-  const colHeight = colArray.map(v => 24);
-  rowWidth[0] = 50;
-  rowWidth[1] = 50;
-  const fixedPoint = { x: 1, y: 1 };
+  const rowWidth = rowArray.map(v => defaultCellSize.width);
+  const colHeight = colArray.map(v => defaultCellSize.height);
+  rowSize.forEach((v, i) => {
+    if (v > 0) {
+      rowWidth[i] = v;
+    }
+  });
   const sumTop = y =>
     colHeight.reduce((a, v, i) => {
       if (i < y) a += v;
@@ -70,7 +76,11 @@ export const CsvTable = ({
         width={rowWidth[cell.x] - 1}
         height={colHeight[cell.y] - 1}
         {...props}>
-        <div style={{ marginLeft: 10 }}>{escapeHtml(cell.value)}</div>
+        <pre className="csv-table-code">
+          <code>
+            <div style={{ marginLeft: 10 }}>{escapeHtml(cell.value)}</div>
+          </code>
+        </pre>
       </TableCell>
     );
   };
@@ -85,9 +95,17 @@ export const CsvTable = ({
       style={{
         left,
         top,
-        height: sumTop(maxCol),
-        width: sumLeft(maxRow),
-      }}>
+        height: sumTop(maxCol) + 2,
+        width: sumLeft(maxRow) + 2,
+      }}
+      dataName={dataname}>
+      <TableCell
+        className="table-marker"
+        zIndex={50}
+        width={100}
+        height={24}
+        left={0}
+        top={0}></TableCell>
       <TableCell
         className="table-top-left"
         position="sticky"

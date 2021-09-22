@@ -1,0 +1,14 @@
+APP_ENV=production
+APP_WHITESPACE= start with white space 
+APP_SINGLE_QUOTE=' single quote '
+APP_DOUBLE_QUOTE=" double quote "
+# comment line
+APP_COMMENT_LINE=comment
+
+
+APP_MULTILINE="multiline\ntext"
+APP_FAKE_MULTILINE="fake multiline\\\ntext"
+APP_JSON={"foo": "bar"}
+APP_NUMBER=1234
+APP_MULTI_NUMBER=100,200
+APP_EMPTY=

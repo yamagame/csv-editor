@@ -1,0 +1,44 @@
+APP_WHITESPACE= start with white space 
+APP_DOUBLE_QUOTE=" double quote "
+# comment line
+APP_COMMENT_LINE=comment
+APP_ENV=production
+   
+
+APP_MULTILINE="multiline\ntext"
+APP_JSON={"foo": "bar"}
+APP_SINGLE_QUOTE=' single quote '
+APP_NUMBER=1234
+APP_MULTI_NUMBER=100,200
+APP_EMPTY=
+APP_NEW_ENV=
+
+APP2_WHITESPACE= start with white space 
+APP2_DOUBLE_QUOTE=" double quote "
+# comment line
+APP2_COMMENT_LINE=comment
+APP2_ENV=production
+   
+
+APP2_MULTILINE="multiline\ntext"
+APP2_JSON={"foo": "bar"}
+APP2_SINGLE_QUOTE=' single quote '
+APP2_NUMBER=1234
+APP2_MULTI_NUMBER=100,200
+APP2_EMPTY=
+APP2_NEW_ENV=
+
+APP3_WHITESPACE= start with white space 
+APP3_DOUBLE_QUOTE=" double quote "
+# comment line
+APP3_COMMENT_LINE=comment
+APP3_ENV=production
+   
+
+APP3_MULTILINE="multiline\ntext"
+APP3_JSON={"foo": "bar"}
+APP3_SINGLE_QUOTE=' single quote '
+APP3_NUMBER=1234
+APP3_MULTI_NUMBER=100,200
+APP3_EMPTY=
+APP3_NEW_ENV=

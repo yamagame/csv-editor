@@ -6,7 +6,7 @@ export function escapeHtml(string: string) {
   if (typeof string !== "string") {
     return string;
   }
-  return removeQuote(string).replace(/[&'`"<>\n]/g, function (match) {
+  return removeQuote(string).replace(/[&'`"<>]/g, function (match) {
     return {
       "&": "&amp;",
       "'": "&#x27;",
@@ -14,7 +14,6 @@ export function escapeHtml(string: string) {
       '"': "&quot;",
       "<": "&lt;",
       ">": "&gt;",
-      "\n": "<br/>",
     }[match];
   });
 }
@@ -30,7 +29,7 @@ export function removeQuote(value) {
   return value;
 }
 
-export const readDir = (rootDir: string) => {
+export const readDir = (rootDir: string, callback) => {
   const _readDir = (dir: string) => {
     let result = [];
     const files = fs.readdirSync(dir);
@@ -38,9 +37,11 @@ export const readDir = (rootDir: string) => {
       const filepath = path.join(dir, file);
       const stat = fs.statSync(filepath);
       if (stat.isDirectory()) {
-        result = [...result, ..._readDir(filepath)];
+        if (path.parse(filepath).name !== "node_modules") {
+          result = [...result, ..._readDir(filepath)];
+        }
       } else if (stat.isFile()) {
-        if (path.extname(filepath) === ".csv") {
+        if (callback(filepath)) {
           result.push(filepath.replace(rootDir, ""));
         }
       }

@@ -3,7 +3,18 @@ body {
   padding: 0;
 }
 
+section {
+  display: block;
+  margin: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  border: solid 1px lightgray;
+  border-radius: 5px;
+}
+
 .csv-table {
+  font-size: 0.7em;
+  user-select: none;
   margin: 0;
   padding: 0;
   position: relative;
@@ -14,8 +25,32 @@ body {
 }
 
 .csv-table-cell {
+  overflow: hidden;
   border-top: solid 1px;
   border-left: solid 1px;
   border-right: solid 1px;
   border-bottom: solid 1px;
+}
+
+.csv-control-panel {
+  display: block;
+  position: absolute;
+  z-index: 100;
+  left: 30px;
+  height: 24px;
+}
+
+.csv-control-panel input {
+  width: 500px;
+}
+
+.table-marker {
+  visibility: hidden;
+  border: solid 2px blue;
+  pointer-events: none;
+}
+
+.csv-table-code {
+  margin: 0px;
+  padding: 0px;
 }
