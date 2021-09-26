@@ -37,61 +37,62 @@ function CsvTable(env, tableId, inputSelctor) {
     this.width = parseInt(element.getAttribute("data-width"), 10);
     this.height = parseInt(element.getAttribute("data-height"), 10);
     this.backgroundColor = element.style["background-color"];
+    this.color = element.querySelector("div").style["color"];
     this.selected = false;
-    element.addEventListener("click", e => {
-      const select = callback => {
-        if (!this.selected) {
-          if (!e.shiftKey && !e.altKey) {
-            controller.clearSelectAll();
-          }
-          if (
-            e.altKey &&
-            controller.currentSelectedCell &&
-            (controller.currentSelectedCell.x === this.x ||
-              controller.currentSelectedCell.y === this.y)
-          ) {
-            const tx = [controller.currentSelectedCell.x, this.x];
-            const ty = [controller.currentSelectedCell.y, this.y];
-            let minx = Math.min(...tx);
-            let maxx = Math.max(...tx);
-            let miny = Math.min(...ty);
-            let maxy = Math.max(...ty);
-            if (minx === 0 && maxx === 0) {
-              controller.cells.forEach(cell => {
-                if (cell.y <= maxy && cell.y >= miny) {
-                  cell.setSelect();
-                }
-              });
-            } else {
-              controller.cells.forEach(cell => {
-                if (cell.x <= maxx && cell.x >= minx) {
-                  cell.setSelect();
-                }
-              });
-            }
-            this.setSelect();
-            dataInput.value = "";
-          } else {
+    this.select = (e, callback) => {
+      if (!this.selected) {
+        if (!e.shiftKey && !e.altKey) {
+          controller.clearSelectAll();
+        }
+        if (
+          e.altKey &&
+          controller.currentSelectedCell &&
+          (controller.currentSelectedCell.x === this.x ||
+            controller.currentSelectedCell.y === this.y)
+        ) {
+          const tx = [controller.currentSelectedCell.x, this.x];
+          const ty = [controller.currentSelectedCell.y, this.y];
+          let minx = Math.min(...tx);
+          let maxx = Math.max(...tx);
+          let miny = Math.min(...ty);
+          let maxy = Math.max(...ty);
+          if (minx === 0 && maxx === 0) {
             controller.cells.forEach(cell => {
-              if (callback(cell)) {
+              if (cell.y <= maxy && cell.y >= miny) {
                 cell.setSelect();
               }
             });
-            this.setSelect();
-            dataInput.value = "";
+          } else {
+            controller.cells.forEach(cell => {
+              if (cell.x <= maxx && cell.x >= minx) {
+                cell.setSelect();
+              }
+            });
           }
+          this.setSelect();
+          dataInput.value = "";
         } else {
           controller.cells.forEach(cell => {
             if (callback(cell)) {
-              cell.clearSelect();
+              cell.setSelect();
             }
           });
+          this.setSelect();
+          dataInput.value = "";
         }
-      };
+      } else {
+        controller.cells.forEach(cell => {
+          if (callback(cell)) {
+            cell.clearSelect();
+          }
+        });
+      }
+    };
+    element.addEventListener("click", e => {
       if (this.y === 0 && this.x > 0) {
-        select(cell => cell.y >= 0 && cell.x === this.x);
+        this.select(e, cell => cell.y >= 0 && cell.x === this.x);
       } else if (this.x === 0 && this.y > 0) {
-        select(cell => cell.x >= 0 && cell.y === this.y);
+        this.select(e, cell => cell.x >= 0 && cell.y === this.y);
       } else {
         if (!this.selected) {
           if (!e.shiftKey && !e.altKey) {
@@ -142,14 +143,24 @@ function CsvTable(env, tableId, inputSelctor) {
       this.selected = false;
     };
     this.moveFrom = (x, y, width, height) => {
+      const dx = controller.sumLeft(this.x + x) - controller.sumLeft(this.x);
+      const dy = controller.sumTop(this.y + y) - controller.sumTop(this.y);
       this.x += x;
       this.y += y;
       this.element.setAttribute("data-x", this.x);
       this.element.setAttribute("data-y", this.y);
       const left = parseInt(this.element.style.left);
       const top = parseInt(this.element.style.top);
-      this.element.style.setProperty("left", `${left + width}px`);
-      this.element.style.setProperty("top", `${top + height}px`);
+      this.element.style.setProperty("left", `${left + dx}px`);
+      this.element.style.setProperty("top", `${top + dy}px`);
+      this.element.style.setProperty(
+        "width",
+        `${controller.rowWidth[this.x]}px`
+      );
+      this.element.style.setProperty(
+        "height",
+        `${controller.colHeight[this.y]}px`
+      );
     };
     this.setText = text => {
       this.element.querySelector("div").innerText = text;
@@ -176,7 +187,7 @@ function CsvTable(env, tableId, inputSelctor) {
       pre.setAttribute("class", "csv-table-code");
       const code = document.createElement("code");
       const div = document.createElement("div");
-      div.style = "margin-left: 10px";
+      div.style = `margin-left: 10px; color: ${cell.color};`;
       const newContent = document.createTextNode("");
       div.appendChild(newContent);
       code.appendChild(div);
@@ -213,8 +224,12 @@ function CsvTable(env, tableId, inputSelctor) {
       marker.style.setProperty("height", `${this.colHeight[cell.y] - 2}px`);
     };
     this.resize = () => {
-      const rowArray = new Array(this.maxRow).fill(0);
-      const colArray = new Array(this.maxCol).fill(0);
+      const rowArray = new Array(
+        Math.max(this.maxRow, this.rowWidth ? this.rowWidth.length : 0)
+      ).fill(0);
+      const colArray = new Array(
+        Math.max(this.maxCol, this.colHeight ? this.colHeight.length : 0)
+      ).fill(0);
       this.rowWidth = rowArray.map(v => this.defaultCellSize.width);
       this.colHeight = colArray.map(v => this.defaultCellSize.height);
       this.rowSize.forEach((v, i) => {
@@ -236,7 +251,7 @@ function CsvTable(env, tableId, inputSelctor) {
       [...this.rowWidth].slice(0, x).reduce((a, v, i) => {
         return a + v;
       }, 0);
-    this.insertRowLine = () => {
+    this.insertColLine = () => {
       const selectedCell = this.currentSelectedCell;
       const colCells = this.cells.filter(cell => {
         return cell.y === selectedCell.y;
@@ -248,13 +263,16 @@ function CsvTable(env, tableId, inputSelctor) {
         cell.element.parentElement.insertBefore(element, cell.element);
         const newCell = new TableCell(element, controller);
         newCell.backgroundColor = cell.backgroundColor;
+        newCell.color = cell.color;
         newCell.selected = true;
+        // console.log(newCell.getText());
+        // newCell.setText("");
         newCells.push(newCell);
       });
 
       const y = selectedCell.y;
-      const height = this.colHeight[y];
-      this.colHeight.splice(y, 0, this.colHeight[y]);
+      const height = this.colHeight[y + 1];
+      this.colHeight.push(this.colHeight[this.colHeight.length - 1]);
       this.maxCol++;
       this.cells.forEach(cell => {
         if (cell.y >= y) {
@@ -266,9 +284,10 @@ function CsvTable(env, tableId, inputSelctor) {
       tableLeft.style.height = `${parseInt(tableLeft.style.height) + height}px`;
 
       this.cells = [...this.cells, ...newCells];
+      this.cells.forEach(cell => console.log(cell.x, cell.y, cell.getText()));
       this.resetIndexNumber();
     };
-    this.insertColLine = () => {
+    this.insertRowLine = () => {
       const selectedCell = this.currentSelectedCell;
       const rowCells = this.cells.filter(cell => {
         return cell.x === selectedCell.x;
@@ -280,13 +299,16 @@ function CsvTable(env, tableId, inputSelctor) {
         cell.element.parentElement.insertBefore(element, cell.element);
         const newCell = new TableCell(element, controller);
         newCell.backgroundColor = cell.backgroundColor;
+        newCell.color = cell.color;
         newCell.selected = true;
+        // console.log(newCell.getText());
+        // newCell.setText("");
         newCells.push(newCell);
       });
 
       const x = selectedCell.x;
-      const width = this.rowWidth[x];
-      this.rowWidth.splice(x, 0, this.rowWidth[x]);
+      const width = this.rowWidth[x + 1];
+      this.rowWidth.push(this.rowWidth[this.rowWidth.length - 1]);
       this.maxRow++;
       this.cells.forEach(cell => {
         if (cell.x >= x) {
@@ -298,6 +320,7 @@ function CsvTable(env, tableId, inputSelctor) {
       tableTop.style.width = `${parseInt(tableTop.style.width) + width}px`;
 
       this.cells = [...this.cells, ...newCells];
+      this.cells.forEach(cell => console.log(cell.x, cell.y, cell.getText()));
       this.resetIndexNumber();
     };
     this.resetIndexNumber = () => {
@@ -311,26 +334,113 @@ function CsvTable(env, tableId, inputSelctor) {
         .forEach((cell, i) => {
           cell.setText(`${i}`);
         });
+      this.cells
+        .filter(cell => cell.y === 0)
+        .sort((a, b) => {
+          if (a.x < b.x) return -1;
+          if (a.x > b.x) return 1;
+          return 0;
+        })
+        .forEach((cell, i) => {
+          cell.setText(`${i}`);
+        });
     };
     this.selectCellWithPosition = (x, y) => {
       const cell = this.cells.find(cell => cell.x === x && cell.y === y);
       if (cell) {
         this.setMarker(cell);
         this.currentSelectedCell = cell;
-        this.setInput(cell);
       }
       return cell;
     };
     this.setInput = cell => {
       dataInput.value = cell.element.innerText.replace(/\n/g, "\\n");
     };
+    this.delete = () => {
+      const selectedCell = this.currentSelectedCell;
+      const selectLine = (dx, dy) => {
+        this.resetIndexNumber();
+        this.resize();
+        this.clearSelectAll();
+        const selectCell = (x, y) => {
+          const targetCell = this.cells.find(
+            cell => cell.x === x && cell.y === y
+          );
+          if (targetCell) {
+            targetCell.element.dispatchEvent(
+              new MouseEvent("click", {
+                view: window,
+                shiftKey: true,
+                altKey: true,
+              })
+            );
+            return true;
+          }
+          return false;
+        };
+        if (!selectCell(selectedCell.x, selectedCell.y)) {
+          selectCell(selectedCell.x + dx, selectedCell.y + dy);
+        }
+      };
+      if (selectedCell && (selectedCell.y > 0 || selectedCell.x > 0)) {
+        const removeElements = [];
+        if (selectedCell.x === 0) {
+          if (this.maxCol > 2) {
+            const cells = this.cells
+              .filter(cell => {
+                if (cell.y === selectedCell.y) {
+                  removeElements.push(cell.element);
+                  return false;
+                }
+                return true;
+              })
+              .map(cell => {
+                if (cell.y > selectedCell.y) {
+                  const height = this.colHeight[selectedCell.y];
+                  cell.moveFrom(0, -1, 0, -height);
+                }
+                return cell;
+              });
+            this.cells = cells;
+            this.maxCol--;
+            selectLine(0, -1);
+          }
+        } else if (selectedCell.y === 0) {
+          if (this.maxRow > 2) {
+            const cells = this.cells
+              .filter(cell => {
+                if (cell.x === selectedCell.x) {
+                  removeElements.push(cell.element);
+                  return false;
+                }
+                return true;
+              })
+              .map(cell => {
+                if (cell.x > selectedCell.x) {
+                  const width = this.rowWidth[selectedCell.x];
+                  cell.moveFrom(-1, 0, -width, 0);
+                }
+                return cell;
+              });
+            this.cells = cells;
+            this.maxRow--;
+            selectLine(-1, 0);
+          }
+        } else {
+          selectedCell.setText("");
+          dataInput.value = "";
+        }
+        removeElements.forEach(el => el.remove());
+      }
+    };
     this.save = url => {
+      const csv = this.cells.map(cell => ({
+        x: cell.x,
+        y: cell.y,
+        value: cell.getText(),
+      }));
       postRequest(`${url}/${dataName}`, {
-        csv: this.cells.map(cell => ({
-          x: cell.x,
-          y: cell.y,
-          value: cell.getText(),
-        })),
+        csv,
       });
     };
   }
@@ -392,15 +502,24 @@ function CsvTable(env, tableId, inputSelctor) {
     if (e.target == document.querySelector("body")) {
       if (e.key === "Enter") {
         if (controller.currentSelectedCell) {
-          if (controller.currentSelectedCell.x === 0) {
+          if (
+            controller.currentSelectedCell.x === 0 &&
+            controller.currentSelectedCell.y > 0
+          ) {
             const { x, y } = controller.currentSelectedCell;
-            controller.insertRowLine(controller.currentSelectedCell.y);
+            controller.insertColLine(controller.currentSelectedCell.y);
             controller.selectCellWithPosition(x, y);
-          } else if (controller.currentSelectedCell.y === 0) {
+          } else if (
+            controller.currentSelectedCell.x > 0 &&
+            controller.currentSelectedCell.y === 0
+          ) {
             const { x, y } = controller.currentSelectedCell;
-            controller.insertColLine(controller.currentSelectedCell.x);
+            controller.insertRowLine(controller.currentSelectedCell.x);
             controller.selectCellWithPosition(x, y);
-          } else {
+          } else if (
+            controller.currentSelectedCell.x > 0 &&
+            controller.currentSelectedCell.y > 0
+          ) {
             dataInput.focus();
           }
         }
@@ -416,6 +535,12 @@ function CsvTable(env, tableId, inputSelctor) {
       }
       if (e.key === "ArrowRight") {
         moveSelect(e, 1, 0);
+      }
+      if (e.key === "Backspace") {
+        controller.delete();
+      }
+      if (e.key === "Delete") {
+        controller.delete();
       }
     }
   });

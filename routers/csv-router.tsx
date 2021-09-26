@@ -54,16 +54,21 @@ export function CsvRouter({ search_dir }) {
     });
     req.body.csv.forEach(cell => {
       if (data.csv.length <= cell.y) {
-        data.csv = [...data.csv, new Array(cell.y - data.csv.length).fill([])];
+        data.csv = [
+          ...data.csv,
+          ...new Array(cell.y - data.csv.length + 1).fill([]),
+        ];
       }
       if (data.csv[cell.y].length <= cell.x) {
         data.csv[cell.y] = [
           ...data.csv[cell.y],
-          new Array(cell.x - data.csv[cell.y].length).fill({ value: "" }),
+          ...new Array(cell.x - data.csv[cell.y].length + 1).fill({
+            value: "",
+          }),
         ];
       }
       try {
-        data.csv[cell.y][cell.x].value = cell.value;
+        data.csv[cell.y][cell.x] = { value: cell.value };
       } catch {}
     });
     {
