@@ -15,6 +15,7 @@ export function factory(tag, props, ...children) {
     ? `${Object.entries(props)
         .map(([k, v]) => {
           if (k === "className") return ["class", v];
+          if (k === "onClick") return ["onClick", v];
           const _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
           if (_k) {
             return [_k, v];

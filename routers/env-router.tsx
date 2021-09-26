@@ -53,23 +53,53 @@ export function EnvEditRouter({ search_dir }) {
       });
     });
 
+    interface Cell {
+      value: string;
+      color?: string;
+      backgroundColor?: string;
+    }
+
     const csvArray = [
       [
         { value: "" },
-        ...envFiles.map(v => ({
-          value: v,
-        })),
+        ...envFiles.map(
+          v =>
+            ({
+              value: v,
+            } as Cell)
+        ),
       ],
       ...Object.entries(envData).map(env => {
-        return [{ value: env[0] }, ...(env[1] as Array<{}>)];
+        return [{ value: env[0] }, ...(env[1] as Array<Cell>)];
       }),
     ];
     const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
     const maxCol = csvArray.length;
     const header = new Array(maxRow).fill(0).map((v, i) => ({
       value: `${i + 1}`,
+      color: "white",
+      backgroundColor: "gray",
     }));
-    const csv = [header, ...csvArray].map((v, i) => [{ value: `${i}` }, ...v]);
+    const csv = [header, ...csvArray].map((v, i) => [
+      { value: `${i}`, color: "white", backgroundColor: "gray" },
+      ...v,
+    ]);
+    csv.forEach((col, y) => {
+      if (y <= 0) return;
+      if (y <= 1) {
+        col.forEach((cell, x) => {
+          if (x > 0) {
+            cell.backgroundColor = "lightgray";
+          }
+        });
+      } else {
+        col.forEach((cell, x) => {
+          if (x > 0 && x <= 1) {
+            cell.backgroundColor = "lightgray";
+          }
+        });
+      }
+    });
     return {
       csv,
       ...{
@@ -103,7 +133,7 @@ export function EnvEditRouter({ search_dir }) {
     const container = (
       <Container title="Top">
         <div className="csv-control-panel">
-          <input id="csv-data-input" className="" type="text" />
+          <input className="csv-data-input" type="text" />
         </div>
         <CsvTable
           id="csv-table"
@@ -163,8 +193,14 @@ export function EnvViewRouter({ search_dir }) {
     const maxCol = csvArray.length;
     const header = new Array(maxRow).fill(0).map((v, i) => ({
       value: `${i + 1}`,
+      color: "white",
+      backgroundColor: "gray",
     }));
-    const csv = [header, ...csvArray].map((v, i) => [{ value: `${i}` }, ...v]);
+    const csv = [header, ...csvArray].map((v, i) => [
+      { value: `${i}`, color: "white", backgroundColor: "gray" },
+      ,
+      ...v,
+    ]);
     return {
       csv,
       ...{
@@ -179,13 +215,12 @@ export function EnvViewRouter({ search_dir }) {
 
   router.get("/*", (req, res) => {
     const data = envParser(req, {
-      fixedPoint: { x: 1, y: 1 },
       rowSize,
     });
     const container = (
       <Container title="Top">
         <div className="csv-control-panel">
-          <input id="csv-data-input" className="" type="text" />
+          <input className="csv-data-input" type="text" />
         </div>
         <CsvTable
           id="csv-table"
@@ -205,7 +240,6 @@ export function EnvViewRouter({ search_dir }) {
 
   router.post("/*", (req, res) => {
     const data = envParser(req, {
-      fixedPoint: { x: 1, y: 1 },
       rowSize,
     });
     res.send(

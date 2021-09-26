@@ -40,10 +40,6 @@ section {
   height: 24px;
 }
 
-.csv-control-panel input {
-  width: 500px;
-}
-
 .table-marker {
   visibility: hidden;
   border: solid 2px blue;
@@ -53,4 +49,15 @@ section {
 .csv-table-code {
   margin: 0px;
   padding: 0px;
+}
+
+.csv-save-button {
+  font-size: 0.7em;
+  padding: 0px;
+  margin-right: 10px;
+  width: 80px;
+}
+
+.csv-data-input {
+  width: 500px;
 }

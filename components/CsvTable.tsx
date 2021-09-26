@@ -36,6 +36,7 @@ export const CsvTable = ({
   top = 50,
   left = 0,
   rowSize = [],
+  colSize = [],
 }) => {
   const csvArray = data;
   const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
@@ -47,6 +48,11 @@ export const CsvTable = ({
   rowSize.forEach((v, i) => {
     if (v > 0) {
       rowWidth[i] = v;
+    }
+  });
+  colSize.forEach((v, i) => {
+    if (v > 0) {
+      colHeight[i] = v;
     }
   });
   const sumTop = y =>
@@ -62,6 +68,8 @@ export const CsvTable = ({
   const DataCell = (cell, props) => {
     const top = sumTop(cell.y);
     const left = sumLeft(cell.x);
+    const { color } = props;
+    delete props.color;
     return (
       <TableCell
         className="csv-table-cell"
@@ -78,7 +86,9 @@ export const CsvTable = ({
         {...props}>
         <pre className="csv-table-code">
           <code>
-            <div style={{ marginLeft: 10 }}>{escapeHtml(cell.value)}</div>
+            <div style={{ marginLeft: 10, color }}>
+              {escapeHtml(cell.value)}
+            </div>
           </code>
         </pre>
       </TableCell>
@@ -120,7 +130,12 @@ export const CsvTable = ({
               return { ...(v[x] || { value: "" }), x, y: y, ox: 0, oy: 0 };
             })
             .filter(cell => cell.x <= fixedPoint.x && cell.y <= fixedPoint.y)
-            .map(cell => DataCell(cell, { backgroundColor: "lightgray" }))
+            .map(cell =>
+              DataCell(cell, {
+                backgroundColor: cell.backgroundColor || "white",
+                color: cell.color || "black",
+              })
+            )
         )}
       </TableCell>
       <TableCell
@@ -147,7 +162,8 @@ export const CsvTable = ({
             .map(cell => ({ ...cell }))
             .map(cell =>
               DataCell(cell, {
-                backgroundColor: "lightgray",
+                backgroundColor: cell.backgroundColor || "white",
+                color: cell.color || "black",
                 pointerEvents: "auto",
               })
             )
@@ -173,7 +189,12 @@ export const CsvTable = ({
               };
             })
             .filter(cell => cell.x <= fixedPoint.x && cell.y > fixedPoint.y)
-            .map(cell => DataCell(cell, { backgroundColor: "lightgray" }))
+            .map(cell =>
+              DataCell(cell, {
+                backgroundColor: cell.backgroundColor || "white",
+                color: cell.color || "black",
+              })
+            )
         )}
       </TableCell>
       <TableCell
@@ -194,7 +215,12 @@ export const CsvTable = ({
               };
             })
             .filter(cell => cell.x > fixedPoint.x && cell.y > fixedPoint.y)
-            .map(cell => DataCell(cell, { backgroundColor: "white" }))
+            .map(cell =>
+              DataCell(cell, {
+                backgroundColor: cell.backgroundColor || "white",
+                color: cell.color || "black",
+              })
+            )
         )}
       </TableCell>
     </div>

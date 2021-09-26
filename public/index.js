@@ -11,11 +11,13 @@ function postRequest(url, body, callback) {
   XHR.send(JSON.stringify(body));
 }
 
-function CsvTable(env, tableId, inputId) {
-  const dataInput = document.getElementById(inputId);
+function CsvTable(env, tableId, inputSelctor) {
+  const dataInput = document.querySelector(inputSelctor);
   dataInput.addEventListener("change", e => {
     if (controller.currentSelectedCell) {
-      controller.currentSelectedCell.setText(e.srcElement.value);
+      controller.currentSelectedCell.setText(
+        e.srcElement.value.replace(/\\n/g, "\n")
+      );
     }
   });
 
@@ -151,6 +153,9 @@ function CsvTable(env, tableId, inputId) {
     };
     this.setText = text => {
       this.element.querySelector("div").innerText = text;
+    };
+    this.getText = () => {
+      return this.element.querySelector("div").innerText;
     };
   }
 
@@ -319,12 +324,21 @@ function CsvTable(env, tableId, inputId) {
     this.setInput = cell => {
       dataInput.value = cell.element.innerText.replace(/\n/g, "\\n");
     };
+    this.save = url => {
+      postRequest(`${url}/${dataName}`, {
+        csv: this.cells.map(cell => ({
+          x: cell.x,
+          y: cell.y,
+          value: cell.getText(),
+        })),
+      });
+    };
   }
 
   const controller = new CellController(tableCell);
 
   postRequest(
-    `/${env}/${dataName}`,
+    `${env}/${dataName}`,
     { rowSize: true, defaultCellSize: true, maxRow: true, maxCol: true },
     res => {
       controller.rowSize = res.rowSize;
@@ -349,50 +363,62 @@ function CsvTable(env, tableId, inputId) {
     ajustTableSize();
   });
 
-  window.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      if (controller.currentSelectedCell) {
-        if (controller.currentSelectedCell.x === 0) {
-          const { x, y } = controller.currentSelectedCell;
-          controller.insertRowLine(controller.currentSelectedCell.y);
-          controller.selectCellWithPosition(x, y);
-        } else if (controller.currentSelectedCell.y === 0) {
-          const { x, y } = controller.currentSelectedCell;
-          controller.insertColLine(controller.currentSelectedCell.x);
-          controller.selectCellWithPosition(x, y);
-        }
+  const moveSelect = (e, dx, dy) => {
+    if (controller.currentSelectedCell) {
+      const cell = controller.currentSelectedCell;
+      const _cell = controller.selectCellWithPosition(cell.x + dx, cell.y + dy);
+      if (!e.shiftKey && !e.altKey) {
+        if (_cell) controller.clearSelectAll();
       }
-    }
-    const moveSelect = (e, dx, dy) => {
-      if (controller.currentSelectedCell) {
-        const cell = controller.currentSelectedCell;
-        if (!e.shiftKey && !e.altKey) {
-          controller.clearSelectAll();
-        }
-        const _cell = controller.selectCellWithPosition(
-          cell.x + dx,
-          cell.y + dy
+      if (_cell && _cell.element) {
+        _cell.element.dispatchEvent(
+          new MouseEvent("click", {
+            view: window,
+            shiftKey: e.shiftKey,
+            altKey: e.altKey,
+          })
         );
-        if (_cell) {
-          _cell.setSelect();
-        } else {
-          controller.selectCellWithPosition(cell.x, cell.y);
-          cell.setSelect();
+      }
+    }
+    e.preventDefault();
+  };
+
+  window.addEventListener("keydown", e => {
+    if (e.target == dataInput) {
+      if (e.key === "Enter") {
+        dataInput.blur();
+      }
+    }
+    if (e.target == document.querySelector("body")) {
+      if (e.key === "Enter") {
+        if (controller.currentSelectedCell) {
+          if (controller.currentSelectedCell.x === 0) {
+            const { x, y } = controller.currentSelectedCell;
+            controller.insertRowLine(controller.currentSelectedCell.y);
+            controller.selectCellWithPosition(x, y);
+          } else if (controller.currentSelectedCell.y === 0) {
+            const { x, y } = controller.currentSelectedCell;
+            controller.insertColLine(controller.currentSelectedCell.x);
+            controller.selectCellWithPosition(x, y);
+          } else {
+            dataInput.focus();
+          }
         }
       }
-      e.preventDefault();
-    };
-    if (e.key === "ArrowDown") {
-      moveSelect(e, 0, 1);
-    }
-    if (e.key === "ArrowUp") {
-      moveSelect(e, 0, -1);
-    }
-    if (e.key === "ArrowLeft") {
-      moveSelect(e, -1, 0);
-    }
-    if (e.key === "ArrowRight") {
-      moveSelect(e, 1, 0);
+      if (e.key === "ArrowDown") {
+        moveSelect(e, 0, 1);
+      }
+      if (e.key === "ArrowUp") {
+        moveSelect(e, 0, -1);
+      }
+      if (e.key === "ArrowLeft") {
+        moveSelect(e, -1, 0);
+      }
+      if (e.key === "ArrowRight") {
+        moveSelect(e, 1, 0);
+      }
     }
   });
+
+  return controller;
 }
