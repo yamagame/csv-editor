@@ -1,4 +1,4 @@
-function post(url, body, callback) {
+function postRequest(url, body, callback) {
   const XHR = new XMLHttpRequest();
   XHR.addEventListener("load", function (event) {
     callback(JSON.parse(XHR.response));
@@ -11,8 +11,13 @@ function post(url, body, callback) {
   XHR.send(JSON.stringify(body));
 }
 
-function CsvTable(tableId) {
-  const dataInput = document.getElementById("csv-data-input");
+function CsvTable(env, tableId, inputId) {
+  const dataInput = document.getElementById(inputId);
+  dataInput.addEventListener("change", e => {
+    if (controller.currentSelectedCell) {
+      controller.currentSelectedCell.setText(e.srcElement.value);
+    }
+  });
 
   const element = document.getElementById(tableId);
   const dataName = element.getAttribute("data-name");
@@ -113,10 +118,10 @@ function CsvTable(tableId) {
               }
             });
             this.setSelect();
-            dataInput.value = element.innerText.replace(/\n/g, "\\n");
+            controller.setInput(this);
           } else {
             this.setSelect();
-            dataInput.value = element.innerText.replace(/\n/g, "\\n");
+            controller.setInput(this);
           }
         } else {
           this.clearSelect();
@@ -304,15 +309,22 @@ function CsvTable(tableId) {
     };
     this.selectCellWithPosition = (x, y) => {
       const cell = this.cells.find(cell => cell.x === x && cell.y === y);
-      this.currentSelectedCell = cell;
-      this.setMarker(cell);
+      if (cell) {
+        this.setMarker(cell);
+        this.currentSelectedCell = cell;
+        this.setInput(cell);
+      }
+      return cell;
+    };
+    this.setInput = cell => {
+      dataInput.value = cell.element.innerText.replace(/\n/g, "\\n");
     };
   }
 
   const controller = new CellController(tableCell);
 
-  post(
-    `/edit/env/${dataName}`,
+  postRequest(
+    `/${env}/${dataName}`,
     { rowSize: true, defaultCellSize: true, maxRow: true, maxCol: true },
     res => {
       controller.rowSize = res.rowSize;
@@ -351,7 +363,36 @@ function CsvTable(tableId) {
         }
       }
     }
+    const moveSelect = (e, dx, dy) => {
+      if (controller.currentSelectedCell) {
+        const cell = controller.currentSelectedCell;
+        if (!e.shiftKey && !e.altKey) {
+          controller.clearSelectAll();
+        }
+        const _cell = controller.selectCellWithPosition(
+          cell.x + dx,
+          cell.y + dy
+        );
+        if (_cell) {
+          _cell.setSelect();
+        } else {
+          controller.selectCellWithPosition(cell.x, cell.y);
+          cell.setSelect();
+        }
+      }
+      e.preventDefault();
+    };
+    if (e.key === "ArrowDown") {
+      moveSelect(e, 0, 1);
+    }
+    if (e.key === "ArrowUp") {
+      moveSelect(e, 0, -1);
+    }
+    if (e.key === "ArrowLeft") {
+      moveSelect(e, -1, 0);
+    }
+    if (e.key === "ArrowRight") {
+      moveSelect(e, 1, 0);
+    }
   });
 }
-
-const csvtable = new CsvTable("csv-table");
