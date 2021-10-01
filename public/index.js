@@ -34,8 +34,6 @@ function CsvTable(env, tableId, inputSelctor) {
     this.element = element;
     this.x = parseInt(element.getAttribute("data-x"), 10);
     this.y = parseInt(element.getAttribute("data-y"), 10);
-    this.width = parseInt(element.getAttribute("data-width"), 10);
-    this.height = parseInt(element.getAttribute("data-height"), 10);
     this.backgroundColor = element.style["background-color"];
     this.color = element.querySelector("div").style["color"];
     this.selected = false;
@@ -131,6 +129,7 @@ function CsvTable(env, tableId, inputSelctor) {
         }
       }
       controller.showMarker();
+      e.preventDefault();
     });
     this.setSelect = () => {
       this.element.style.setProperty("background-color", "pink");
@@ -141,6 +140,12 @@ function CsvTable(env, tableId, inputSelctor) {
     this.clearSelect = () => {
       this.element.style.setProperty("background-color", this.backgroundColor);
       this.selected = false;
+    };
+    this.getWidth = () => {
+      return controller.rowWidth[this.x];
+    };
+    this.getHeight = () => {
+      return controller.colHeight[this.y];
     };
     this.moveFrom = (x, y, width, height) => {
       const dx = controller.sumLeft(this.x + x) - controller.sumLeft(this.x);
@@ -155,15 +160,38 @@ function CsvTable(env, tableId, inputSelctor) {
       this.element.style.setProperty("top", `${top + dy}px`);
       this.element.style.setProperty(
         "width",
-        `${controller.rowWidth[this.x]}px`
+        `${controller.rowWidth[this.x] - 1}px`
       );
       this.element.style.setProperty(
         "height",
-        `${controller.colHeight[this.y]}px`
+        `${controller.colHeight[this.y] - 1}px`
       );
     };
+    this.clickButton = e => {
+      console.log(`click ${this.getText()}`);
+      e.stopPropagation();
+    };
     this.setText = text => {
-      this.element.querySelector("div").innerText = text;
+      const div = this.element.querySelector("div");
+      div.innerText = text;
+      const commonStyle = () => {
+        let s = `position: absolute;`;
+        s += `top: 1px;`;
+        return s;
+      };
+      if (text.indexOf("@") === 0) {
+        div.classList.add("csv-cell-button");
+        div.style = `${commonStyle()} width: ${
+          this.getWidth() - 32
+        }px; height: ${this.getHeight() - 5}px; margin-left: 10px; color: ${
+          this.color
+        }; margin-right: 10px;`;
+        div.addEventListener("click", this.clickButton);
+      } else {
+        div.classList.remove("csv-cell-button");
+        div.style = `${commonStyle()} margin-left: 10px; color: ${this.color};`;
+        div.removeEventListener("click", this.clickButton);
+      }
     };
     this.getText = () => {
       return this.element.querySelector("div").innerText;
@@ -197,8 +225,6 @@ function CsvTable(env, tableId, inputSelctor) {
       element.setAttribute("class", "csv-table-cell");
       element.setAttribute("data-x", cell.x);
       element.setAttribute("data-y", cell.y);
-      element.setAttribute("data-width", cell.element.style.width);
-      element.setAttribute("data-height", cell.element.style.height);
       return element;
     }
 
@@ -220,8 +246,8 @@ function CsvTable(env, tableId, inputSelctor) {
     this.setMarker = cell => {
       marker.style.setProperty("top", `${this.sumTop(cell.y)}px`);
       marker.style.setProperty("left", `${this.sumLeft(cell.x)}px`);
-      marker.style.setProperty("width", `${this.rowWidth[cell.x] - 2}px`);
-      marker.style.setProperty("height", `${this.colHeight[cell.y] - 2}px`);
+      marker.style.setProperty("width", `${this.rowWidth[cell.x] - 3}px`);
+      marker.style.setProperty("height", `${this.colHeight[cell.y] - 3}px`);
     };
     this.resize = () => {
       const rowArray = new Array(
@@ -456,6 +482,7 @@ function CsvTable(env, tableId, inputSelctor) {
       controller.maxRow = res.maxRow;
       controller.maxCol = res.maxCol;
       controller.resize();
+      controller.cells.forEach(cell => cell.setText(cell.getText()));
     }
   );
 
@@ -497,9 +524,20 @@ function CsvTable(env, tableId, inputSelctor) {
     if (e.target == dataInput) {
       if (e.key === "Enter") {
         dataInput.blur();
+        moveSelect(e, 0, 1);
       }
     }
     if (e.target == document.querySelector("body")) {
+      if (e.key === " ") {
+        if (controller.currentSelectedCell) {
+          if (controller.currentSelectedCell.getText() !== "") {
+            controller.currentSelectedCell.setText("");
+          } else {
+            controller.currentSelectedCell.setText("◯");
+          }
+          moveSelect(e, 0, 1);
+        }
+      }
       if (e.key === "Enter") {
         if (controller.currentSelectedCell) {
           if (

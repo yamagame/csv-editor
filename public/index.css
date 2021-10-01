@@ -61,3 +61,16 @@ section {
 .csv-data-input {
   width: 500px;
 }
+
+.csv-cell-button {
+  display: inline-block;
+  background-color: lightgray;
+  border: solid 1px gray;
+  padding: 0 5px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.csv-cell-button:active {
+  background-color: skyblue;
+}
