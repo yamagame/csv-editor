@@ -2,7 +2,7 @@ import { factory, Fragment } from "libs/preact";
 import { escapeHtml } from "libs/utils";
 
 export const TableCell = (props: any) => {
-  const { children, className, data } = props;
+  const { children, className, data, marker, name } = props;
   delete props.children;
   delete props.className;
   delete props.data;
@@ -20,9 +20,20 @@ export const TableCell = (props: any) => {
   return (
     <div
       className={className}
+      name={name}
       style={deleteUndef({ position: "absolute", ...props })}
       {...dataProps}>
       {children}
+      {marker && (
+        <TableCell
+          className="table-marker"
+          name={className}
+          zIndex={props.zIndex || 0}
+          width={100}
+          height={24}
+          left={0}
+          top={0}></TableCell>
+      )}
     </div>
   );
 };
@@ -110,16 +121,10 @@ export const CsvTable = ({
       }}
       dataName={dataname}>
       <TableCell
-        className="table-marker"
-        zIndex={50}
-        width={100}
-        height={24}
-        left={0}
-        top={0}></TableCell>
-      <TableCell
         className="table-top-left"
         position="sticky"
         zIndex={30}
+        marker
         width={sumLeft(fixedPoint.x + 1)}
         height={sumTop(fixedPoint.y + 1)}
         left={0}
@@ -143,6 +148,7 @@ export const CsvTable = ({
         position="sticky"
         pointerEvents="none"
         zIndex={10}
+        marker
         width={sumLeft(maxRow) + 2}
         height={sumTop(fixedPoint.y + 1)}
         left={0}
@@ -173,6 +179,7 @@ export const CsvTable = ({
         className="table-left"
         position="sticky"
         zIndex={20}
+        marker
         width={sumLeft(fixedPoint.x + 1)}
         height={sumTop(maxCol) - topOffset + 1}
         left={0}
@@ -198,7 +205,9 @@ export const CsvTable = ({
         )}
       </TableCell>
       <TableCell
+        className="table-right-bottom"
         zIndex={0}
+        marker
         width={sumLeft(maxRow) + 2}
         height={sumTop(maxCol) + 1}
         left={0}

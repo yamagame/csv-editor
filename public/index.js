@@ -27,7 +27,9 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const tableCell = element.querySelectorAll(".csv-table-cell");
   const tableTop = element.querySelector(".table-top");
   const tableLeft = element.querySelector(".table-left");
-  const marker = element.querySelector(".table-marker");
+  const tableTopLeft = element.querySelector(".table-top-left");
+  const tableRightBottom = element.querySelector(".table-right-bottom");
+  const markerAll = element.querySelectorAll(".table-marker");
   const borderThick = 1;
 
   function TableCell(element, controller) {
@@ -238,16 +240,41 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
     this.showMarker = () => {
       if (this.cells.some(cell => cell.selected) && this.currentSelectedCell) {
-        marker.style.setProperty("visibility", "visible");
+        const { element } = this.currentSelectedCell;
+        const table = {
+          "table-top": tableTop,
+          "table-left": tableLeft,
+          "table-top-left": tableTopLeft,
+          "table-right-bottom": tableRightBottom,
+        };
+        markerAll.forEach(marker => {
+          const name = marker.getAttribute("name");
+          console.log(name);
+          if (table[name].contains(element)) {
+            marker.style.setProperty("visibility", "visible");
+          } else {
+            marker.style.setProperty("visibility", "hidden");
+          }
+        });
       } else {
-        marker.style.setProperty("visibility", "hidden");
+        markerAll.forEach(marker => {
+          marker.style.setProperty("visibility", "hidden");
+        });
       }
     };
     this.setMarker = cell => {
-      marker.style.setProperty("top", `${this.sumTop(cell.y)}px`);
-      marker.style.setProperty("left", `${this.sumLeft(cell.x)}px`);
-      marker.style.setProperty("width", `${this.rowWidth[cell.x] - 3}px`);
-      marker.style.setProperty("height", `${this.colHeight[cell.y] - 3}px`);
+      markerAll.forEach(marker => {
+        marker.style.setProperty("top", cell.element.style.top);
+      });
+      markerAll.forEach(marker => {
+        marker.style.setProperty("left", cell.element.style.left);
+      });
+      markerAll.forEach(marker =>
+        marker.style.setProperty("width", `${this.rowWidth[cell.x] - 3}px`)
+      );
+      markerAll.forEach(marker =>
+        marker.style.setProperty("height", `${this.colHeight[cell.y] - 3}px`)
+      );
     };
     this.resize = () => {
       const rowArray = new Array(
@@ -503,7 +530,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (!e.shiftKey && !e.altKey) {
         if (_cell) controller.clearSelectAll();
       }
-      if (_cell && _cell.element) {
+      if (_cell && _cell.element && !_cell.selected) {
         _cell.element.dispatchEvent(
           new MouseEvent("click", {
             view: window,
