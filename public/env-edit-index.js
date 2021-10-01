@@ -1,1 +1,11 @@
-const controlelr = CsvTable("/env/edit", "csv-table", ".csv-data-input");
+const controlelr = CsvTable(
+  //baseURL
+  "/env/edit",
+  //table ID
+  "csv-table",
+  //input selector
+  ".csv-data-input",
+  cell => {
+    postRequest(`/action/${dataName}`, { text: cell.getText() });
+  }
+);

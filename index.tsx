@@ -1,7 +1,6 @@
-import { factory, Fragment, render } from "libs/preact";
+import { factory, render } from "libs/preact";
 import path = require("path");
 import express from "express";
-import { CsvTable } from "components/CsvTable";
 import { readDir } from "libs/utils";
 import { Container } from "components/Container";
 import { EnvEditRouter, EnvViewRouter } from "routers/env-router";
@@ -21,6 +20,11 @@ app.use("/env/edit", EnvEditRouter({ search_dir: TARGET_DIR }));
 app.use("/env/view", EnvViewRouter({ search_dir: TARGET_DIR }));
 
 app.use("/csv", CsvRouter({ search_dir: TARGET_DIR }));
+
+app.use("/action", (req, res) => {
+  console.log(req.body);
+  res.sendStatus(200);
+});
 
 app.get("/", function (req, res) {
   const container = (

@@ -11,7 +11,7 @@ function postRequest(url, body, callback) {
   XHR.send(JSON.stringify(body));
 }
 
-function CsvTable(env, tableId, inputSelctor) {
+function CsvTable(env, tableId, inputSelctor, onclick) {
   const dataInput = document.querySelector(inputSelctor);
   dataInput.addEventListener("change", e => {
     if (controller.currentSelectedCell) {
@@ -168,7 +168,7 @@ function CsvTable(env, tableId, inputSelctor) {
       );
     };
     this.clickButton = e => {
-      console.log(`click ${this.getText()}`);
+      onclick(this);
       e.stopPropagation();
     };
     this.setText = text => {
@@ -291,8 +291,6 @@ function CsvTable(env, tableId, inputSelctor) {
         newCell.backgroundColor = cell.backgroundColor;
         newCell.color = cell.color;
         newCell.selected = true;
-        // console.log(newCell.getText());
-        // newCell.setText("");
         newCells.push(newCell);
       });
 
@@ -327,8 +325,6 @@ function CsvTable(env, tableId, inputSelctor) {
         newCell.backgroundColor = cell.backgroundColor;
         newCell.color = cell.color;
         newCell.selected = true;
-        // console.log(newCell.getText());
-        // newCell.setText("");
         newCells.push(newCell);
       });
 
