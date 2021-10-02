@@ -249,7 +249,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         };
         markerAll.forEach(marker => {
           const name = marker.getAttribute("name");
-          console.log(name);
           if (table[name].contains(element)) {
             marker.style.setProperty("visibility", "visible");
           } else {
@@ -492,6 +491,27 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         csv,
       });
     };
+    this.selectedCells = () => {
+      return this.cells.filter(cell => cell.selected);
+    };
+    this.setPasteboard = (type, cells) => {
+      this.pasteboard = { type, cells };
+    };
+    this.getPasteboard = () => {
+      return this.pasteboard || { type: "copy", cells: [] };
+    };
+    this.selectedCellTopLeft = () => {
+      let minx = -1;
+      let miny = -1;
+      this.cells.forEach(cell => {
+        if (cell.selected) {
+          if (minx < 0 || minx > cell.x) minx = cell.x;
+          if (miny < 0 || miny > cell.y) miny = cell.y;
+        }
+      });
+      if (minx < 0 || miny < 0) return null;
+      return { x: minx, y: miny };
+    };
   }
 
   const controller = new CellController(tableCell);
@@ -551,6 +571,55 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     }
     if (e.target == document.querySelector("body")) {
+      if (e.metaKey) {
+        if (e.key === "x") {
+          const selCell = controller.selectedCellTopLeft();
+          if (selCell) {
+            controller.setPasteboard(
+              "cut",
+              controller.selectedCells().map(cell => ({
+                x: cell.x - selCell.x,
+                y: cell.y - selCell.y,
+                text: cell.getText(),
+                cell,
+              }))
+            );
+          }
+        }
+        if (e.key === "c") {
+          const selCell = controller.selectedCellTopLeft();
+          if (selCell) {
+            controller.setPasteboard(
+              "copy",
+              controller.selectedCells().map(cell => ({
+                x: cell.x - selCell.x,
+                y: cell.y - selCell.y,
+                text: cell.getText(),
+                cell,
+              }))
+            );
+          }
+        }
+        if (e.key === "v") {
+          const selCell = controller.selectedCellTopLeft();
+          if (selCell) {
+            const { type, cells } = controller.getPasteboard();
+            if (type === "cut") {
+              cells.forEach(item => item.cell.setText(""));
+            }
+            cells.forEach(item => {
+              controller.cells.forEach(cell => {
+                if (
+                  cell.x === selCell.x + item.x &&
+                  cell.y === selCell.y + item.y
+                ) {
+                  cell.setText(item.text);
+                }
+              });
+            });
+          }
+        }
+      }
       if (e.key === " ") {
         if (controller.currentSelectedCell) {
           if (controller.currentSelectedCell.getText() !== "") {
