@@ -178,20 +178,20 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       div.innerText = text;
       const commonStyle = () => {
         let s = `position: absolute;`;
-        s += `top: 1px;`;
+        s += " margin-left: 10px;";
         return s;
       };
       if (text.indexOf("@") === 0) {
         div.classList.add("csv-cell-button");
-        div.style = `${commonStyle()} width: ${
+        div.style = `${commonStyle()} top: 1px; width: ${
           this.getWidth() - 32
-        }px; height: ${this.getHeight() - 5}px; margin-left: 10px; color: ${
+        }px; height: ${this.getHeight() - 5}px; color: ${
           this.color
         }; margin-right: 10px;`;
         div.addEventListener("click", this.clickButton);
       } else {
         div.classList.remove("csv-cell-button");
-        div.style = `${commonStyle()} margin-left: 10px; color: ${this.color};`;
+        div.style = `${commonStyle()} color: ${this.color};`;
         div.removeEventListener("click", this.clickButton);
       }
     };
@@ -512,9 +512,56 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (minx < 0 || miny < 0) return null;
       return { x: minx, y: miny };
     };
+    this.updateThumb = () => {
+      const thumbAll = element.querySelectorAll(".table-thumb");
+      thumbAll.forEach(thumb => {
+        thumb.addEventListener("mousedown", e => {
+          this.mouseDown(e, thumb);
+        });
+      });
+    };
+    this.mouseDown = (e, thumb) => {
+      this.targetThumb = thumb;
+      console.log("down");
+      e.stopPropagation();
+    };
+    this.mouseUp = e => {
+      if (this.targetThumb) {
+        delete this.targetThumb;
+        console.log("up");
+      }
+    };
   }
 
   const controller = new CellController(tableCell);
+
+  function ReizeMarker() {
+    const resizeMarkers = {
+      tableTop: [...tableTop.querySelectorAll(".table-resize-marker")],
+      tableLeft: [...tableLeft.querySelectorAll(".table-resize-marker")],
+      tableTopLeft: [...tableTopLeft.querySelectorAll(".table-resize-marker")],
+    };
+    Object.entries(resizeMarkers).forEach(([k, v]) => {
+      const horizontal = v.find(v => v.classList.contains("horizontal"));
+      const vertical = v.find(v => v.classList.contains("vertical"));
+      // horizontal.style.visibility = "hidden";
+      // vertical.style.visibility = "hidden";
+      horizontal.style.width = "1px";
+      horizontal.style.height = `${parseInt(tableLeft.style.height) - 2}px`;
+      vertical.style.width = `${parseInt(tableTop.style.width) - 2}px`;
+      vertical.style.height = "1px";
+      const hoffset = horizontal.getAttribute("data-top-offset");
+      if (hoffset) {
+        console.log(hoffset);
+        horizontal.style.top = `-${hoffset}px`;
+      }
+      const voffset = vertical.getAttribute("data-top-offset");
+      if (voffset) {
+        vertical.style.top = `-${voffset}px`;
+      }
+    });
+  }
+  ReizeMarker();
 
   postRequest(
     `${env}/${dataName}`,
@@ -526,6 +573,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       controller.maxCol = res.maxCol;
       controller.resize();
       controller.cells.forEach(cell => cell.setText(cell.getText()));
+      controller.updateThumb();
     }
   );
 
@@ -562,6 +610,8 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     }
     e.preventDefault();
   };
+
+  window.addEventListener("mouseup", controller.mouseUp);
 
   window.addEventListener("keydown", e => {
     if (e.target == dataInput) {

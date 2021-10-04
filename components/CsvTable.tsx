@@ -1,6 +1,80 @@
 import { factory, Fragment } from "libs/preact";
 import { escapeHtml } from "libs/utils";
 
+export const ResizeMarker = ({ topOffset }) => {
+  return (
+    <>
+      <div
+        className="table-resize-marker horizontal"
+        dataTopOffset={topOffset}></div>
+      <div
+        className="table-resize-marker vertical"
+        dataTopOffset={topOffset}></div>
+    </>
+  );
+};
+
+export const TableThumbs = ({
+  cells,
+  topOffset = 0,
+  rowWidth,
+  colHeight,
+  sumTop,
+  sumLeft,
+}) =>
+  cells.map(d =>
+    d.map(cell => {
+      const top = sumTop(cell.y) - topOffset;
+      const left = sumLeft(cell.x);
+      const width = rowWidth[cell.x];
+      const height = colHeight[cell.y];
+      return (
+        <>
+          <div
+            className="table-thumb"
+            style={{
+              left,
+              top,
+              width,
+              height: `2px`,
+              cursor: "row-resize",
+              // backgroundColor: "blue",
+            }}></div>
+          <div
+            className="table-thumb"
+            style={{
+              top: top + height - 1,
+              left,
+              width,
+              height: `2px`,
+              cursor: "row-resize",
+              // backgroundColor: "blue",
+            }}></div>
+          <div
+            className="table-thumb"
+            style={{
+              left,
+              top,
+              height,
+              cursor: "col-resize",
+              width: `2px`,
+              // backgroundColor: "lightgray",
+            }}></div>
+          <div
+            className="table-thumb"
+            style={{
+              left: `${left + width - 2}px`,
+              top,
+              height,
+              cursor: "col-resize",
+              width: `2px`,
+              // backgroundColor: "lightgray",
+            }}></div>
+        </>
+      );
+    })
+  );
+
 export const TableCell = (props: any) => {
   const { children, className, data, marker, name } = props;
   delete props.children;
@@ -34,6 +108,33 @@ export const TableCell = (props: any) => {
           left={0}
           top={0}></TableCell>
       )}
+    </div>
+  );
+};
+
+export const ThumbCell = (props: any) => {
+  const { children, className, data, name } = props;
+  delete props.children;
+  delete props.className;
+  delete props.data;
+  const deleteUndef = style => {
+    const r = { ...style };
+    Object.entries(style).forEach(([k, v]) => v === undefined && delete r[k]);
+    return r;
+  };
+  const dataProps = data
+    ? Object.entries(data).reduce((a, [k, v]) => {
+        a[`data-${k}`] = v;
+        return a;
+      }, {})
+    : {};
+  return (
+    <div
+      className={className}
+      name={name}
+      style={deleteUndef({ position: "absolute", ...props })}
+      {...dataProps}>
+      {children}
     </div>
   );
 };
@@ -97,7 +198,7 @@ export const CsvTable = ({
         {...props}>
         <pre className="csv-table-code">
           <code>
-            <div style={{ marginLeft: 10, color }}>
+            <div style={{ marginLeft: 10, color, top: 1 }}>
               {escapeHtml(cell.value)}
             </div>
           </code>
@@ -105,10 +206,103 @@ export const CsvTable = ({
       </TableCell>
     );
   };
+  const ThumbDataCell = (cell, props) => {
+    const top = sumTop(cell.y);
+    const left = sumLeft(cell.x);
+    const width = rowWidth[cell.x];
+    const height = colHeight[cell.y];
+    return (
+      <ThumbCell
+        className="thumb-table-cell"
+        data={{
+          x: cell.x,
+          y: cell.y,
+          top,
+          left,
+        }}
+        left={left + cell.ox}
+        top={top + cell.oy}
+        width={width}
+        height={height}
+        {...props}>
+        <>
+          <div
+            className="table-thumb"
+            style={{
+              left: `${width - 3}px`,
+              top: 0,
+              height: `${height}px`,
+              cursor: "col-resize",
+              width: `6px`,
+              backgroundColor: "lightgray",
+            }}></div>
+          <div
+            className="table-thumb"
+            style={{
+              left: 0,
+              top: `${height - 3}px`,
+              width: `${width - 3}px`,
+              height: `6px`,
+              cursor: "row-resize",
+              backgroundColor: "blue",
+            }}></div>
+        </>
+      </ThumbCell>
+    );
+  };
   const leftOffset =
     rowWidth.reduce((a, v, i) => (i <= fixedPoint.x ? a + v : a), 0) * 2;
   const topOffset =
     colHeight.reduce((a, v, i) => (i <= fixedPoint.y ? a + v : a), 0) * 2;
+
+  const topLeftCells = csvArray.map((v, y) =>
+    rowArray
+      .map((_, x) => {
+        return { ...(v[x] || { value: "" }), x, y: y, ox: 0, oy: 0 };
+      })
+      .filter(cell => cell.x <= fixedPoint.x && cell.y <= fixedPoint.y)
+  );
+  const topCells = csvArray.map((v, y) =>
+    rowArray
+      .map((_, x) => {
+        return {
+          ...(v[x] || { value: "" }),
+          x,
+          y: y,
+          ox: -0,
+          oy: -topOffset,
+        };
+      })
+      .filter(cell => cell.x > fixedPoint.x && cell.y <= fixedPoint.y)
+      .map(cell => ({ ...cell }))
+  );
+  const leftCells = csvArray.map((v, y) =>
+    rowArray
+      .map((_, x) => {
+        return {
+          ...(v[x] || { value: "" }),
+          x,
+          y,
+          ox: 0,
+          oy: -topOffset,
+        };
+      })
+      .filter(cell => cell.x <= fixedPoint.x && cell.y > fixedPoint.y)
+  );
+  const rightBottomCells = csvArray.map((v, y) =>
+    rowArray
+      .map((_, x) => {
+        return {
+          ...(v[x] || { value: "" }),
+          x,
+          y: y,
+          ox: 0,
+          oy: 0,
+        };
+      })
+      .filter(cell => cell.x > fixedPoint.x && cell.y > fixedPoint.y)
+  );
+
   return (
     <div
       id={id}
@@ -129,51 +323,50 @@ export const CsvTable = ({
         height={sumTop(fixedPoint.y + 1)}
         left={0}
         top={0}>
-        {csvArray.map((v, y) =>
-          rowArray
-            .map((_, x) => {
-              return { ...(v[x] || { value: "" }), x, y: y, ox: 0, oy: 0 };
+        {topLeftCells.map(d =>
+          d.map(cell =>
+            DataCell(cell, {
+              backgroundColor: cell.backgroundColor || "white",
+              color: cell.color || "black",
             })
-            .filter(cell => cell.x <= fixedPoint.x && cell.y <= fixedPoint.y)
-            .map(cell =>
-              DataCell(cell, {
-                backgroundColor: cell.backgroundColor || "white",
-                color: cell.color || "black",
-              })
-            )
+          )
         )}
+        <TableThumbs
+          cells={topLeftCells}
+          rowWidth={rowWidth}
+          colHeight={colHeight}
+          sumTop={sumTop}
+          sumLeft={sumLeft}
+        />
+        <ResizeMarker />
       </TableCell>
       <TableCell
         className="table-top"
         position="sticky"
-        pointerEvents="none"
         zIndex={10}
         marker
         width={sumLeft(maxRow) + 2}
         height={sumTop(fixedPoint.y + 1)}
         left={0}
         top={topOffset}>
-        {csvArray.map((v, y) =>
-          rowArray
-            .map((_, x) => {
-              return {
-                ...(v[x] || { value: "" }),
-                x,
-                y: y,
-                ox: -0,
-                oy: -topOffset,
-              };
+        {topCells.map(d =>
+          d.map(cell =>
+            DataCell(cell, {
+              backgroundColor: cell.backgroundColor || "white",
+              color: cell.color || "black",
+              pointerEvents: "auto",
             })
-            .filter(cell => cell.x > fixedPoint.x && cell.y <= fixedPoint.y)
-            .map(cell => ({ ...cell }))
-            .map(cell =>
-              DataCell(cell, {
-                backgroundColor: cell.backgroundColor || "white",
-                color: cell.color || "black",
-                pointerEvents: "auto",
-              })
-            )
+          )
         )}
+        <TableThumbs
+          topOffset={topOffset}
+          cells={topCells}
+          rowWidth={rowWidth}
+          colHeight={colHeight}
+          sumTop={sumTop}
+          sumLeft={sumLeft}
+        />
+        <ResizeMarker topOffset={topOffset} />
       </TableCell>
       <TableCell
         className="table-left"
@@ -184,25 +377,23 @@ export const CsvTable = ({
         height={sumTop(maxCol) - topOffset + 1}
         left={0}
         top={topOffset}>
-        {csvArray.map((v, y) =>
-          rowArray
-            .map((_, x) => {
-              return {
-                ...(v[x] || { value: "" }),
-                x,
-                y,
-                ox: 0,
-                oy: -topOffset,
-              };
+        {leftCells.map(d =>
+          d.map(cell =>
+            DataCell(cell, {
+              backgroundColor: cell.backgroundColor || "white",
+              color: cell.color || "black",
             })
-            .filter(cell => cell.x <= fixedPoint.x && cell.y > fixedPoint.y)
-            .map(cell =>
-              DataCell(cell, {
-                backgroundColor: cell.backgroundColor || "white",
-                color: cell.color || "black",
-              })
-            )
+          )
         )}
+        <TableThumbs
+          topOffset={topOffset}
+          cells={leftCells}
+          rowWidth={rowWidth}
+          colHeight={colHeight}
+          sumTop={sumTop}
+          sumLeft={sumLeft}
+        />
+        <ResizeMarker topOffset={topOffset} />
       </TableCell>
       <TableCell
         className="table-right-bottom"
@@ -212,24 +403,13 @@ export const CsvTable = ({
         height={sumTop(maxCol) + 1}
         left={0}
         top={0}>
-        {csvArray.map((v, y) =>
-          rowArray
-            .map((_, x) => {
-              return {
-                ...(v[x] || { value: "" }),
-                x,
-                y: y,
-                ox: 0,
-                oy: 0,
-              };
+        {rightBottomCells.map(d =>
+          d.map(cell =>
+            DataCell(cell, {
+              backgroundColor: cell.backgroundColor || "white",
+              color: cell.color || "black",
             })
-            .filter(cell => cell.x > fixedPoint.x && cell.y > fixedPoint.y)
-            .map(cell =>
-              DataCell(cell, {
-                backgroundColor: cell.backgroundColor || "white",
-                color: cell.color || "black",
-              })
-            )
+          )
         )}
       </TableCell>
     </div>

@@ -23,7 +23,6 @@ export function CsvRouter({ search_dir }) {
       rowSize: [],
     };
     const csvParser = require("libs/csv-parser");
-    console.log(req.params[0]);
     const csvArray = csvParser.load(path.join(search_dir, req.params[0]));
     const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
     const maxCol = csvArray.length;
