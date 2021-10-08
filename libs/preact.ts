@@ -23,7 +23,7 @@ export function factory(tag, props, ...children) {
           return [k, v];
         })
         .filter(([k, v]) => {
-          return v !== undefined && v !== null;
+          return v !== undefined && v !== null && v !== false;
         })
         .map(([k, v]) => {
           if (typeof v === "object") {

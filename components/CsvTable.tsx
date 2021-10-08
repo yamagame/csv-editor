@@ -1,7 +1,7 @@
 import { factory, Fragment } from "libs/preact";
 import { escapeHtml } from "libs/utils";
 
-export const ResizeMarker = ({ topOffset }) => {
+export const ResizeMarker = ({ topOffset = 0 }) => {
   return (
     <>
       <div
@@ -21,6 +21,7 @@ export const TableThumbs = ({
   colHeight,
   sumTop,
   sumLeft,
+  direction,
 }) =>
   cells.map(d =>
     d.map(cell => {
@@ -28,48 +29,69 @@ export const TableThumbs = ({
       const left = sumLeft(cell.x);
       const width = rowWidth[cell.x];
       const height = colHeight[cell.y];
+      if (cell.x === 0 && cell.y === 0) return null;
       return (
         <>
-          <div
-            className="table-thumb"
-            style={{
-              left,
-              top,
-              width,
-              height: `2px`,
-              cursor: "row-resize",
-              // backgroundColor: "blue",
-            }}></div>
-          <div
-            className="table-thumb"
-            style={{
-              top: top + height - 1,
-              left,
-              width,
-              height: `2px`,
-              cursor: "row-resize",
-              // backgroundColor: "blue",
-            }}></div>
-          <div
-            className="table-thumb"
-            style={{
-              left,
-              top,
-              height,
-              cursor: "col-resize",
-              width: `2px`,
-              // backgroundColor: "lightgray",
-            }}></div>
-          <div
-            className="table-thumb"
-            style={{
-              left: `${left + width - 2}px`,
-              top,
-              height,
-              cursor: "col-resize",
-              width: `2px`,
-              // backgroundColor: "lightgray",
-            }}></div>
+          {direction.match("horizontal") ? (
+            <>
+              {cell.x > 1 ? (
+                <div
+                  className="table-thumb row-resize"
+                  style={{
+                    left,
+                    top,
+                    width,
+                    height: `2px`,
+                    cursor: "row-resize",
+                    backgroundColor: "blue",
+                  }}
+                  dataX={cell.x}
+                  dataY={cell.y - 1}></div>
+              ) : null}
+              <div
+                className="table-thumb row-resize"
+                style={{
+                  top: top + height - 1,
+                  left,
+                  width,
+                  height: `2px`,
+                  cursor: "row-resize",
+                  backgroundColor: "blue",
+                }}
+                dataX={cell.x}
+                dataY={cell.y}></div>
+            </>
+          ) : null}
+          {direction.match("vertical") ? (
+            <>
+              {cell.y > 1 ? (
+                <div
+                  className="table-thumb col-resize"
+                  style={{
+                    left,
+                    top,
+                    height,
+                    cursor: "col-resize",
+                    width: `2px`,
+                    backgroundColor: "lightgray",
+                  }}
+                  dataX={cell.x - 1}
+                  dataY={cell.y}></div>
+              ) : null}
+              <div
+                className="table-thumb col-resize"
+                style={{
+                  left: `${left + width - 2}px`,
+                  top,
+                  height,
+                  cursor: "col-resize",
+                  width: `2px`,
+                  backgroundColor: "lightgray",
+                }}
+                dataX={cell.x}
+                dataY={cell.y}></div>
+            </>
+          ) : null}
         </>
       );
     })
@@ -332,13 +354,14 @@ export const CsvTable = ({
           )
         )}
         <TableThumbs
+          direction="horizontal vertical"
           cells={topLeftCells}
           rowWidth={rowWidth}
           colHeight={colHeight}
           sumTop={sumTop}
           sumLeft={sumLeft}
         />
-        <ResizeMarker />
+        <ResizeMarker topOffset={topOffset} />
       </TableCell>
       <TableCell
         className="table-top"
@@ -346,7 +369,7 @@ export const CsvTable = ({
         zIndex={10}
         marker
         width={sumLeft(maxRow) + 2}
-        height={sumTop(fixedPoint.y + 1)}
+        height={0}
         left={0}
         top={topOffset}>
         {topCells.map(d =>
@@ -359,6 +382,7 @@ export const CsvTable = ({
           )
         )}
         <TableThumbs
+          direction="vertical"
           topOffset={topOffset}
           cells={topCells}
           rowWidth={rowWidth}
@@ -366,7 +390,6 @@ export const CsvTable = ({
           sumTop={sumTop}
           sumLeft={sumLeft}
         />
-        <ResizeMarker topOffset={topOffset} />
       </TableCell>
       <TableCell
         className="table-left"
@@ -386,6 +409,7 @@ export const CsvTable = ({
           )
         )}
         <TableThumbs
+          direction="horizontal"
           topOffset={topOffset}
           cells={leftCells}
           rowWidth={rowWidth}
@@ -393,7 +417,6 @@ export const CsvTable = ({
           sumTop={sumTop}
           sumLeft={sumLeft}
         />
-        <ResizeMarker topOffset={topOffset} />
       </TableCell>
       <TableCell
         className="table-right-bottom"

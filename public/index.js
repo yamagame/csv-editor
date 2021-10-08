@@ -512,56 +512,215 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (minx < 0 || miny < 0) return null;
       return { x: minx, y: miny };
     };
+
+    this.thumbs = {
+      horizontal: [],
+      vertical: [],
+    };
+
     this.updateThumb = () => {
       const thumbAll = element.querySelectorAll(".table-thumb");
+      this.thumbs.horizontal = [];
+      this.thumbs.vertical = [];
       thumbAll.forEach(thumb => {
+        if (thumb.classList.contains("row-resize")) {
+          this.thumbs.horizontal.push(thumb);
+        } else {
+          this.thumbs.vertical.push(thumb);
+        }
         thumb.addEventListener("mousedown", e => {
           this.mouseDown(e, thumb);
         });
       });
+      this.thumbs.horizontal.sort((a, b) => {
+        return parseInt(a.style.top) - parseInt(b.style.top);
+      });
+      this.thumbs.vertical.sort((a, b) => {
+        return parseInt(a.style.left) - parseInt(b.style.left);
+      });
     };
+
+    const resizeMarkers = (function () {
+      const resizeMarkers = {
+        tableTopLeft: [
+          ...tableTopLeft.querySelectorAll(".table-resize-marker"),
+        ],
+      };
+      Object.entries(resizeMarkers).forEach(([k, v]) => {
+        const horizontal = v.find(v => v.classList.contains("horizontal"));
+        const vertical = v.find(v => v.classList.contains("vertical"));
+        if (horizontal) {
+          horizontal.style.visibility = "hidden";
+          horizontal.style.width = `${parseInt(element.style.width) - 4}px`;
+          horizontal.style.height = "1px";
+        }
+        if (vertical) {
+          vertical.style.visibility = "hidden";
+          vertical.style.width = "1px";
+          vertical.style.height = `${parseInt(element.style.height) - 4}px`;
+        }
+      });
+      return resizeMarkers;
+    })();
+
+    this.getResizeMarker = thumb => {
+      if (thumb.classList.contains("row-resize")) {
+        return resizeMarkers.tableTopLeft.find(marker => {
+          if (marker.classList.contains("horizontal")) {
+            return marker;
+          }
+        });
+      } else {
+        return resizeMarkers.tableTopLeft.find(marker => {
+          if (marker.classList.contains("vertical")) {
+            return marker;
+          }
+        });
+      }
+    };
+
+    this.elementPosition = () => {
+      const rect = element.getBoundingClientRect();
+      const dx = rect.left + window.pageXOffset;
+      const dy = rect.top + window.pageYOffset;
+      return [dx, dy];
+    };
+
+    this.resizeMarkerX = (x, thumb) => {
+      const index = this.thumbs.vertical.indexOf(thumb);
+      const leftThumb = this.thumbs.vertical[index - 2];
+      const min = leftThumb ? parseInt(leftThumb.style.left) + 4 : 0;
+      if (x <= min) return min;
+      return x;
+    };
+
+    this.resizeMarkerY = (y, thumb) => {
+      const index = this.thumbs.horizontal.indexOf(thumb);
+      const topThumb = this.thumbs.horizontal[index - 2];
+      const min = topThumb ? parseInt(topThumb.style.top) + 4 : 0;
+      if (y <= min) return min;
+      return y;
+    };
+
+    this.moveResizeMarker = (thumb, e) => {
+      const [dx, dy] = this.elementPosition();
+      const marker = this.getResizeMarker(thumb);
+      if (marker) {
+        marker.style.visibility = "visible";
+        if (marker.classList.contains("vertical")) {
+          marker.style.left = `${this.resizeMarkerX(e.clientX - dx, thumb)}px`;
+        } else {
+          marker.style.top = `${this.resizeMarkerY(e.clientY - dy, thumb)}px`;
+        }
+      }
+    };
+
+    this.hideResizeMarker = () => {
+      Object.entries(resizeMarkers).forEach(([k, v]) => {
+        const horizontal = v.find(v => v.classList.contains("horizontal"));
+        const vertical = v.find(v => v.classList.contains("vertical"));
+        if (horizontal) {
+          horizontal.style.visibility = "hidden";
+        }
+        if (vertical) {
+          vertical.style.visibility = "hidden";
+        }
+      });
+    };
+
     this.mouseDown = (e, thumb) => {
       this.targetThumb = thumb;
-      console.log("down");
+      this.mousePosition = { x: e.clientX, y: e.clientY };
+      this.moveResizeMarker(this.targetThumb, e);
       e.stopPropagation();
+    };
+    this.mouseMove = e => {
+      if (this.targetThumb) {
+        this.mousePosition = {
+          ...this.mousePosition,
+          dx: e.clientX - this.mousePosition.x,
+          dy: e.clientY - this.mousePosition.y,
+        };
+        this.moveResizeMarker(this.targetThumb, e);
+      }
     };
     this.mouseUp = e => {
       if (this.targetThumb) {
+        const { dx, dy } = this.mousePosition;
+        if (this.targetThumb.classList.contains("row-resize")) {
+          this.thumbs.horizontal.forEach(thumb => console.log(thumb.style.top));
+          const index = parseInt(this.targetThumb.getAttribute("data-y"));
+          if (index === 0) {
+            this.thumbs.vertical.forEach(thumb => {
+              thumb.style.height = `${parseInt(thumb.style.height) + dy}px`;
+            });
+          }
+          this.thumbs.horizontal.forEach(thumb => {
+            const i = parseInt(thumb.getAttribute("data-y"));
+            if (i >= index) {
+              thumb.style.top = `${parseInt(thumb.style.top) + dy}px`;
+            }
+          });
+          this.colHeight[index] += dy;
+          this.cells.forEach(cell => {
+            if (cell.y === index) {
+              cell.element.style.height = `${
+                parseInt(cell.element.style.height) + dy
+              }px`;
+            } else if (cell.y > index) {
+              cell.element.style.top = `${
+                parseInt(cell.element.style.top) + dy
+              }px`;
+            }
+          });
+          Object.entries(resizeMarkers).forEach(([k, v]) => {
+            v.forEach(v => {
+              if (v.classList.contains("vertical")) {
+                v.style.height = `${parseInt(v.style.height) + dy}px`;
+              }
+            });
+          });
+        } else {
+          const index = parseInt(this.targetThumb.getAttribute("data-x"));
+          this.thumbs.vertical.forEach(thumb => {
+            const i = parseInt(thumb.getAttribute("data-x"));
+            if (i >= index) {
+              thumb.style.left = `${parseInt(thumb.style.left) + dx}px`;
+            }
+          });
+          if (index === 0) {
+            this.thumbs.horizontal.forEach(thumb => {
+              thumb.style.width = `${parseInt(thumb.style.width) + dx}px`;
+            });
+          }
+          this.rowWidth[index] += dx;
+          this.cells.forEach(cell => {
+            if (cell.x === index) {
+              cell.element.style.width = `${
+                parseInt(cell.element.style.width) + dx
+              }px`;
+            } else if (cell.x > index) {
+              cell.element.style.left = `${
+                parseInt(cell.element.style.left) + dx
+              }px`;
+            }
+          });
+          Object.entries(resizeMarkers).forEach(([k, v]) => {
+            v.forEach(v => {
+              if (v.classList.contains("horizontal")) {
+                v.style.width = `${parseInt(v.style.width) + dx}px`;
+              }
+            });
+          });
+        }
         delete this.targetThumb;
-        console.log("up");
+        this.hideResizeMarker();
       }
+      delete this.mousePosition;
     };
   }
 
   const controller = new CellController(tableCell);
-
-  function ReizeMarker() {
-    const resizeMarkers = {
-      tableTop: [...tableTop.querySelectorAll(".table-resize-marker")],
-      tableLeft: [...tableLeft.querySelectorAll(".table-resize-marker")],
-      tableTopLeft: [...tableTopLeft.querySelectorAll(".table-resize-marker")],
-    };
-    Object.entries(resizeMarkers).forEach(([k, v]) => {
-      const horizontal = v.find(v => v.classList.contains("horizontal"));
-      const vertical = v.find(v => v.classList.contains("vertical"));
-      // horizontal.style.visibility = "hidden";
-      // vertical.style.visibility = "hidden";
-      horizontal.style.width = "1px";
-      horizontal.style.height = `${parseInt(tableLeft.style.height) - 2}px`;
-      vertical.style.width = `${parseInt(tableTop.style.width) - 2}px`;
-      vertical.style.height = "1px";
-      const hoffset = horizontal.getAttribute("data-top-offset");
-      if (hoffset) {
-        console.log(hoffset);
-        horizontal.style.top = `-${hoffset}px`;
-      }
-      const voffset = vertical.getAttribute("data-top-offset");
-      if (voffset) {
-        vertical.style.top = `-${voffset}px`;
-      }
-    });
-  }
-  ReizeMarker();
 
   postRequest(
     `${env}/${dataName}`,
@@ -610,6 +769,8 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     }
     e.preventDefault();
   };
+
+  window.addEventListener("mousemove", controller.mouseMove);
 
   window.addEventListener("mouseup", controller.mouseUp);
 
