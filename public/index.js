@@ -680,6 +680,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
               }
             });
           });
+          tableLeft.style.height = `${parseInt(tableLeft.style.height) + dy}px`;
         } else {
           const index = parseInt(this.targetThumb.getAttribute("data-x"));
           this.thumbs.vertical.forEach(thumb => {
@@ -712,6 +713,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
               }
             });
           });
+          tableTop.style.width = `${parseInt(tableTop.style.width) + dx}px`;
+        }
+        if (this.currentSelectedCell) {
+          this.setMarker(this.currentSelectedCell);
         }
         delete this.targetThumb;
         this.hideResizeMarker();
