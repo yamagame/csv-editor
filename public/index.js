@@ -211,6 +211,92 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       this.cells.push(new TableCell(element, this));
     });
 
+    function makeThumb(props) {
+      const {
+        className,
+        top,
+        left,
+        width,
+        height,
+        cursor,
+        x,
+        y,
+        backgroundColor,
+      } = props;
+      const div = document.createElement("div");
+      div.setAttribute("class", `table-thumb ${className}`);
+      div.style = `left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px; cursor: ${cursor}; background-color: ${backgroundColor};`;
+      div.setAttribute("data-x", x);
+      div.setAttribute("data-y", y);
+      return div;
+    }
+
+    function makeThumbs(cell) {
+      const r = [];
+      const { element } = cell;
+      const top = parseInt(element.style.top);
+      const left = parseInt(element.style.left);
+      const width = parseInt(element.style.width);
+      const height = parseInt(element.style.height);
+      if (cell.x === 0) {
+        r.push(
+          makeThumb({
+            className: "row-resize",
+            top: top - 1,
+            left,
+            width: width + 1,
+            height: 2,
+            x: cell.x,
+            y: cell.y - 1,
+            backgroundColor: "blue",
+            cursor: "row-resize",
+          })
+        );
+        r.push(
+          makeThumb({
+            className: "row-resize",
+            top: top + height,
+            left,
+            width: width + 1,
+            height: 2,
+            x: cell.x,
+            y: cell.y,
+            backgroundColor: "blue",
+            cursor: "row-resize",
+          })
+        );
+      }
+      if (cell.y === 0) {
+        r.push(
+          makeThumb({
+            className: "col-resize",
+            top,
+            left,
+            width: 2,
+            height: height + 1,
+            x: cell.x - 1,
+            y: cell.y,
+            backgroundColor: "lightgray",
+            cursor: "col-resize",
+          })
+        );
+        r.push(
+          makeThumb({
+            className: "col-resize",
+            top,
+            left: left + width - 1,
+            width: 2,
+            height: height + 1,
+            x: cell.x,
+            y: cell.y,
+            backgroundColor: "lightgray",
+            cursor: "col-resize",
+          })
+        );
+      }
+      return r;
+    }
+
     function makeCell(cell) {
       const element = document.createElement("div");
       const pre = document.createElement("pre");
@@ -263,17 +349,17 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
     this.setMarker = cell => {
       markerAll.forEach(marker => {
-        marker.style.setProperty("top", cell.element.style.top);
+        marker.style.top = cell.element.style.top;
       });
       markerAll.forEach(marker => {
-        marker.style.setProperty("left", cell.element.style.left);
+        marker.style.left = cell.element.style.left;
       });
-      markerAll.forEach(marker =>
-        marker.style.setProperty("width", `${this.rowWidth[cell.x] - 3}px`)
-      );
-      markerAll.forEach(marker =>
-        marker.style.setProperty("height", `${this.colHeight[cell.y] - 3}px`)
-      );
+      markerAll.forEach(marker => {
+        marker.style.width = `${this.rowWidth[cell.x] - 3}px`;
+      });
+      markerAll.forEach(marker => {
+        marker.style.height = `${this.colHeight[cell.y] - 3}px`;
+      });
     };
     this.resize = () => {
       const rowArray = new Array(
@@ -332,10 +418,30 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       });
 
       tableLeft.style.height = `${parseInt(tableLeft.style.height) + height}px`;
+      tableRightBottom.style.height = `${
+        parseInt(tableRightBottom.style.height) + height
+      }px`;
 
       this.cells = [...this.cells, ...newCells];
-      this.cells.forEach(cell => console.log(cell.x, cell.y, cell.getText()));
       this.resetIndexNumber();
+
+      const lastCell = this.cells.find(
+        cell => cell.x === 0 && cell.y === this.maxCol - 1
+      );
+      if (lastCell) {
+        const thumbs = makeThumbs(lastCell);
+        thumbs.forEach(thumb => tableLeft.appendChild(thumb));
+      }
+
+      this.updateThumb();
+
+      Object.entries(resizeMarkers).forEach(([k, v]) => {
+        v.forEach(v => {
+          if (v.classList.contains("vertical")) {
+            v.style.height = `${parseInt(v.style.height) + height}px`;
+          }
+        });
+      });
     };
     this.insertRowLine = () => {
       const selectedCell = this.currentSelectedCell;
@@ -366,10 +472,30 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       });
 
       tableTop.style.width = `${parseInt(tableTop.style.width) + width}px`;
+      tableRightBottom.style.width = `${
+        parseInt(tableRightBottom.style.width) + width
+      }px`;
 
       this.cells = [...this.cells, ...newCells];
-      this.cells.forEach(cell => console.log(cell.x, cell.y, cell.getText()));
       this.resetIndexNumber();
+
+      const lastCell = this.cells.find(
+        cell => cell.y === 0 && cell.x === this.maxRow - 1
+      );
+      if (lastCell) {
+        const thumbs = makeThumbs(lastCell);
+        thumbs.forEach(thumb => tableTop.appendChild(thumb));
+      }
+
+      this.updateThumb();
+
+      Object.entries(resizeMarkers).forEach(([k, v]) => {
+        v.forEach(v => {
+          if (v.classList.contains("horizontal")) {
+            v.style.width = `${parseInt(v.style.width) + width}px`;
+          }
+        });
+      });
     };
     this.resetIndexNumber = () => {
       this.cells
@@ -528,9 +654,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         } else {
           this.thumbs.vertical.push(thumb);
         }
-        thumb.addEventListener("mousedown", e => {
+        const mouseDown = e => {
           this.mouseDown(e, thumb);
-        });
+        };
+        thumb.removeEventListener("mousedown", mouseDown);
+        thumb.addEventListener("mousedown", mouseDown);
       });
       this.thumbs.horizontal.sort((a, b) => {
         return parseInt(a.style.top) - parseInt(b.style.top);
@@ -648,7 +776,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (this.targetThumb) {
         const { dx, dy } = this.mousePosition;
         if (this.targetThumb.classList.contains("row-resize")) {
-          this.thumbs.horizontal.forEach(thumb => console.log(thumb.style.top));
           const index = parseInt(this.targetThumb.getAttribute("data-y"));
           if (index === 0) {
             this.thumbs.vertical.forEach(thumb => {
