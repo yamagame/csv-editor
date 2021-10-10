@@ -764,24 +764,39 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     };
 
-    this.elementPosition = () => {
-      const rect = element.getBoundingClientRect();
-      const dx = rect.left + window.pageXOffset;
-      const dy = rect.top + window.pageYOffset;
+    const thumbElement = thumb => {
+      if (tableTop.contains(thumb)) return tableTop;
+      if (tableLeft.contains(thumb)) return tableLeft;
+      return element;
+    };
+
+    const getScrollOffset = thumb => {
+      const vrect = element.getBoundingClientRect();
+      const rect = thumbElement(thumb).getBoundingClientRect();
+      return [vrect.x - rect.x, vrect.y - rect.y];
+    };
+
+    this.elementPosition = thumb => {
+      const [ddx, ddy] = getScrollOffset(thumb);
+      const rect = thumbElement(thumb).getBoundingClientRect();
+      const dx = rect.left + window.pageXOffset + ddx;
+      const dy = rect.top + window.pageYOffset + ddy;
       return [dx, dy];
     };
 
     this.resizeMarkerX = (x, thumb) => {
+      const [dx, dy] = getScrollOffset(thumb);
       const index = this.thumbs.vertical.indexOf(thumb);
       const leftThumb = this.thumbs.vertical[index - 2];
       const min = leftThumb
-        ? parseInt(leftThumb.style.left) + 4
-        : this.rowWidth[0] + 4;
+        ? parseInt(leftThumb.style.left) + 4 - dx
+        : this.rowWidth[0] + 4 - dx;
       if (x <= min) return min;
       return x;
     };
 
     this.resizeMarkerY = (y, thumb, marker) => {
+      const [dx, dy] = getScrollOffset(thumb);
       const index = this.thumbs.horizontal.indexOf(thumb);
       const topThumb = this.thumbs.horizontal[index - 2];
       const topOffset = this.topOffset;
@@ -795,15 +810,15 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         if (y <= min) return min;
       } else {
         const min = topThumb
-          ? parseInt(topThumb.style.top) + 4 + topOffset
-          : this.colHeight[0] + 4;
+          ? parseInt(topThumb.style.top) + 4 + topOffset - dy
+          : this.colHeight[0] + 4 - dy;
         if (y <= min) return min;
       }
       return y;
     };
 
     this.moveResizeMarker = (thumb, e) => {
-      const [dx, dy] = this.elementPosition();
+      const [dx, dy] = this.elementPosition(thumb);
       const marker = this.getResizeMarker(thumb);
       if (marker) {
         marker.style.visibility = "visible";
