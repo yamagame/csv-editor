@@ -274,8 +274,8 @@ export const CsvTable = ({
   };
   const leftOffset =
     rowWidth.reduce((a, v, i) => (i <= fixedPoint.x ? a + v : a), 0) * 2;
-  const topOffset =
-    colHeight.reduce((a, v, i) => (i <= fixedPoint.y ? a + v : a), 0) * 2;
+  const topOffset = 0;
+  //    colHeight.reduce((a, v, i) => (i <= fixedPoint.y ? a + v : a), 0) * 2;
 
   const topLeftCells = csvArray.map((v, y) =>
     rowArray
@@ -342,7 +342,7 @@ export const CsvTable = ({
         zIndex={30}
         marker
         width={sumLeft(fixedPoint.x + 1)}
-        height={sumTop(fixedPoint.y + 1)}
+        height={0 /* sumTop(fixedPoint.y + 1)*/}
         left={0}
         top={0}>
         {topLeftCells.map(d =>

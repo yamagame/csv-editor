@@ -31,6 +31,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const tableRightBottom = element.querySelector(".table-right-bottom");
   const markerAll = element.querySelectorAll(".table-marker");
   const borderThick = 1;
+  const topOffset = parseInt(tableTopLeft.style.height) * 2;
 
   function TableCell(element, controller) {
     this.element = element;
@@ -200,13 +201,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
   }
 
-  function CellController(tableCell) {
+  function CellController(tableCell, topOffset) {
     this.cells = [];
     this.defaultCellSize = { width: 50, height: 18 };
     this.rowSize = [];
     this.colSize = [];
     this.rowWidth = [];
     this.colHeight = [];
+    this.topOffset = topOffset;
     tableCell.forEach(element => {
       this.cells.push(new TableCell(element, this));
     });
@@ -782,11 +784,21 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.resizeMarkerY = (y, thumb, marker) => {
       const index = this.thumbs.horizontal.indexOf(thumb);
       const topThumb = this.thumbs.horizontal[index - 2];
-      const topOffset = parseInt(marker.getAttribute("data-top-offset"));
-      const min = topThumb
-        ? parseInt(topThumb.style.top) + 4 + topOffset
-        : this.colHeight[0] + 4;
-      if (y <= min) return min;
+      const topOffset = this.topOffset;
+      const colIndex = parseInt(thumb.getAttribute("data-y"));
+      if (
+        this.fixedPoint.y >= 1 &&
+        colIndex <= this.fixedPoint.y &&
+        tableTopLeft.contains(thumb)
+      ) {
+        const min = this.sumTop(colIndex) + 4;
+        if (y <= min) return min;
+      } else {
+        const min = topThumb
+          ? parseInt(topThumb.style.top) + 4 + topOffset
+          : this.colHeight[0] + 4;
+        if (y <= min) return min;
+      }
       return y;
     };
 
@@ -830,12 +842,12 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         dx: this.defaultCellSize.width - width,
         dy: this.defaultCellSize.height - height,
       };
-      if (this.targetThumb.classList.contains("row-resize")) {
+      this.mouseUp(e);
+      if (thumb.classList.contains("row-resize")) {
         this.colSize[datay] = this.defaultCellSize.height;
       } else {
         this.rowSize[datax] = this.defaultCellSize.width;
       }
-      this.mouseUp(e);
     };
 
     this.mouseDown = (e, thumb) => {
@@ -896,10 +908,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
               }
             });
           });
-          tableLeft.style.height = `${parseInt(tableLeft.style.height) + dy}px`;
           tableRightBottom.style.height = `${
             parseInt(tableRightBottom.style.height) + dy
           }px`;
+          tableLeft.style.height = `${parseInt(tableLeft.style.height) + dy}px`;
         } else {
           const index = parseInt(this.targetThumb.getAttribute("data-x"));
           this.thumbs.vertical.forEach(thumb => {
@@ -937,6 +949,12 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           tableRightBottom.style.width = `${
             parseInt(tableRightBottom.style.width) + dx
           }px`;
+          tableTopLeft.style.width = `${
+            parseInt(tableTopLeft.style.width) + dx
+          }px`;
+          if (this.fixedPoint.x >= 1 && index >= this.fixedPoint.x) {
+            tableLeft.style.width = `${parseInt(tableLeft.style.width) + dx}px`;
+          }
         }
         if (this.currentSelectedCell) {
           this.setMarker(this.currentSelectedCell);
@@ -948,7 +966,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
   }
 
-  const controller = new CellController(tableCell);
+  const controller = new CellController(tableCell, topOffset);
 
   postRequest(
     `${env}/${dataName}`,
@@ -958,6 +976,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       defaultCellSize: true,
       maxRow: true,
       maxCol: true,
+      fixedPoint: true,
     },
     res => {
       controller.rowSize = res.rowSize || [];
@@ -965,6 +984,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       controller.defaultCellSize = res.defaultCellSize;
       controller.maxRow = res.maxRow;
       controller.maxCol = res.maxCol;
+      controller.fixedPoint = res.fixedPoint;
       controller.resize();
       controller.cells.forEach(cell => cell.setText(cell.getText()));
       controller.updateThumb();

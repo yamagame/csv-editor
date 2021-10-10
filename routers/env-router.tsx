@@ -8,11 +8,13 @@ import { Container } from "components/Container";
 export function EnvEditRouter({ search_dir }) {
   const router = express.Router();
   const rowSize = [40, 130, 130, 130, 130];
+  const colSize = [0, 0];
 
   interface EnvParserOptions {
     defaultCellSize?: { width: number; height: number };
     fixedPoint?: { x: number; y: number };
     rowSize?: number[];
+    colSize?: number[];
     dataname?: string;
   }
 
@@ -21,6 +23,7 @@ export function EnvEditRouter({ search_dir }) {
       defaultCellSize: { width: 50, height: 18 },
       fixedPoint: { x: 0, y: 0 },
       rowSize: [],
+      colSize: [],
     };
     const envParser = require("libs/env-parser");
 
@@ -109,6 +112,8 @@ export function EnvEditRouter({ search_dir }) {
         dataname: req.params[0],
         maxRow: maxRow + 1,
         maxCol: maxCol + 1,
+        colSize,
+        rowSize,
       },
     };
   }
@@ -117,6 +122,7 @@ export function EnvEditRouter({ search_dir }) {
     const data = envParser(req, {
       fixedPoint: { x: 1, y: 1 },
       rowSize,
+      colSize,
     });
     res.send(
       Object.entries(req.body).reduce((a, [k, v]) => {
@@ -145,6 +151,7 @@ export function EnvEditRouter({ search_dir }) {
           defaultCellSize={data.defaultCellSize}
           fixedPoint={data.fixedPoint}
           rowSize={data.rowSize}
+          colSize={data.colSize}
         />
         <script type="text/javascript" src="/env-edit-index.js"></script>
       </Container>
@@ -171,11 +178,13 @@ export function EnvEditRouter({ search_dir }) {
 export function EnvViewRouter({ search_dir }) {
   const router = express.Router();
   const rowSize = [0, 150, 400];
+  const colSize = [0, 0];
 
   interface CsvParserOptions {
     defaultCellSize?: { width: number; height: number };
     fixedPoint?: { x: number; y: number };
     rowSize?: number[];
+    colSize?: number[];
     dataname?: string;
   }
 
@@ -210,6 +219,8 @@ export function EnvViewRouter({ search_dir }) {
         dataname: req.params[0],
         maxRow: maxRow + 1,
         maxCol: maxCol + 1,
+        rowSize,
+        colSize,
       },
     };
   }
