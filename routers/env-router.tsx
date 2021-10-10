@@ -31,7 +31,8 @@ export function EnvEditRouter({ search_dir }) {
     const envData = {};
     const envKeys = {};
     const envTemp = envFiles.map(filepath => {
-      const data = envParser.load(path.join(search_dir, filepath));
+      const envFilePath = path.join(search_dir, filepath);
+      const data = envParser.load(envFilePath);
       return data;
     });
     envTemp.forEach(env => {

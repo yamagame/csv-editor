@@ -1,4 +1,5 @@
 import { factory, Fragment, render } from "libs/preact";
+import { loadJson, saveJson } from "libs/utils";
 import fs = require("fs");
 import path = require("path");
 import express from "express";
@@ -8,6 +9,7 @@ import { Container } from "components/Container";
 export function CsvRouter({ search_dir }) {
   const router = express.Router();
   const rowSize = [40, 40];
+  const colSize = [0];
 
   interface CsvParserOptions {
     defaultCellSize?: { width: number; height: number };
@@ -23,7 +25,9 @@ export function CsvRouter({ search_dir }) {
       rowSize: [],
     };
     const csvParser = require("libs/csv-parser");
-    const csvArray = csvParser.load(path.join(search_dir, req.params[0]));
+    const csvFilePath = path.join(search_dir, req.params[0]);
+    const csvArray = csvParser.load(csvFilePath);
+    const csvJson = loadJson(csvFilePath);
     const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
     const maxCol = csvArray.length;
     const header = new Array(maxRow).fill(0).map((v, i) => ({
@@ -43,6 +47,7 @@ export function CsvRouter({ search_dir }) {
         dataname: req.params[0],
         maxRow: maxRow + 1,
         maxCol: maxCol + 1,
+        ...csvJson,
       },
     };
   }
@@ -78,13 +83,19 @@ export function CsvRouter({ search_dir }) {
       const csvPath = path.join(search_dir, req.params[0]);
       fs.writeFileSync(csvPath, csvString);
     }
-    res.sendStatus(200);
+    {
+      const { rowSize, colSize, maxCol, maxRow } = req.body;
+      const csvFilePath = path.join(search_dir, req.params[0]);
+      saveJson(csvFilePath, { rowSize, colSize, maxCol, maxRow });
+    }
+    res.send({ result: "OK" });
   });
 
   router.post("/view/*", (req, res) => {
     const data = csvParser(req, {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
+      colSize,
     });
     res.send(
       Object.entries(req.body).reduce((a, [k, v]) => {
@@ -119,6 +130,7 @@ export function CsvRouter({ search_dir }) {
           defaultCellSize={data.defaultCellSize}
           fixedPoint={data.fixedPoint}
           rowSize={data.rowSize}
+          colSize={data.colSize}
         />
         <script type="text/javascript" src="/csv-index.js"></script>
       </Container>

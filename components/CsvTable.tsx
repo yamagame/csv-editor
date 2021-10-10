@@ -32,9 +32,9 @@ export const TableThumbs = ({
       if (cell.x === 0 && cell.y === 0) return null;
       return (
         <>
-          {direction.match("horizontal") ? (
+          {direction.match("horizontal") && cell.x === 0 ? (
             <>
-              {cell.x > 1 ? (
+              {cell.y > 1 ? (
                 <div
                   className="table-thumb row-resize"
                   style={{
@@ -43,7 +43,7 @@ export const TableThumbs = ({
                     width,
                     height: `2px`,
                     cursor: "row-resize",
-                    backgroundColor: "blue",
+                    // backgroundColor: "blue",
                   }}
                   dataX={cell.x}
                   dataY={cell.y - 1}></div>
@@ -56,15 +56,15 @@ export const TableThumbs = ({
                   width,
                   height: `2px`,
                   cursor: "row-resize",
-                  backgroundColor: "blue",
+                  // backgroundColor: "blue",
                 }}
                 dataX={cell.x}
                 dataY={cell.y}></div>
             </>
           ) : null}
-          {direction.match("vertical") ? (
+          {direction.match("vertical") && cell.y === 0 ? (
             <>
-              {cell.y > 1 ? (
+              {cell.x > 1 ? (
                 <div
                   className="table-thumb col-resize"
                   style={{
@@ -73,7 +73,7 @@ export const TableThumbs = ({
                     height,
                     cursor: "col-resize",
                     width: `2px`,
-                    backgroundColor: "lightgray",
+                    // backgroundColor: "lightgray",
                   }}
                   dataX={cell.x - 1}
                   dataY={cell.y}></div>
@@ -86,7 +86,7 @@ export const TableThumbs = ({
                   height,
                   cursor: "col-resize",
                   width: `2px`,
-                  backgroundColor: "lightgray",
+                  // backgroundColor: "lightgray",
                 }}
                 dataX={cell.x}
                 dataY={cell.y}></div>

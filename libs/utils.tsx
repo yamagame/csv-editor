@@ -50,3 +50,35 @@ export const readDir = (rootDir: string, callback) => {
   };
   return _readDir(rootDir);
 };
+
+export const loadJson = (basepath: string) => {
+  const name = path.basename(basepath);
+  const dir = path.dirname(basepath);
+  const filepath = path.format({ dir, name, ext: ".json" });
+  try {
+    return JSON.parse(fs.readFileSync(filepath, "utf-8"));
+  } catch {
+    return {};
+  }
+};
+
+export const saveJson = (basepath: string, params: any) => {
+  const name = path.basename(basepath);
+  const dir = path.dirname(basepath);
+  const filepath = path.format({ dir, name, ext: ".json" });
+  try {
+    const data = JSON.parse(fs.readFileSync(filepath, "utf-8"));
+    let updated = false;
+    Object.keys(params).forEach(key => {
+      if (params[key]) {
+        data[key] = params[key];
+        updated = true;
+      }
+    });
+    if (updated) {
+      fs.writeFileSync(filepath, JSON.stringify(data, null, "  "), "utf8");
+    }
+  } catch {
+    return {};
+  }
+};
