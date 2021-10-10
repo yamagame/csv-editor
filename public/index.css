@@ -73,8 +73,9 @@ section {
   left: 0px;
   width: 100px;
   height: 100px;
-  border: solid 1px blue;
-  background-color: blue;
+  border: solid 1px gray;
+  background-color: gray;
+  pointer-events: none;
 }
 
 .csv-table-code {

@@ -707,8 +707,13 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         const mouseDown = e => {
           this.mouseDown(e, thumb);
         };
+        const dblClick = e => {
+          this.resizeDefault(e, thumb);
+        };
         thumb.removeEventListener("mousedown", mouseDown);
         thumb.addEventListener("mousedown", mouseDown);
+        thumb.removeEventListener("dblclick", dblClick);
+        thumb.addEventListener("dblclick", dblClick);
       });
       this.thumbs.horizontal.sort((a, b) => {
         return parseInt(a.style.top) - parseInt(b.style.top);
@@ -813,6 +818,24 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           vertical.style.visibility = "hidden";
         }
       });
+    };
+
+    this.resizeDefault = (e, thumb) => {
+      this.targetThumb = thumb;
+      const datax = thumb.getAttribute("data-x");
+      const datay = thumb.getAttribute("data-y");
+      const width = this.rowWidth[datax];
+      const height = this.colHeight[datay];
+      this.mousePosition = {
+        dx: this.defaultCellSize.width - width,
+        dy: this.defaultCellSize.height - height,
+      };
+      if (this.targetThumb.classList.contains("row-resize")) {
+        this.colSize[datay] = this.defaultCellSize.height;
+      } else {
+        this.rowSize[datax] = this.defaultCellSize.width;
+      }
+      this.mouseUp(e);
     };
 
     this.mouseDown = (e, thumb) => {

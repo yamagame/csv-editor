@@ -15,6 +15,7 @@ export function CsvRouter({ search_dir }) {
     defaultCellSize?: { width: number; height: number };
     fixedPoint?: { x: number; y: number };
     rowSize?: number[];
+    colSize?: number[];
     dataname?: string;
   }
 
