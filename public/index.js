@@ -420,9 +420,13 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       });
 
-      tableLeft.style.height = `${parseInt(tableLeft.style.height) + height}px`;
+      const addheight = this.colHeight[this.colHeight.length - 1];
+
+      tableLeft.style.height = `${
+        parseInt(tableLeft.style.height) + addheight
+      }px`;
       tableRightBottom.style.height = `${
-        parseInt(tableRightBottom.style.height) + height
+        parseInt(tableRightBottom.style.height) + addheight
       }px`;
 
       this.cells = [...this.cells, ...newCells];
@@ -441,7 +445,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       Object.entries(resizeMarkers).forEach(([k, v]) => {
         v.forEach(v => {
           if (v.classList.contains("vertical")) {
-            v.style.height = `${parseInt(v.style.height) + height}px`;
+            v.style.height = `${parseInt(v.style.height) + addheight}px`;
           }
         });
       });
@@ -475,9 +479,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       });
 
-      tableTop.style.width = `${parseInt(tableTop.style.width) + width}px`;
+      const addwidth = this.rowWidth[this.rowWidth.length - 1];
+
+      tableTop.style.width = `${parseInt(tableTop.style.width) + addwidth}px`;
       tableRightBottom.style.width = `${
-        parseInt(tableRightBottom.style.width) + width
+        parseInt(tableRightBottom.style.width) + addwidth
       }px`;
 
       this.cells = [...this.cells, ...newCells];
@@ -496,7 +502,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       Object.entries(resizeMarkers).forEach(([k, v]) => {
         v.forEach(v => {
           if (v.classList.contains("horizontal")) {
-            v.style.width = `${parseInt(v.style.width) + width}px`;
+            v.style.width = `${parseInt(v.style.width) + addwidth}px`;
           }
         });
       });
@@ -967,9 +973,9 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           tableTopLeft.style.width = `${
             parseInt(tableTopLeft.style.width) + dx
           }px`;
-          if (this.fixedPoint.x >= 1 && index >= this.fixedPoint.x) {
-            tableLeft.style.width = `${parseInt(tableLeft.style.width) + dx}px`;
-          }
+          // if (this.fixedPoint.x >= 1 && index >= this.fixedPoint.x) {
+          //   tableLeft.style.width = `${parseInt(tableLeft.style.width) + dx}px`;
+          // }
         }
         if (this.currentSelectedCell) {
           this.setMarker(this.currentSelectedCell);
@@ -989,19 +995,19 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       rowSize: true,
       colSize: true,
       defaultCellSize: true,
-      maxRow: true,
-      maxCol: true,
       fixedPoint: true,
     },
     res => {
       controller.rowSize = res.rowSize || [];
       controller.colSize = res.colSize || [];
       controller.defaultCellSize = res.defaultCellSize;
-      controller.maxRow = res.maxRow;
-      controller.maxCol = res.maxCol;
       controller.fixedPoint = res.fixedPoint;
-      controller.resize();
       controller.cells.forEach(cell => cell.setText(cell.getText()));
+      controller.maxRow =
+        controller.cells.reduce((a, cell) => (a < cell.x ? cell.x : a), 0) + 1;
+      controller.maxCol =
+        controller.cells.reduce((a, cell) => (a < cell.y ? cell.y : a), 0) + 1;
+      controller.resize();
       controller.updateThumb();
     }
   );
