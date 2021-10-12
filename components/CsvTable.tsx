@@ -199,6 +199,7 @@ export const CsvTable = ({
       if (i < x) a += v;
       return a;
     }, 0);
+
   const DataCell = (cell, props) => {
     const top = sumTop(cell.y);
     const left = sumLeft(cell.x);
@@ -228,54 +229,11 @@ export const CsvTable = ({
       </TableCell>
     );
   };
-  const ThumbDataCell = (cell, props) => {
-    const top = sumTop(cell.y);
-    const left = sumLeft(cell.x);
-    const width = rowWidth[cell.x];
-    const height = colHeight[cell.y];
-    return (
-      <ThumbCell
-        className="thumb-table-cell"
-        data={{
-          x: cell.x,
-          y: cell.y,
-          top,
-          left,
-        }}
-        left={left + cell.ox}
-        top={top + cell.oy}
-        width={width}
-        height={height}
-        {...props}>
-        <>
-          <div
-            className="table-thumb"
-            style={{
-              left: `${width - 3}px`,
-              top: 0,
-              height: `${height}px`,
-              cursor: "col-resize",
-              width: `6px`,
-              backgroundColor: "lightgray",
-            }}></div>
-          <div
-            className="table-thumb"
-            style={{
-              left: 0,
-              top: `${height - 3}px`,
-              width: `${width - 3}px`,
-              height: `6px`,
-              cursor: "row-resize",
-              backgroundColor: "blue",
-            }}></div>
-        </>
-      </ThumbCell>
-    );
-  };
+
   const leftOffset =
     rowWidth.reduce((a, v, i) => (i <= fixedPoint.x ? a + v : a), 0) * 2;
-  const topOffset = 0;
-  //    colHeight.reduce((a, v, i) => (i <= fixedPoint.y ? a + v : a), 0) * 2;
+  const topOffset =
+    colHeight.reduce((a, v, i) => (i <= fixedPoint.y ? a + v : a), 0) * 2;
 
   const topLeftCells = csvArray.map((v, y) =>
     rowArray
