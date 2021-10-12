@@ -175,6 +175,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       e.stopPropagation();
     };
     this.setText = text => {
+      // const div = this.element;
       const div = this.element.querySelector("div");
       div.innerText = text;
       const commonStyle = () => {
@@ -197,6 +198,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     };
     this.getText = () => {
+      // return this.element.innerText;
       return this.element.querySelector("div").innerText;
     };
   }
@@ -301,16 +303,16 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
 
     function makeCell(cell) {
       const element = document.createElement("div");
-      const pre = document.createElement("pre");
-      pre.setAttribute("class", "csv-table-code");
-      const code = document.createElement("code");
+      // const pre = document.createElement("pre");
+      // pre.setAttribute("class", "csv-table-code");
+      // const code = document.createElement("code");
       const div = document.createElement("div");
       div.style = `margin-left: 10px; color: ${cell.color};`;
       const newContent = document.createTextNode("");
       div.appendChild(newContent);
-      code.appendChild(div);
-      pre.appendChild(code);
-      element.appendChild(pre);
+      // code.appendChild(div);
+      // pre.appendChild(code);
+      element.appendChild(div);
       element.style.cssText = cell.element.style.cssText;
       element.setAttribute("class", "csv-table-cell");
       element.setAttribute("data-x", cell.x);

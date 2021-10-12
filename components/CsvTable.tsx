@@ -219,13 +219,16 @@ export const CsvTable = ({
         width={rowWidth[cell.x] - 1}
         height={colHeight[cell.y] - 1}
         {...props}>
-        <pre className="csv-table-code">
+        <div style={{ marginLeft: 10, color, top: 1 }}>
+          {escapeHtml(cell.value)}
+        </div>
+        {/* <pre className="csv-table-code">
           <code>
             <div style={{ marginLeft: 10, color, top: 1 }}>
               {escapeHtml(cell.value)}
             </div>
           </code>
-        </pre>
+        </pre> */}
       </TableCell>
     );
   };
@@ -384,11 +387,12 @@ export const CsvTable = ({
         height={sumTop(maxCol) + 1}
         left={0}
         top={0}>
-        {rightBottomCells.map(d =>
+        {rightBottomCells.map((d, y) =>
           d.map(cell =>
             DataCell(cell, {
               backgroundColor: cell.backgroundColor || "white",
               color: cell.color || "black",
+              // visibility: y > 10 ? "hidden" : "visible",
             })
           )
         )}

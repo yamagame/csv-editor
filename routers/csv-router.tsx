@@ -94,7 +94,7 @@ export function CsvRouter({ search_dir }) {
 
   router.post("/view/*", (req, res) => {
     const data = csvParser(req, {
-      fixedPoint: { x: 1, y: 1 },
+      fixedPoint: { x: 0, y: 0 },
       rowSize,
       colSize,
     });
@@ -108,7 +108,7 @@ export function CsvRouter({ search_dir }) {
 
   router.get("/view/*", (req, res) => {
     const data = csvParser(req, {
-      fixedPoint: { x: 1, y: 1 },
+      fixedPoint: { x: 0, y: 0 },
       rowSize,
     });
     const container = (

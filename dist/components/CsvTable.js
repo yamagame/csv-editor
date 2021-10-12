@@ -162,9 +162,7 @@ var CsvTable = function (_a) {
                 top: top,
                 left: left,
             }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props),
-            preact_1.factory("pre", { className: "csv-table-code" },
-                preact_1.factory("code", null,
-                    preact_1.factory("div", { style: { marginLeft: 10, color: color, top: 1 } }, utils_1.escapeHtml(cell.value))))));
+            preact_1.factory("div", { style: { marginLeft: 10, color: color, top: 1 } }, utils_1.escapeHtml(cell.value))));
     };
     var leftOffset = rowWidth.reduce(function (a, v, i) { return (i <= fixedPoint.x ? a + v : a); }, 0) * 2;
     var topOffset = colHeight.reduce(function (a, v, i) { return (i <= fixedPoint.y ? a + v : a); }, 0) * 2;
@@ -235,11 +233,12 @@ var CsvTable = function (_a) {
                 });
             }),
             preact_1.factory(exports.TableThumbs, { direction: "horizontal", topOffset: topOffset, cells: leftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
-        preact_1.factory(exports.TableCell, { className: "table-right-bottom", zIndex: 0, marker: true, width: sumLeft(maxRow) + 2, height: sumTop(maxCol) + 1, left: 0, top: 0 }, rightBottomCells.map(function (d) {
+        preact_1.factory(exports.TableCell, { className: "table-right-bottom", zIndex: 0, marker: true, width: sumLeft(maxRow) + 2, height: sumTop(maxCol) + 1, left: 0, top: 0 }, rightBottomCells.map(function (d, y) {
             return d.map(function (cell) {
                 return DataCell(cell, {
                     backgroundColor: cell.backgroundColor || "white",
                     color: cell.color || "black",
+                    // visibility: y > 10 ? "hidden" : "visible",
                 });
             });
         }))));

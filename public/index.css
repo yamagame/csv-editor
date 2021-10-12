@@ -32,6 +32,8 @@ section {
   top: 0;
   display: inline-block;
   overflow: auto;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .csv-table-cell {
@@ -71,8 +73,8 @@ section {
   position: absolute;
   top: 0px;
   left: 0px;
-  width: 100px;
-  height: 100px;
+  width: 0px;
+  height: 0px;
   border: solid 1px gray;
   background-color: gray;
   pointer-events: none;

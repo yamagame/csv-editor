@@ -90,7 +90,7 @@ function CsvRouter(_a) {
     });
     router.post("/view/*", function (req, res) {
         var data = csvParser(req, {
-            fixedPoint: { x: 1, y: 1 },
+            fixedPoint: { x: 0, y: 0 },
             rowSize: rowSize,
             colSize: colSize,
         });
@@ -102,7 +102,7 @@ function CsvRouter(_a) {
     });
     router.get("/view/*", function (req, res) {
         var data = csvParser(req, {
-            fixedPoint: { x: 1, y: 1 },
+            fixedPoint: { x: 0, y: 0 },
             rowSize: rowSize,
         });
         var container = (preact_1.factory(Container_1.Container, { title: "Top" },
