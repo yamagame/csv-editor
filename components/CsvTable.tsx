@@ -124,6 +124,7 @@ export const TableCell = (props: any) => {
         <TableCell
           className="table-marker"
           name={className}
+          position="absolute"
           zIndex={props.zIndex || 0}
           width={100}
           height={24}

@@ -92,7 +92,7 @@ var TableCell = function (props) {
         : {};
     return (preact_1.factory("div", __assign({ className: className, name: name, style: deleteUndef(__assign({}, props)) }, dataProps),
         children,
-        marker && (preact_1.factory(exports.TableCell, { className: "table-marker", name: className, zIndex: props.zIndex || 0, width: 100, height: 24, left: 0, top: 0 }))));
+        marker && (preact_1.factory(exports.TableCell, { className: "table-marker", name: className, position: "absolute", zIndex: props.zIndex || 0, width: 100, height: 24, left: 0, top: 0 }))));
 };
 exports.TableCell = TableCell;
 var ThumbCell = function (props) {

@@ -90,10 +90,13 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     };
     element.addEventListener("click", e => {
+      if (!controller.loaded) return;
       if (this.y === 0 && this.x > 0) {
         this.select(e, cell => cell.y >= 0 && cell.x === this.x);
+        controller.setMarker(this);
       } else if (this.x === 0 && this.y > 0) {
         this.select(e, cell => cell.x >= 0 && cell.y === this.y);
+        controller.setMarker(this);
       } else {
         if (!this.selected) {
           if (!e.shiftKey && !e.altKey) {
@@ -130,6 +133,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         } else {
           this.clearSelect();
         }
+        controller.setMarker(this);
       }
       controller.showMarker();
       e.preventDefault();
@@ -138,7 +142,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       this.element.style.setProperty("background-color", "pink");
       this.selected = true;
       controller.currentSelectedCell = this;
-      controller.setMarker(this);
+      // controller.setMarker(this);
     };
     this.clearSelect = () => {
       this.element.style.setProperty("background-color", this.backgroundColor);
@@ -352,11 +356,38 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     };
     this.setMarker = cell => {
+      const cellRect = cell.element.getBoundingClientRect();
+      const tableRect1 = element.getBoundingClientRect();
+      const tableRect2 = tableTopLeft.getBoundingClientRect();
       markerAll.forEach(marker => {
-        marker.style.top = cell.element.style.top;
+        const name = marker.getAttribute("name");
+        if (name === "table-right-bottom") {
+          marker.style.top = `${cellRect.top - tableRect1.top}px`;
+        } else if (name === "table-top") {
+          marker.style.top = `${this.sumTop(cell.y) - this.topOffset}px`;
+        } else if (name === "table-top-left") {
+          marker.style.top = `${this.sumTop(cell.y)}px`;
+        } else {
+          marker.style.top = `${
+            cellRect.top - this.topOffset - tableRect1.top
+          }px`;
+        }
       });
       markerAll.forEach(marker => {
-        marker.style.left = cell.element.style.left;
+        const name = marker.getAttribute("name");
+        const tableRect1 = element.getBoundingClientRect();
+        const tableRect2 = tableTopLeft.getBoundingClientRect();
+        if (name === "table-right-bottom") {
+          marker.style.left = `${cellRect.left - tableRect1.left}px`;
+        } else if (name === "table-top") {
+          marker.style.left = `${
+            this.sumLeft(cell.x) // - parseInt(tableRect1.left)
+          }px`;
+        } else if (name === "table-top-left") {
+          marker.style.left = `${this.sumLeft(cell.x)}px`;
+        } else {
+          marker.style.left = `${cellRect.left - parseInt(tableRect1.left)}px`;
+        }
       });
       markerAll.forEach(marker => {
         marker.style.width = `${this.rowWidth[cell.x] - 3}px`;
@@ -1018,6 +1049,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         controller.cells.reduce((a, cell) => (a < cell.y ? cell.y : a), 0) + 1;
       controller.resize();
       controller.updateThumb();
+      controller.loaded = true;
     }
   );
 
