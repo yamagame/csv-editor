@@ -294,7 +294,7 @@ export const CsvTable = ({
         top,
         height: sumTop(maxCol) + 1,
         width: sumLeft(maxRow) + 1,
-        backgroundColor: "pink",
+        // backgroundColor: "pink",
       }}
       dataName={dataname}>
       <TableCell

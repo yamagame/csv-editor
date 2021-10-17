@@ -131,7 +131,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             controller.setInput(this);
           }
         } else {
-          this.clearSelect();
+          if (controller.editCell === this) {
+            this.clearSelect();
+            delete controller.editCell;
+          } else {
+            dataInput.focus();
+            dataInput.select();
+            controller.editCell = this;
+          }
         }
         controller.setMarker(this);
       }
@@ -142,7 +149,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       this.element.style.setProperty("background-color", "pink");
       this.selected = true;
       controller.currentSelectedCell = this;
-      // controller.setMarker(this);
     };
     this.clearSelect = () => {
       this.element.style.setProperty("background-color", this.backgroundColor);
@@ -179,7 +185,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       e.stopPropagation();
     };
     this.setText = text => {
-      // const div = this.element;
       const div = this.element.querySelector("div");
       if (div.innerText === text) return;
       div.innerText = text;
@@ -202,7 +207,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     };
     this.getText = () => {
-      // return this.element.innerText;
       return this.element.querySelector("div").innerText;
     };
   }
@@ -307,15 +311,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
 
     function makeCell(cell) {
       const element = document.createElement("div");
-      // const pre = document.createElement("pre");
-      // pre.setAttribute("class", "csv-table-code");
-      // const code = document.createElement("code");
       const div = document.createElement("div");
       div.style = `color: ${cell.color};`;
       const newContent = document.createTextNode("");
       div.appendChild(newContent);
-      // code.appendChild(div);
-      // pre.appendChild(code);
       element.appendChild(div);
       element.style.cssText = cell.element.style.cssText;
       element.setAttribute("class", "csv-table-cell");
@@ -331,6 +330,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       });
       delete this.currentSelectedCell;
+      delete this.editCell;
     };
     this.showMarker = () => {
       if (this.cells.some(cell => cell.selected) && this.currentSelectedCell) {
@@ -456,9 +456,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       tableLeft.style.height = `${
         parseInt(tableLeft.style.height) + addheight
       }px`;
-      // tableRightBottom.style.height = `${
-      //   parseInt(tableRightBottom.style.height) + addheight
-      // }px`;
       element.style.height = `${parseInt(element.style.height) + addheight}px`;
 
       this.cells = [...this.cells, ...newCells];
@@ -638,9 +635,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             tableLeft.style.height = `${
               parseInt(tableLeft.style.height) + dy
             }px`;
-            // tableRightBottom.style.height = `${
-            //   parseInt(tableRightBottom.style.height) + dy
-            // }px`;
             element.style.height = `${parseInt(element.style.height) + dy}px`;
           }
         } else if (selectedCell.y === 0) {
@@ -965,9 +959,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
               }
             });
           });
-          // tableRightBottom.style.height = `${
-          //   parseInt(tableRightBottom.style.height) + dy
-          // }px`;
           tableLeft.style.height = `${parseInt(tableLeft.style.height) + dy}px`;
           element.style.height = `${parseInt(element.style.height) + dy}px`;
         } else {
@@ -1171,6 +1162,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             controller.currentSelectedCell.y > 0
           ) {
             dataInput.focus();
+            dataInput.select();
           }
         }
       }

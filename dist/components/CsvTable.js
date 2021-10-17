@@ -200,7 +200,7 @@ var CsvTable = function (_a) {
             top: top,
             height: sumTop(maxCol) + 1,
             width: sumLeft(maxRow) + 1,
-            backgroundColor: "pink",
+            // backgroundColor: "pink",
         }, dataName: dataname },
         preact_1.factory(exports.TableCell, { className: "table-top-left", position: "fixed", zIndex: 30, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(fixedPoint.y + 1), 
             // height={0 /* sumTop(fixedPoint.y + 1)*/}
