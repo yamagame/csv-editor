@@ -358,7 +358,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.setMarker = cell => {
       const cellRect = cell.element.getBoundingClientRect();
       const tableRect1 = element.getBoundingClientRect();
-      const tableRect2 = tableTopLeft.getBoundingClientRect();
       markerAll.forEach(marker => {
         const name = marker.getAttribute("name");
         if (name === "table-right-bottom") {
@@ -376,7 +375,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       markerAll.forEach(marker => {
         const name = marker.getAttribute("name");
         const tableRect1 = element.getBoundingClientRect();
-        const tableRect2 = tableTopLeft.getBoundingClientRect();
         if (name === "table-right-bottom") {
           marker.style.left = `${cellRect.left - tableRect1.left}px`;
         } else if (name === "table-top") {
@@ -1009,13 +1007,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           tableRightBottom.style.width = `${
             parseInt(tableRightBottom.style.width) + dx
           }px`;
-          tableTopLeft.style.width = `${
-            parseInt(tableTopLeft.style.width) + dx
-          }px`;
           element.style.width = `${parseInt(element.style.width) + dx}px`;
-          // if (this.fixedPoint.x >= 1 && index >= this.fixedPoint.x) {
-          //   tableLeft.style.width = `${parseInt(tableLeft.style.width) + dx}px`;
-          // }
         }
         if (this.currentSelectedCell) {
           this.setMarker(this.currentSelectedCell);
