@@ -27,21 +27,32 @@ section {
   user-select: none;
   margin: 0;
   padding: 0;
-  position: relative;
+  position: absolute;
   left: 0;
   top: 0;
   display: inline-block;
-  overflow: auto;
+  overflow: visible;
   user-select: none;
   -webkit-user-select: none;
 }
 
 .csv-table-cell {
+  position: absolute;
+  display: block;
   overflow: hidden;
   border-top: solid 1px;
   border-left: solid 1px;
   border-right: solid 1px;
   border-bottom: solid 1px;
+  margin: 0;
+  padding: 0;
+  padding-top: 1px;
+  padding-left: 1px;
+}
+
+.csv-table-cell > div {
+  margin-top: 1px;
+  margin-left: 1px;
 }
 
 .thumb-table-cell {
@@ -51,10 +62,14 @@ section {
 
 .csv-control-panel {
   display: block;
-  position: absolute;
+  position: fixed;
   z-index: 100;
-  left: 30px;
-  height: 24px;
+  top: 0px;
+  left: 0px;
+  height: 22px;
+  width: 100%;
+  padding: 4px;
+  background-color: #fafafa;
 }
 
 .table-marker {
@@ -75,7 +90,7 @@ section {
   left: 0px;
   width: 0px;
   height: 0px;
-  border: solid 1px gray;
+  border: solid 1px black;
   background-color: gray;
   pointer-events: none;
 }

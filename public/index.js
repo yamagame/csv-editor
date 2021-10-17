@@ -31,7 +31,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const tableRightBottom = element.querySelector(".table-right-bottom");
   const markerAll = element.querySelectorAll(".table-marker");
   const borderThick = 1;
-  const topOffset = parseInt(tableTopLeft.style.height) * 2;
+  const topOffset = tableTopLeft.getBoundingClientRect().height * 2;
 
   function TableCell(element, controller) {
     this.element = element;
@@ -177,17 +177,17 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.setText = text => {
       // const div = this.element;
       const div = this.element.querySelector("div");
+      if (div.innerText === text) return;
       div.innerText = text;
       const commonStyle = () => {
-        let s = `position: absolute;`;
-        s += " margin-left: 10px;";
+        let s = ``;
         return s;
       };
       if (text.indexOf("@") === 0) {
         div.classList.add("csv-cell-button");
-        div.style = `${commonStyle()} top: 1px; width: ${
+        div.style = `${commonStyle()} width: ${
           this.getWidth() - 32
-        }px; height: ${this.getHeight() - 5}px; color: ${
+        }px; height: ${this.getHeight() - 7}px; color: ${
           this.color
         }; margin-right: 10px;`;
         div.addEventListener("click", this.clickButton);
@@ -307,7 +307,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       // pre.setAttribute("class", "csv-table-code");
       // const code = document.createElement("code");
       const div = document.createElement("div");
-      div.style = `margin-left: 10px; color: ${cell.color};`;
+      div.style = `color: ${cell.color};`;
       const newContent = document.createTextNode("");
       div.appendChild(newContent);
       // code.appendChild(div);
@@ -427,9 +427,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       tableLeft.style.height = `${
         parseInt(tableLeft.style.height) + addheight
       }px`;
-      tableRightBottom.style.height = `${
-        parseInt(tableRightBottom.style.height) + addheight
-      }px`;
+      // tableRightBottom.style.height = `${
+      //   parseInt(tableRightBottom.style.height) + addheight
+      // }px`;
+      element.style.height = `${parseInt(element.style.height) + addheight}px`;
 
       this.cells = [...this.cells, ...newCells];
       this.resetIndexNumber();
@@ -484,9 +485,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       const addwidth = this.rowWidth[this.rowWidth.length - 1];
 
       tableTop.style.width = `${parseInt(tableTop.style.width) + addwidth}px`;
-      tableRightBottom.style.width = `${
-        parseInt(tableRightBottom.style.width) + addwidth
-      }px`;
+      // tableRightBottom.style.width = `${
+      //   parseInt(tableRightBottom.style.width) + addwidth
+      // }px`;
+      element.style.width = `${parseInt(element.style.width) + addwidth}px`;
 
       this.cells = [...this.cells, ...newCells];
       this.resetIndexNumber();
@@ -607,9 +609,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             tableLeft.style.height = `${
               parseInt(tableLeft.style.height) + dy
             }px`;
-            tableRightBottom.style.height = `${
-              parseInt(tableRightBottom.style.height) + dy
-            }px`;
+            // tableRightBottom.style.height = `${
+            //   parseInt(tableRightBottom.style.height) + dy
+            // }px`;
+            element.style.height = `${parseInt(element.style.height) + dy}px`;
           }
         } else if (selectedCell.y === 0) {
           if (this.maxRow > 2) {
@@ -744,7 +747,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         const vertical = v.find(v => v.classList.contains("vertical"));
         if (horizontal) {
           horizontal.style.visibility = "hidden";
-          horizontal.style.width = `${parseInt(element.style.width) - 4}px`;
+          horizontal.style.width = `${parseInt(element.style.width) - 2}px`;
           horizontal.style.height = "1px";
         }
         if (vertical) {
@@ -793,22 +796,26 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
 
     this.resizeMarkerX = (x, thumb) => {
-      const [dx, dy] = getScrollOffset(thumb);
       const index = this.thumbs.vertical.indexOf(thumb);
+      const colIndex = parseInt(thumb.getAttribute("data-x"));
       const leftThumb = this.thumbs.vertical[index - 2];
-      const min = leftThumb
-        ? parseInt(leftThumb.style.left) + 4 - dx
-        : this.rowWidth[0] + 4 - dx;
+      const topPos = parseInt(tableTopLeft.style.left);
+      const thumbPosition = leftThumb
+        ? leftThumb.getBoundingClientRect().left
+        : topPos + this.sumLeft(colIndex);
+      const min = thumbPosition + 4 - topPos;
       if (x <= min) return min;
       return x;
     };
 
     this.resizeMarkerY = (y, thumb, marker) => {
-      const [dx, dy] = getScrollOffset(thumb);
       const index = this.thumbs.horizontal.indexOf(thumb);
-      const topThumb = this.thumbs.horizontal[index - 2];
-      const topOffset = this.topOffset;
       const colIndex = parseInt(thumb.getAttribute("data-y"));
+      const topThumb = this.thumbs.horizontal[index - 2];
+      const topPos = parseInt(tableTopLeft.style.top);
+      const thumbPosition = topThumb
+        ? topThumb.getBoundingClientRect().top
+        : topPos + this.sumTop(colIndex);
       if (
         this.fixedPoint.y >= 1 &&
         colIndex <= this.fixedPoint.y &&
@@ -817,9 +824,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         const min = this.sumTop(colIndex) + 4;
         if (y <= min) return min;
       } else {
-        const min = topThumb
-          ? parseInt(topThumb.style.top) + 4 + topOffset - dy
-          : this.colHeight[0] + 4 - dy;
+        const min = thumbPosition + 4 - topPos;
         if (y <= min) return min;
       }
       return y;
@@ -931,10 +936,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
               }
             });
           });
-          tableRightBottom.style.height = `${
-            parseInt(tableRightBottom.style.height) + dy
-          }px`;
+          // tableRightBottom.style.height = `${
+          //   parseInt(tableRightBottom.style.height) + dy
+          // }px`;
           tableLeft.style.height = `${parseInt(tableLeft.style.height) + dy}px`;
+          element.style.height = `${parseInt(element.style.height) + dy}px`;
         } else {
           const index = parseInt(this.targetThumb.getAttribute("data-x"));
           this.thumbs.vertical.forEach(thumb => {
@@ -975,6 +981,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           tableTopLeft.style.width = `${
             parseInt(tableTopLeft.style.width) + dx
           }px`;
+          element.style.width = `${parseInt(element.style.width) + dx}px`;
           // if (this.fixedPoint.x >= 1 && index >= this.fixedPoint.x) {
           //   tableLeft.style.width = `${parseInt(tableLeft.style.width) + dx}px`;
           // }
@@ -1022,11 +1029,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     element.style.setProperty("width", `${width}px`);
     element.style.setProperty("height", `${height}px`);
   }
-  ajustTableSize();
+  // ajustTableSize();
 
-  window.addEventListener("resize", () => {
-    ajustTableSize();
-  });
+  // window.addEventListener("resize", () => {
+  //   ajustTableSize();
+  // });
 
   const moveSelect = (e, dx, dy) => {
     if (controller.currentSelectedCell) {

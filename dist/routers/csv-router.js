@@ -109,7 +109,7 @@ function CsvRouter(_a) {
             preact_1.factory("div", { className: "csv-control-panel" },
                 preact_1.factory("input", { className: "csv-save-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" }),
                 preact_1.factory("input", { className: "csv-data-input", type: "text" })),
-            preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 30, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize }),
+            preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize }),
             preact_1.factory("script", { type: "text/javascript", src: "/csv-index.js" })));
         res.send(preact_1.render(container));
     });

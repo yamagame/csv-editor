@@ -16,7 +16,7 @@ export function Container({ title, children }: Props) {
         <link rel="stylesheet" type="text/css" href="/index.css" />
         <title>{title}</title>
       </head>
-      <body>
+      <body onload="main()">
         <script type="text/javascript" src="/index.js"></script>
         {children}
       </body>

@@ -12,7 +12,7 @@ function Container(_a) {
             preact_1.factory("meta", { name: "viewport", content: "width=device-width, initial-scale=1.0" }),
             preact_1.factory("link", { rel: "stylesheet", type: "text/css", href: "/index.css" }),
             preact_1.factory("title", null, title)),
-        preact_1.factory("body", null,
+        preact_1.factory("body", { onload: "main()" },
             preact_1.factory("script", { type: "text/javascript", src: "/index.js" }),
             children)));
 }

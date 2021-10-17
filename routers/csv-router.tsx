@@ -125,7 +125,7 @@ export function CsvRouter({ search_dir }) {
         <CsvTable
           id="csv-table"
           data={data.csv}
-          left={30}
+          left={0}
           top={30}
           dataname={data.dataname}
           defaultCellSize={data.defaultCellSize}

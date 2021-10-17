@@ -117,7 +117,7 @@ export const TableCell = (props: any) => {
     <div
       className={className}
       name={name}
-      style={deleteUndef({ position: "absolute", ...props })}
+      style={deleteUndef({ ...props })}
       {...dataProps}>
       {children}
       {marker && (
@@ -219,9 +219,7 @@ export const CsvTable = ({
         width={rowWidth[cell.x] - 1}
         height={colHeight[cell.y] - 1}
         {...props}>
-        <div style={{ marginLeft: 10, color, top: 1 }}>
-          {escapeHtml(cell.value)}
-        </div>
+        <div style={{ color, top: 1 }}>{escapeHtml(cell.value)}</div>
         {/* <pre className="csv-table-code">
           <code>
             <div style={{ marginLeft: 10, color, top: 1 }}>
@@ -293,19 +291,21 @@ export const CsvTable = ({
       style={{
         left,
         top,
-        height: sumTop(maxCol) + 2,
-        width: sumLeft(maxRow) + 2,
+        height: sumTop(maxCol) + 1,
+        width: sumLeft(maxRow) + 1,
+        backgroundColor: "pink",
       }}
       dataName={dataname}>
       <TableCell
         className="table-top-left"
-        position="sticky"
+        position="fixed"
         zIndex={30}
         marker
         width={sumLeft(fixedPoint.x + 1)}
-        height={0 /* sumTop(fixedPoint.y + 1)*/}
-        left={0}
-        top={0}>
+        height={sumTop(fixedPoint.y + 1)}
+        // height={0 /* sumTop(fixedPoint.y + 1)*/}
+        left={left}
+        top={top}>
         {topLeftCells.map(d =>
           d.map(cell =>
             DataCell(cell, {
@@ -332,7 +332,7 @@ export const CsvTable = ({
         width={sumLeft(maxRow) + 2}
         height={0}
         left={0}
-        top={topOffset}>
+        top={topOffset + top}>
         {topCells.map(d =>
           d.map(cell =>
             DataCell(cell, {
@@ -359,8 +359,9 @@ export const CsvTable = ({
         marker
         width={sumLeft(fixedPoint.x + 1)}
         height={sumTop(maxCol) - topOffset + 1}
-        left={0}
-        top={topOffset}>
+        marginLeft={0}
+        left={left}
+        top={topOffset + top}>
         {leftCells.map(d =>
           d.map(cell =>
             DataCell(cell, {
@@ -384,7 +385,7 @@ export const CsvTable = ({
         zIndex={0}
         marker
         width={sumLeft(maxRow) + 2}
-        height={sumTop(maxCol) + 1}
+        height={0 /*sumTop(maxCol) + 1*/}
         left={0}
         top={0}>
         {rightBottomCells.map((d, y) =>

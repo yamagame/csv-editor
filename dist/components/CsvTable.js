@@ -90,7 +90,7 @@ var TableCell = function (props) {
             return a;
         }, {})
         : {};
-    return (preact_1.factory("div", __assign({ className: className, name: name, style: deleteUndef(__assign({ position: "absolute" }, props)) }, dataProps),
+    return (preact_1.factory("div", __assign({ className: className, name: name, style: deleteUndef(__assign({}, props)) }, dataProps),
         children,
         marker && (preact_1.factory(exports.TableCell, { className: "table-marker", name: className, zIndex: props.zIndex || 0, width: 100, height: 24, left: 0, top: 0 }))));
 };
@@ -162,7 +162,7 @@ var CsvTable = function (_a) {
                 top: top,
                 left: left,
             }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props),
-            preact_1.factory("div", { style: { marginLeft: 10, color: color, top: 1 } }, utils_1.escapeHtml(cell.value))));
+            preact_1.factory("div", { style: { color: color, top: 1 } }, utils_1.escapeHtml(cell.value))));
     };
     var leftOffset = rowWidth.reduce(function (a, v, i) { return (i <= fixedPoint.x ? a + v : a); }, 0) * 2;
     var topOffset = colHeight.reduce(function (a, v, i) { return (i <= fixedPoint.y ? a + v : a); }, 0) * 2;
@@ -198,10 +198,13 @@ var CsvTable = function (_a) {
     return (preact_1.factory("div", { id: id, className: "csv-table", style: {
             left: left,
             top: top,
-            height: sumTop(maxCol) + 2,
-            width: sumLeft(maxRow) + 2,
+            height: sumTop(maxCol) + 1,
+            width: sumLeft(maxRow) + 1,
+            backgroundColor: "pink",
         }, dataName: dataname },
-        preact_1.factory(exports.TableCell, { className: "table-top-left", position: "sticky", zIndex: 30, marker: true, width: sumLeft(fixedPoint.x + 1), height: 0 /* sumTop(fixedPoint.y + 1)*/, left: 0, top: 0 },
+        preact_1.factory(exports.TableCell, { className: "table-top-left", position: "fixed", zIndex: 30, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(fixedPoint.y + 1), 
+            // height={0 /* sumTop(fixedPoint.y + 1)*/}
+            left: left, top: top },
             topLeftCells.map(function (d) {
                 return d.map(function (cell) {
                     return DataCell(cell, {
@@ -212,7 +215,7 @@ var CsvTable = function (_a) {
             }),
             preact_1.factory(exports.TableThumbs, { direction: "horizontal vertical", cells: topLeftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft }),
             preact_1.factory(exports.ResizeMarker, { topOffset: topOffset })),
-        preact_1.factory(exports.TableCell, { className: "table-top", position: "sticky", zIndex: 10, marker: true, width: sumLeft(maxRow) + 2, height: 0, left: 0, top: topOffset },
+        preact_1.factory(exports.TableCell, { className: "table-top", position: "sticky", zIndex: 10, marker: true, width: sumLeft(maxRow) + 2, height: 0, left: 0, top: topOffset + top },
             topCells.map(function (d) {
                 return d.map(function (cell) {
                     return DataCell(cell, {
@@ -223,7 +226,7 @@ var CsvTable = function (_a) {
                 });
             }),
             preact_1.factory(exports.TableThumbs, { direction: "vertical", topOffset: topOffset, cells: topCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
-        preact_1.factory(exports.TableCell, { className: "table-left", position: "sticky", zIndex: 20, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(maxCol) - topOffset + 1, left: 0, top: topOffset },
+        preact_1.factory(exports.TableCell, { className: "table-left", position: "sticky", zIndex: 20, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(maxCol) - topOffset + 1, marginLeft: 0, left: left, top: topOffset + top },
             leftCells.map(function (d) {
                 return d.map(function (cell) {
                     return DataCell(cell, {
@@ -233,7 +236,7 @@ var CsvTable = function (_a) {
                 });
             }),
             preact_1.factory(exports.TableThumbs, { direction: "horizontal", topOffset: topOffset, cells: leftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
-        preact_1.factory(exports.TableCell, { className: "table-right-bottom", zIndex: 0, marker: true, width: sumLeft(maxRow) + 2, height: sumTop(maxCol) + 1, left: 0, top: 0 }, rightBottomCells.map(function (d, y) {
+        preact_1.factory(exports.TableCell, { className: "table-right-bottom", zIndex: 0, marker: true, width: sumLeft(maxRow) + 2, height: 0 /*sumTop(maxCol) + 1*/, left: 0, top: 0 }, rightBottomCells.map(function (d, y) {
             return d.map(function (cell) {
                 return DataCell(cell, {
                     backgroundColor: cell.backgroundColor || "white",

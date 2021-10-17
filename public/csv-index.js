@@ -1,5 +1,9 @@
-const controlelr = CsvTable("/csv/view", "csv-table", ".csv-data-input");
+let controller;
 
-function save() {
-  controlelr.save("/csv/save");
+function main() {
+  controller = CsvTable("/csv/view", "csv-table", ".csv-data-input");
+
+  function save() {
+    controller.save("/csv/save");
+  }
 }
