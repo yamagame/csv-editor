@@ -6,10 +6,10 @@ import express from "express";
 import { CsvTable } from "components/CsvTable";
 import { Container } from "components/Container";
 
-export function CsvRouter({ search_dir }) {
+export function CsvRouter(options: any = {}, optionReader: () => {}) {
   const router = express.Router();
-  const rowSize = [40, 40];
-  const colSize = [0];
+  const rowSize = options.cellWidth || [40, 40];
+  const colSize = options.cellHeight || [0];
 
   interface CsvParserOptions {
     defaultCellSize?: { width: number; height: number };
@@ -19,14 +19,14 @@ export function CsvRouter({ search_dir }) {
     dataname?: string;
   }
 
-  function csvParser(req, options: CsvParserOptions = {}) {
+  function csvParser(filename, options: CsvParserOptions = {}) {
     const defaultOptions = {
       defaultCellSize: { width: 130, height: 18 },
       fixedPoint: { x: 0, y: 0 },
       rowSize: [],
     };
     const csvParser = require("libs/csv-parser");
-    const csvFilePath = path.join(search_dir, req.params[0]);
+    const csvFilePath = path.join(filename);
     const csvArray = csvParser.load(csvFilePath);
     const csvJson = loadJson(csvFilePath);
     const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
@@ -45,7 +45,7 @@ export function CsvRouter({ search_dir }) {
       ...{
         ...defaultOptions,
         ...options,
-        dataname: req.params[0],
+        dataname: filename,
         maxRow: maxRow + 1,
         maxCol: maxCol + 1,
         ...csvJson,
@@ -54,7 +54,7 @@ export function CsvRouter({ search_dir }) {
   }
 
   router.post("/save/*", (req, res) => {
-    const data = csvParser(req, {
+    const data = csvParser(req.params[0], {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
     });
@@ -81,19 +81,19 @@ export function CsvRouter({ search_dir }) {
       const csvParser = require("libs/csv-parser");
       const csvData = [...data.csv].slice(1).map(col => col.slice(1));
       const csvString = csvParser.stringify(csvData);
-      const csvPath = path.join(search_dir, req.params[0]);
+      const csvPath = req.params[0];
       fs.writeFileSync(csvPath, csvString);
     }
     {
       const { rowSize, colSize, maxCol, maxRow } = req.body;
-      const csvFilePath = path.join(search_dir, req.params[0]);
+      const csvFilePath = req.params[0];
       saveJson(csvFilePath, { rowSize, colSize, maxCol, maxRow });
     }
     res.send({ result: "OK" });
   });
 
   router.post("/view/*", (req, res) => {
-    const data = csvParser(req, {
+    const data = csvParser(req.params[0], {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
       colSize,
@@ -106,11 +106,27 @@ export function CsvRouter({ search_dir }) {
     );
   });
 
-  router.get("/view/*", (req, res) => {
-    const data = csvParser(req, {
+  router.get("/view", (req, res) => {
+    const data = csvParser(req.query.file, {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
     });
+    const form = [
+      {
+        expression: "A0 == 'NG'",
+        style: {
+          color: "red",
+          fontWeight: "bold",
+        },
+      },
+      {
+        range: "B2",
+        expression: "$B0 != ''",
+        style: {
+          backgroundColor: "yellow",
+        },
+      },
+    ];
     const container = (
       <Container title="Top">
         <div className="csv-control-panel">
@@ -132,6 +148,7 @@ export function CsvRouter({ search_dir }) {
           fixedPoint={data.fixedPoint}
           rowSize={data.rowSize}
           colSize={data.colSize}
+          form={form}
         />
         <script type="text/javascript" src="/csv-index.js"></script>
       </Container>

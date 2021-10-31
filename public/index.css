@@ -123,3 +123,19 @@ section {
 .csv-cell-button:active {
   background-color: skyblue;
 }
+
+.group-name {
+  font-size: 0.9em;
+  margin: 0px;
+  margin-bottom: 2px;
+}
+
+.group-item {
+  font-size: 0.9em;
+  margin-left: 10px;
+  margin-bottom: 2px;
+}
+
+.bg-pink {
+  background-color: pink;
+}

@@ -1,0 +1,29 @@
+{
+  "directories": [
+    {
+      "id": "csv-viewer",
+      "name": "CSVファイル",
+      "dir": "./test-csv",
+      "extension": ".csv",
+      "viewer": "csv/view",
+      "cellWidth": [],
+      "cellHeight": [],
+      "form": [
+        {
+          "range": "",
+          "expression": "",
+          "style": {
+            "backgrundColor": "pink"
+          }
+        }
+      ]
+    },
+    {
+      "id": "env-viewer",
+      "name": "ENVファイル",
+      "dir": "./test-csv",
+      "files": ["sample-env"],
+      "viewer": "env/view"
+    }
+  ]
+}

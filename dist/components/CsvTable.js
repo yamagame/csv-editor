@@ -14,6 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CsvTable = exports.ThumbCell = exports.TableCell = exports.TableThumbs = exports.ResizeMarker = void 0;
 var preact_1 = require("libs/preact");
 var utils_1 = require("libs/utils");
+var macro = require("libs/csv-macro");
 var ResizeMarker = function (_a) {
     var _b = _a.topOffset, topOffset = _b === void 0 ? 0 : _b;
     return (preact_1.factory(preact_1.Fragment, null,
@@ -119,7 +120,7 @@ var ThumbCell = function (props) {
 };
 exports.ThumbCell = ThumbCell;
 var CsvTable = function (_a) {
-    var _b = _a.data, data = _b === void 0 ? [] : _b, _c = _a.id, id = _c === void 0 ? "csv-table" : _c, _d = _a.dataname, dataname = _d === void 0 ? "" : _d, _e = _a.fixedPoint, fixedPoint = _e === void 0 ? { x: 1, y: 1 } : _e, _f = _a.defaultCellSize, defaultCellSize = _f === void 0 ? { width: 50, height: 18 } : _f, _g = _a.top, top = _g === void 0 ? 50 : _g, _h = _a.left, left = _h === void 0 ? 0 : _h, _j = _a.rowSize, rowSize = _j === void 0 ? [] : _j, _k = _a.colSize, colSize = _k === void 0 ? [] : _k;
+    var _b = _a.data, data = _b === void 0 ? [] : _b, _c = _a.id, id = _c === void 0 ? "csv-table" : _c, _d = _a.dataname, dataname = _d === void 0 ? "" : _d, _e = _a.fixedPoint, fixedPoint = _e === void 0 ? { x: 1, y: 1 } : _e, _f = _a.defaultCellSize, defaultCellSize = _f === void 0 ? { width: 50, height: 18 } : _f, _g = _a.top, top = _g === void 0 ? 50 : _g, _h = _a.left, left = _h === void 0 ? 0 : _h, _j = _a.rowSize, rowSize = _j === void 0 ? [] : _j, _k = _a.colSize, colSize = _k === void 0 ? [] : _k, _l = _a.form, form = _l === void 0 ? [] : _l;
     var csvArray = data;
     var maxRow = csvArray.reduce(function (a, v) { return (a < v.length ? v.length : a); }, 0);
     var maxCol = csvArray.length;
@@ -127,6 +128,11 @@ var CsvTable = function (_a) {
     var colArray = new Array(maxCol).fill(0);
     var rowWidth = rowArray.map(function (v) { return defaultCellSize.width; });
     var colHeight = colArray.map(function (v) { return defaultCellSize.height; });
+    var macros = form.map(function (f) { return ({
+        range: macro.range(f.range || ""),
+        macro: macro.compile(f.expression || ""),
+        style: f.style || "",
+    }); });
     rowSize.forEach(function (v, i) {
         if (v > 0) {
             rowWidth[i] = v;
@@ -156,13 +162,26 @@ var CsvTable = function (_a) {
         var left = sumLeft(cell.x);
         var color = props.color;
         delete props.color;
-        return (preact_1.factory(exports.TableCell, __assign({ className: "csv-table-cell", data: {
+        var className = ["csv-table-cell"];
+        var macroStyle = {};
+        macros.forEach(function (m) {
+            var getCellText = function (x, y) {
+                return csvArray[y][x].value;
+            };
+            var x = cell.x;
+            var y = cell.y;
+            var step3 = macro.executor(cell, m.macro, m.range, macro.operator({ x: x, y: y }, getCellText));
+            if (step3) {
+                macroStyle = __assign(__assign({}, macroStyle), m.style);
+            }
+        });
+        return (preact_1.factory(exports.TableCell, __assign({ className: className.join(" "), data: {
                 x: cell.x,
                 y: cell.y,
                 top: top,
                 left: left,
-            }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props),
-            preact_1.factory("div", { style: { color: color, top: 1 } }, utils_1.escapeHtml(cell.value))));
+            }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props, macroStyle, { color: "black" }),
+            preact_1.factory("div", { style: __assign({ color: color, top: 1 }, macroStyle) }, utils_1.escapeHtml(cell.value))));
     };
     var leftOffset = rowWidth.reduce(function (a, v, i) { return (i <= fixedPoint.x ? a + v : a); }, 0) * 2;
     var topOffset = colHeight.reduce(function (a, v, i) { return (i <= fixedPoint.y ? a + v : a); }, 0) * 2;

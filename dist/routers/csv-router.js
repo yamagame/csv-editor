@@ -27,12 +27,12 @@ var path = require("path");
 var express_1 = __importDefault(require("express"));
 var CsvTable_1 = require("components/CsvTable");
 var Container_1 = require("components/Container");
-function CsvRouter(_a) {
-    var search_dir = _a.search_dir;
+function CsvRouter(options, optionReader) {
+    if (options === void 0) { options = {}; }
     var router = express_1.default.Router();
-    var rowSize = [40, 40];
-    var colSize = [0];
-    function csvParser(req, options) {
+    var rowSize = options.cellWidth || [40, 40];
+    var colSize = options.cellHeight || [0];
+    function csvParser(filename, options) {
         if (options === void 0) { options = {}; }
         var defaultOptions = {
             defaultCellSize: { width: 130, height: 18 },
@@ -40,7 +40,7 @@ function CsvRouter(_a) {
             rowSize: [],
         };
         var csvParser = require("libs/csv-parser");
-        var csvFilePath = path.join(search_dir, req.params[0]);
+        var csvFilePath = path.join(filename);
         var csvArray = csvParser.load(csvFilePath);
         var csvJson = utils_1.loadJson(csvFilePath);
         var maxRow = csvArray.reduce(function (a, v) { return (a < v.length ? v.length : a); }, 0);
@@ -53,10 +53,10 @@ function CsvRouter(_a) {
         var csv = __spreadArray([header], csvArray).map(function (v, i) { return __spreadArray([
             { value: "" + i, color: "white", backgroundColor: "gray" }
         ], v); });
-        return __assign({ csv: csv }, __assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: req.params[0], maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson));
+        return __assign({ csv: csv }, __assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson));
     }
     router.post("/save/*", function (req, res) {
-        var data = csvParser(req, {
+        var data = csvParser(req.params[0], {
             fixedPoint: { x: 0, y: 0 },
             rowSize: rowSize,
         });
@@ -78,18 +78,18 @@ function CsvRouter(_a) {
             var csvParser_1 = require("libs/csv-parser");
             var csvData = __spreadArray([], data.csv).slice(1).map(function (col) { return col.slice(1); });
             var csvString = csvParser_1.stringify(csvData);
-            var csvPath = path.join(search_dir, req.params[0]);
+            var csvPath = req.params[0];
             fs.writeFileSync(csvPath, csvString);
         }
         {
             var _a = req.body, rowSize_1 = _a.rowSize, colSize_1 = _a.colSize, maxCol = _a.maxCol, maxRow = _a.maxRow;
-            var csvFilePath = path.join(search_dir, req.params[0]);
+            var csvFilePath = req.params[0];
             utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
         }
         res.send({ result: "OK" });
     });
     router.post("/view/*", function (req, res) {
-        var data = csvParser(req, {
+        var data = csvParser(req.params[0], {
             fixedPoint: { x: 0, y: 0 },
             rowSize: rowSize,
             colSize: colSize,
@@ -100,16 +100,32 @@ function CsvRouter(_a) {
             return a;
         }, {}));
     });
-    router.get("/view/*", function (req, res) {
-        var data = csvParser(req, {
+    router.get("/view", function (req, res) {
+        var data = csvParser(req.query.file, {
             fixedPoint: { x: 0, y: 0 },
             rowSize: rowSize,
         });
+        var form = [
+            {
+                expression: "A0 == 'NG'",
+                style: {
+                    color: "red",
+                    fontWeight: "bold",
+                },
+            },
+            {
+                range: "B2",
+                expression: "$B0 != ''",
+                style: {
+                    backgroundColor: "yellow",
+                },
+            },
+        ];
         var container = (preact_1.factory(Container_1.Container, { title: "Top" },
             preact_1.factory("div", { className: "csv-control-panel" },
                 preact_1.factory("input", { className: "csv-save-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" }),
                 preact_1.factory("input", { className: "csv-data-input", type: "text" })),
-            preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize }),
+            preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize, form: form }),
             preact_1.factory("script", { type: "text/javascript", src: "/csv-index.js" })));
         res.send(preact_1.render(container));
     });

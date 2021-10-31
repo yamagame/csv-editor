@@ -3,10 +3,16 @@ import path = require("path");
 import express from "express";
 import { readDir } from "libs/utils";
 import { Container } from "components/Container";
-import { EnvEditRouter, EnvViewRouter } from "routers/env-router";
+import { EnvViewRouter } from "routers/env-router";
 import { CsvRouter } from "routers/csv-router";
+import { readFile } from "fs/promises";
 
-const TARGET_DIR = process.env.TARGET_DIR || "test-csv";
+const CONFIG_PATH = process.env.CONFIG_PATH || "./config.json";
+
+const loadConfig = async () => {
+  const data = await readFile(CONFIG_PATH, "utf-8");
+  return JSON.parse(data);
+};
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,42 +22,45 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static("public"));
 
-app.use("/env/edit", EnvEditRouter({ search_dir: TARGET_DIR }));
-app.use("/env/view", EnvViewRouter({ search_dir: TARGET_DIR }));
+app.use(
+  "/csv",
+  CsvRouter({}, async () => {
+    const { directories } = await loadConfig();
+    return directories.find(group => group.id === "csv-viewer");
+  })
+);
+app.use(
+  "/env",
+  EnvViewRouter({}, async () => {
+    const { directories } = await loadConfig();
+    return directories.find(group => group.id === "env-viewer");
+  })
+);
 
-app.use("/csv", CsvRouter({ search_dir: TARGET_DIR }));
-
-app.use("/action", (req, res) => {
-  console.log(req.body);
-  res.sendStatus(200);
-});
-
-app.get("/", function (req, res) {
+app.get("/", async (req, res) => {
+  const { directories } = await loadConfig();
   const container = (
     <Container title="Top">
-      <section>
-        {readDir(TARGET_DIR, filepath => {
-          return path.extname(filepath) === ".csv";
-        }).map(v => (
-          <div>
-            <a href={`/csv/view${v}`}>{v}</a>
-          </div>
-        ))}
-      </section>
-      <section>
-        {readDir(TARGET_DIR, filepath => {
-          return path.basename(filepath) === "sample-env";
-        }).map(v => (
-          <div>
-            <a href={`/env/view${v}`}>{v}</a>
-          </div>
-        ))}
-      </section>
-      <section>
-        <div>
-          <a href={`/env/edit/sample-env`}>sample-env</a>
-        </div>
-      </section>
+      {directories.map(group => (
+        <section>
+          <p className="group-name">{group.name}</p>
+          {readDir(group.dir, filepath => {
+            if (group.extension) {
+              const ext = path.extname(filepath);
+              return ext !== "" && group.extension.indexOf(ext) >= 0;
+            }
+            if (group.files) {
+              const basename = path.basename(filepath);
+              return group.files.indexOf(basename) >= 0;
+            }
+          }).map(v => (
+            <div className="group-item">
+              <a href={`${group.viewer}?file=${encodeURI(v)}`}>{v}</a>
+            </div>
+          ))}
+        </section>
+      ))}
+      <script type="text/javascript" src="/index.js"></script>
     </Container>
   );
   res.send(render(container));

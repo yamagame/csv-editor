@@ -1,5 +1,6 @@
 import { factory, Fragment } from "libs/preact";
 import { escapeHtml } from "libs/utils";
+const macro = require("libs/csv-macro");
 
 export const ResizeMarker = ({ topOffset = 0 }) => {
   return (
@@ -172,6 +173,7 @@ export const CsvTable = ({
   left = 0,
   rowSize = [],
   colSize = [],
+  form = [],
 }) => {
   const csvArray = data;
   const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
@@ -180,6 +182,11 @@ export const CsvTable = ({
   const colArray = new Array(maxCol).fill(0);
   const rowWidth = rowArray.map(v => defaultCellSize.width);
   const colHeight = colArray.map(v => defaultCellSize.height);
+  const macros = form.map(f => ({
+    range: macro.range(f.range || ""),
+    macro: macro.compile(f.expression || ""),
+    style: f.style || "",
+  }));
   rowSize.forEach((v, i) => {
     if (v > 0) {
       rowWidth[i] = v;
@@ -206,9 +213,27 @@ export const CsvTable = ({
     const left = sumLeft(cell.x);
     const { color } = props;
     delete props.color;
+    const className = ["csv-table-cell"];
+    let macroStyle = {};
+    macros.forEach(m => {
+      const getCellText = (x, y) => {
+        return csvArray[y][x].value;
+      };
+      const x = cell.x;
+      const y = cell.y;
+      const step3 = macro.executor(
+        cell,
+        m.macro,
+        m.range,
+        macro.operator({ x, y }, getCellText)
+      );
+      if (step3) {
+        macroStyle = { ...macroStyle, ...m.style };
+      }
+    });
     return (
       <TableCell
-        className="csv-table-cell"
+        className={className.join(" ")}
         data={{
           x: cell.x,
           y: cell.y,
@@ -219,15 +244,12 @@ export const CsvTable = ({
         top={top + cell.oy}
         width={rowWidth[cell.x] - 1}
         height={colHeight[cell.y] - 1}
-        {...props}>
-        <div style={{ color, top: 1 }}>{escapeHtml(cell.value)}</div>
-        {/* <pre className="csv-table-code">
-          <code>
-            <div style={{ marginLeft: 10, color, top: 1 }}>
-              {escapeHtml(cell.value)}
-            </div>
-          </code>
-        </pre> */}
+        {...props}
+        {...macroStyle}
+        color="black">
+        <div style={{ color, top: 1, ...macroStyle }}>
+          {escapeHtml(cell.value)}
+        </div>
       </TableCell>
     );
   };
