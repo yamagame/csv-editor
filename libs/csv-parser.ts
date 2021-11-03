@@ -88,7 +88,11 @@ function stringify(parsed) {
       if (i > 0) {
         ret += delim;
       }
-      if (col.value.indexOf('"') >= 0 || col.value.indexOf("\n") >= 0) {
+      if (
+        col.value.indexOf(",") >= 0 ||
+        col.value.indexOf('"') >= 0 ||
+        col.value.indexOf("\n") >= 0
+      ) {
         ret += `"${col.value.replace(/"/g, '""')}"`;
       } else {
         ret += col.value;

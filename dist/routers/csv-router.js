@@ -60,6 +60,7 @@ function CsvRouter(options, optionReader) {
             fixedPoint: { x: 0, y: 0 },
             rowSize: rowSize,
         });
+        var _a = req.body, maxRow = _a.maxRow, maxCol = _a.maxCol;
         req.body.csv.forEach(function (cell) {
             if (data.csv.length <= cell.y) {
                 data.csv = __spreadArray(__spreadArray([], data.csv), new Array(cell.y - data.csv.length + 1).fill([]));
@@ -77,12 +78,12 @@ function CsvRouter(options, optionReader) {
         {
             var csvParser_1 = require("libs/csv-parser");
             var csvData = __spreadArray([], data.csv).slice(1).map(function (col) { return col.slice(1); });
-            var csvString = csvParser_1.stringify(csvData);
+            var csvString = csvParser_1.stringify(csvData.map(function (v) { return v.slice(0, maxRow - 1); }).slice(0, maxCol - 1));
             var csvPath = req.params[0];
             fs.writeFileSync(csvPath, csvString);
         }
         {
-            var _a = req.body, rowSize_1 = _a.rowSize, colSize_1 = _a.colSize, maxCol = _a.maxCol, maxRow = _a.maxRow;
+            var _b = req.body, rowSize_1 = _b.rowSize, colSize_1 = _b.colSize;
             var csvFilePath = req.params[0];
             utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
         }
@@ -94,6 +95,23 @@ function CsvRouter(options, optionReader) {
             rowSize: rowSize,
             colSize: colSize,
         });
+        var form = [
+            {
+                expression: "A0 == 'NG'",
+                style: {
+                    color: "red",
+                    fontWeight: "bold",
+                },
+            },
+            {
+                range: "B2",
+                expression: "$B0 != ''",
+                style: {
+                    backgroundColor: "yellow",
+                },
+            },
+        ];
+        data.form = form;
         res.send(Object.entries(req.body).reduce(function (a, _a) {
             var k = _a[0], v = _a[1];
             a[k] = data[k];

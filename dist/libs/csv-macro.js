@@ -236,7 +236,7 @@ var expression = function (token) {
     }
     return expr();
 };
-var executor = function (cell, node, range, callback) {
+var execute = function (cell, node, range, callback) {
     var x = cell.x, y = cell.y;
     var p1 = range.p1, p2 = range.p2;
     if (p1 && p2) {
@@ -372,7 +372,7 @@ var value = function (range, offset, callback) {
 };
 module.exports.token = token;
 module.exports.expression = expression;
-module.exports.executor = executor;
+module.exports.execute = execute;
 module.exports.operator = operator;
 module.exports.value = value;
 module.exports.range = parseRange;
@@ -408,7 +408,7 @@ if (require.main === module) {
         var getCellText = function (x, y) {
             return table[y][x];
         };
-        var step3 = executor({ x: 0, y: 0 }, step2, parseRange(""), operator(offset, getCellText));
+        var step3 = execute({ x: 0, y: 0 }, step2, parseRange(""), operator(offset, getCellText));
         // console.dir(step3, { depth: null });
         return step3;
     };

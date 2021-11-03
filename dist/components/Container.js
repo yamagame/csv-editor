@@ -13,7 +13,8 @@ function Container(_a) {
             preact_1.factory("link", { rel: "stylesheet", type: "text/css", href: "/index.css" }),
             preact_1.factory("title", null, title)),
         preact_1.factory("body", { onload: "main()" },
-            preact_1.factory("script", { type: "text/javascript", src: "/common.js" }),
+            preact_1.factory("script", { type: "text/javascript", src: "/csv-macro.js" }),
+            preact_1.factory("script", { type: "text/javascript", src: "/csv-common.js" }),
             children)));
 }
 exports.Container = Container;

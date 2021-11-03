@@ -163,25 +163,28 @@ var CsvTable = function (_a) {
         var color = props.color;
         delete props.color;
         var className = ["csv-table-cell"];
-        var macroStyle = {};
-        macros.forEach(function (m) {
+        var macroStyle = macros.reduce(function (macroStyle, m) {
             var getCellText = function (x, y) {
                 return csvArray[y][x].value;
             };
             var x = cell.x;
             var y = cell.y;
-            var step3 = macro.executor(cell, m.macro, m.range, macro.operator({ x: x, y: y }, getCellText));
+            var step3 = macro.execute(cell, m.macro, m.range, macro.operator({ x: x, y: y }, getCellText));
             if (step3) {
-                macroStyle = __assign(__assign({}, macroStyle), m.style);
+                return __assign(__assign({}, macroStyle), m.style);
             }
-        });
+            return macroStyle;
+        }, {});
+        var textStyle = __assign({}, macroStyle);
+        delete textStyle["backgroundColor"];
         return (preact_1.factory(exports.TableCell, __assign({ className: className.join(" "), data: {
                 x: cell.x,
                 y: cell.y,
                 top: top,
                 left: left,
+                backgroundColor: props.backgroundColor,
             }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props, macroStyle, { color: "black" }),
-            preact_1.factory("div", { style: __assign({ color: color, top: 1 }, macroStyle) }, utils_1.escapeHtml(cell.value))));
+            preact_1.factory("div", { style: __assign({ color: color, top: 1 }, textStyle) }, utils_1.escapeHtml(cell.value))));
     };
     var leftOffset = rowWidth.reduce(function (a, v, i) { return (i <= fixedPoint.x ? a + v : a); }, 0) * 2;
     var topOffset = colHeight.reduce(function (a, v, i) { return (i <= fixedPoint.y ? a + v : a); }, 0) * 2;

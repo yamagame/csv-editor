@@ -236,7 +236,7 @@ const expression = function (token) {
   return expr();
 };
 
-const executor = function (cell, node, range, callback) {
+const execute = function (cell, node, range, callback) {
   const { x, y } = cell;
   const { p1, p2 } = range;
   if (p1 && p2) {
@@ -365,7 +365,7 @@ const value = (range, offset, callback) => {
 
 module.exports.token = token;
 module.exports.expression = expression;
-module.exports.executor = executor;
+module.exports.execute = execute;
 module.exports.operator = operator;
 module.exports.value = value;
 module.exports.range = parseRange;
@@ -403,7 +403,7 @@ if (require.main === module) {
     const getCellText = (x, y) => {
       return table[y][x];
     };
-    const step3 = executor(
+    const step3 = execute(
       { x: 0, y: 0 },
       step2,
       parseRange(""),

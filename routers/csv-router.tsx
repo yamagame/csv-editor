@@ -58,6 +58,7 @@ export function CsvRouter(options: any = {}, optionReader: () => {}) {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
     });
+    const { maxRow, maxCol } = req.body;
     req.body.csv.forEach(cell => {
       if (data.csv.length <= cell.y) {
         data.csv = [
@@ -80,12 +81,14 @@ export function CsvRouter(options: any = {}, optionReader: () => {}) {
     {
       const csvParser = require("libs/csv-parser");
       const csvData = [...data.csv].slice(1).map(col => col.slice(1));
-      const csvString = csvParser.stringify(csvData);
+      const csvString = csvParser.stringify(
+        csvData.map(v => v.slice(0, maxRow - 1)).slice(0, maxCol - 1)
+      );
       const csvPath = req.params[0];
       fs.writeFileSync(csvPath, csvString);
     }
     {
-      const { rowSize, colSize, maxCol, maxRow } = req.body;
+      const { rowSize, colSize } = req.body;
       const csvFilePath = req.params[0];
       saveJson(csvFilePath, { rowSize, colSize, maxCol, maxRow });
     }
@@ -98,6 +101,23 @@ export function CsvRouter(options: any = {}, optionReader: () => {}) {
       rowSize,
       colSize,
     });
+    const form = [
+      {
+        expression: "A0 == 'NG'",
+        style: {
+          color: "red",
+          fontWeight: "bold",
+        },
+      },
+      {
+        range: "B2",
+        expression: "$B0 != ''",
+        style: {
+          backgroundColor: "yellow",
+        },
+      },
+    ];
+    data.form = form;
     res.send(
       Object.entries(req.body).reduce((a, [k, v]) => {
         a[k] = data[k];

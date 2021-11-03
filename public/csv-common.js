@@ -12,6 +12,8 @@ function postRequest(url, body, callback) {
 }
 
 function CsvTable(env, tableId, inputSelctor, onclick) {
+  const macro = CsvMacro();
+
   const dataInput = document.querySelector(inputSelctor);
   dataInput.addEventListener("change", e => {
     if (controller.currentSelectedCell) {
@@ -30,7 +32,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const tableTopLeft = element.querySelector(".table-top-left");
   const tableRightBottom = element.querySelector(".table-right-bottom");
   const markerAll = element.querySelectorAll(".table-marker");
-  const borderThick = 1;
+  // const borderThick = 1;
   const topOffset = tableTopLeft.getBoundingClientRect().height * 2;
 
   function TableCell(element, controller) {
@@ -38,6 +40,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.x = parseInt(element.getAttribute("data-x"), 10);
     this.y = parseInt(element.getAttribute("data-y"), 10);
     this.backgroundColor = element.style["background-color"];
+    this.baseBackgroundColor = element.getAttribute("data-background-color");
     this.color = element.querySelector("div").style["color"];
     this.selected = false;
     this.select = (e, callback) => {
@@ -184,6 +187,50 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       onclick(this);
       e.stopPropagation();
     };
+    this.setMacroStyle = style => {
+      const div = this.element.querySelector("div");
+      if (this.backgroundColor !== this.baseBackgroundColor) {
+        this.backgroundColor = this.baseBackgroundColor;
+        this.element.style.setProperty(
+          "background-color",
+          this.backgroundColor
+        );
+      }
+      Object.entries(style).forEach(([k, v]) => {
+        const _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
+        if (_k === "background-color") {
+          this.element.style.setProperty(_k, v);
+          this.backgroundColor = v;
+        } else {
+          div.style.setProperty(_k, v);
+        }
+      });
+    };
+    this.macroStyle = () => {
+      const cell = this;
+      const macroStyle = controller.macros.reduce((macroStyle, m) => {
+        const getCellText = (x, y) => {
+          return controller.cells
+            .find(cell => cell.x === x && cell.y === y)
+            .getText();
+        };
+        if (
+          macro.execute(
+            cell,
+            m.macro,
+            m.range,
+            macro.operator(cell, getCellText)
+          )
+        ) {
+          return { ...macroStyle, ...m.style };
+        }
+        return macroStyle;
+      }, {});
+      return macroStyle;
+    };
+    this.updateMacroStyle = () => {
+      this.setMacroStyle(this.macroStyle());
+    };
     this.setText = text => {
       const div = this.element.querySelector("div");
       if (div.innerText === text) return;
@@ -205,6 +252,8 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         div.style = `${commonStyle()} color: ${this.color};`;
         div.removeEventListener("click", this.clickButton);
       }
+      this.updateMacroStyle();
+      controller.updateMacroStyle();
     };
     this.getText = () => {
       return this.element.querySelector("div").innerText;
@@ -632,10 +681,12 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
                 }
               });
             });
-            tableLeft.style.height = `${
-              parseInt(tableLeft.style.height) + dy
-            }px`;
-            element.style.height = `${parseInt(element.style.height) + dy}px`;
+            {
+              const topHeight = parseInt(tableTop.style.height);
+              tableLeft.style.height = `${topHeight + dy}px`;
+              const tableHeight = parseInt(element.style.height);
+              element.style.height = `${tableHeight + dy}px`;
+            }
           }
         } else if (selectedCell.y === 0) {
           if (this.maxRow > 2) {
@@ -671,10 +722,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
                 }
               });
             });
-            tableTop.style.width = `${parseInt(tableTop.style.width) + dx}px`;
-            tableRightBottom.style.width = `${
-              parseInt(tableRightBottom.style.width) + dx
-            }px`;
+            {
+              const topWidth = parseInt(tableTop.style.width);
+              tableTop.style.width = `${topWidth + dx}px`;
+              const bodyWidth = parseInt(tableRightBottom.style.width);
+              tableRightBottom.style.width = `${bodyWidth + dx}px`;
+              const tableWidth = parseInt(element.style.width);
+              element.style.width = `${tableWidth + dx}px`;
+            }
           }
         } else {
           selectedCell.setText("");
@@ -1008,6 +1063,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
       delete this.mousePosition;
     };
+    this.updateMacroStyle = () => {
+      this.cells.forEach(cell => {
+        cell.updateMacroStyle();
+      });
+    };
   }
 
   const controller = new CellController(tableCell, topOffset);
@@ -1019,6 +1079,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       colSize: true,
       defaultCellSize: true,
       fixedPoint: true,
+      form: true,
     },
     res => {
       controller.rowSize = res.rowSize || [];
@@ -1033,17 +1094,23 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       controller.resize();
       controller.updateThumb();
       controller.loaded = true;
+      controller.form = res.form;
+      controller.macros = res.form.map(f => ({
+        range: macro.range(f.range || ""),
+        macro: macro.compile(f.expression || ""),
+        style: f.style || "",
+      }));
     }
   );
 
-  function ajustTableSize() {
-    const top = parseInt(element.style.top, 10);
-    const left = parseInt(element.style.left, 10);
-    const width = window.innerWidth - borderThick - left;
-    const height = window.innerHeight - borderThick - top;
-    element.style.setProperty("width", `${width}px`);
-    element.style.setProperty("height", `${height}px`);
-  }
+  // function ajustTableSize() {
+  //   const top = parseInt(element.style.top, 10);
+  //   const left = parseInt(element.style.left, 10);
+  //   const width = window.innerWidth - borderThick - left;
+  //   const height = window.innerHeight - borderThick - top;
+  //   element.style.setProperty("width", `${width}px`);
+  //   element.style.setProperty("height", `${height}px`);
+  // }
   // ajustTableSize();
 
   // window.addEventListener("resize", () => {

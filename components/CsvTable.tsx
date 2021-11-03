@@ -214,23 +214,25 @@ export const CsvTable = ({
     const { color } = props;
     delete props.color;
     const className = ["csv-table-cell"];
-    let macroStyle = {};
-    macros.forEach(m => {
+    const macroStyle = macros.reduce((macroStyle, m) => {
       const getCellText = (x, y) => {
         return csvArray[y][x].value;
       };
       const x = cell.x;
       const y = cell.y;
-      const step3 = macro.executor(
+      const step3 = macro.execute(
         cell,
         m.macro,
         m.range,
         macro.operator({ x, y }, getCellText)
       );
       if (step3) {
-        macroStyle = { ...macroStyle, ...m.style };
+        return { ...macroStyle, ...m.style };
       }
-    });
+      return macroStyle;
+    }, {});
+    const textStyle = { ...macroStyle };
+    delete textStyle["backgroundColor"];
     return (
       <TableCell
         className={className.join(" ")}
@@ -239,6 +241,7 @@ export const CsvTable = ({
           y: cell.y,
           top,
           left,
+          backgroundColor: props.backgroundColor,
         }}
         left={left + cell.ox}
         top={top + cell.oy}
@@ -247,7 +250,7 @@ export const CsvTable = ({
         {...props}
         {...macroStyle}
         color="black">
-        <div style={{ color, top: 1, ...macroStyle }}>
+        <div style={{ color, top: 1, ...textStyle }}>
           {escapeHtml(cell.value)}
         </div>
       </TableCell>
