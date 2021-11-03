@@ -23,12 +23,28 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const SELECT_COLOR = "#40FFFF";
   const macro = CsvMacro();
 
+  const copyToClipboard = str => {
+    const toCsvData = str => {
+      if (
+        str.indexOf(",") >= 0 ||
+        str.indexOf('"') >= 0 ||
+        str.indexOf("\n") >= 0
+      ) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+    const csvStr = Array.isArray(str)
+      ? str.map(v => toCsvData(v)).join(",")
+      : toCsvData(str);
+    navigator.clipboard.writeText(csvStr);
+  };
+
   const dataInput = document.querySelector(inputSelctor);
   dataInput.addEventListener("change", e => {
+    const text = e.srcElement.value.replace(/\\n/g, "\n");
     if (controller.currentSelectedCell) {
-      controller.currentSelectedCell.setText(
-        e.srcElement.value.replace(/\\n/g, "\n")
-      );
+      controller.currentSelectedCell.setText(text);
     }
   });
 
@@ -634,7 +650,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       return cell;
     };
     this.setInput = cell => {
-      dataInput.value = cell.element.innerText.replace(/\n/g, "\\n");
+      const text = cell.element
+        .querySelector("div")
+        .innerText.replace(/\n/g, "\\n");
+      dataInput.value = text;
     };
     this.delete = () => {
       const selectedCell = this.currentSelectedCell;
@@ -1177,29 +1196,27 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         if (e.key === "x") {
           const selCell = controller.selectedCellTopLeft();
           if (selCell) {
-            controller.setPasteboard(
-              "cut",
-              controller.selectedCells().map(cell => ({
-                x: cell.x - selCell.x,
-                y: cell.y - selCell.y,
-                text: cell.getText(),
-                cell,
-              }))
-            );
+            const data = controller.selectedCells().map(cell => ({
+              x: cell.x - selCell.x,
+              y: cell.y - selCell.y,
+              text: cell.getText(),
+              cell,
+            }));
+            copyToClipboard(data.map(v => v.text));
+            controller.setPasteboard("cut", data);
           }
         }
         if (e.key === "c") {
           const selCell = controller.selectedCellTopLeft();
           if (selCell) {
-            controller.setPasteboard(
-              "copy",
-              controller.selectedCells().map(cell => ({
-                x: cell.x - selCell.x,
-                y: cell.y - selCell.y,
-                text: cell.getText(),
-                cell,
-              }))
-            );
+            const data = controller.selectedCells().map(cell => ({
+              x: cell.x - selCell.x,
+              y: cell.y - selCell.y,
+              text: cell.getText(),
+              cell,
+            }));
+            copyToClipboard(data.map(v => v.text));
+            controller.setPasteboard("copy", data);
           }
         }
         if (e.key === "v") {
