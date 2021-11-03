@@ -43,6 +43,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.baseBackgroundColor = element.getAttribute("data-background-color");
     this.color = element.querySelector("div").style["color"];
     this.selected = false;
+    this.buttonStyle = false;
     this.select = (e, callback) => {
       if (!this.selected) {
         if (!e.shiftKey && !e.altKey) {
@@ -184,10 +185,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       );
     };
     this.clickButton = e => {
-      onclick(this);
+      onclick(dataName, this.getText());
       e.stopPropagation();
     };
-    this.setMacroStyle = style => {
+    this.setStyle = style => {
       const div = this.element.querySelector("div");
       if (this.backgroundColor !== this.baseBackgroundColor) {
         this.backgroundColor = this.baseBackgroundColor;
@@ -228,37 +229,49 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
         return macroStyle;
       }, {});
+      if (this.buttonStyle) {
+        return {
+          ...macroStyle,
+          "background-color": "gray",
+          "font-weight": "bold",
+          "text-align": "center",
+          "border-radius": "5px",
+          border: "solid 1px white",
+          "margin-right": "2px",
+          "margin-top": "1px",
+          color: "white",
+        };
+      }
       return macroStyle;
     };
-    this.updateMacroStyle = () => {
-      this.setMacroStyle(this.macroStyle());
+    this.updateStyle = () => {
+      this.setStyle(this.macroStyle());
+    };
+    this.updateButtonStyle = text => {
+      const buttonStyle = text.indexOf("@") === 0;
+      if (this.buttonStyle != buttonStyle) {
+        this.buttonStyle = buttonStyle;
+        if (this.buttonStyle) {
+          div.classList.add("csv-cell-button");
+          div.addEventListener("click", this.clickButton);
+        } else {
+          div.classList.remove("csv-cell-button");
+          div.removeEventListener("click", this.clickButton);
+        }
+      }
     };
     this.setText = text => {
       const div = this.element.querySelector("div");
       if (div.innerText === text) return;
       div.innerText = text;
-      const commonStyle = () => {
-        let s = ``;
-        return s;
-      };
-      if (text.indexOf("@") === 0) {
-        div.classList.add("csv-cell-button");
-        div.style = `${commonStyle()} width: ${
-          this.getWidth() - 32
-        }px; height: ${this.getHeight() - 7}px; color: ${
-          this.color
-        }; margin-right: 10px;`;
-        div.addEventListener("click", this.clickButton);
-      } else {
-        div.classList.remove("csv-cell-button");
-        div.style = `${commonStyle()} color: ${this.color};`;
-        div.removeEventListener("click", this.clickButton);
-      }
-      controller.updateMacroStyle();
+      this.updateButtonStyle(text);
+      controller.updateStyle();
     };
     this.getText = () => {
       return this.element.querySelector("div").innerText;
     };
+    const div = element.querySelector("div");
+    this.updateButtonStyle(div.innerText);
   }
 
   function CellController(tableCell, topOffset) {
@@ -1066,23 +1079,27 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
     let updateIndex = 0;
     let updateInterval = null;
-    this.updateMacroStyle = () => {
+    this.updateStyle = () => {
       updateIndex = 0;
       if (updateInterval) clearInterval(updateInterval);
-      updateInterval = setInterval(() => {
+      const update = () => {
         const length = 1000;
         for (
           let i = updateIndex;
           i < updateIndex + length && i < this.cells.length;
           i++
         ) {
-          this.cells[i].updateMacroStyle();
+          this.cells[i].updateStyle();
         }
         updateIndex += length;
-        if (updateIndex >= this.cells.length) {
+        return updateIndex >= this.cells.length;
+      };
+      updateInterval = setInterval(() => {
+        if (update()) {
           clearInterval(updateInterval);
         }
-      }, 100);
+      }, 1);
+      update();
     };
   }
 

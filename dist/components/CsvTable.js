@@ -173,10 +173,16 @@ var CsvTable = function (_a) {
             if (step3) {
                 return __assign(__assign({}, macroStyle), m.style);
             }
+            if (cell.value.indexOf("@") === 0) {
+                return __assign(__assign({}, macroStyle), { color: "white", backgroundColor: "gray", fontWeight: "bold", textAlign: "center", borderRadius: 5, border: "solid 1px white", marginRight: 2, marginTop: 1 });
+            }
             return macroStyle;
         }, {});
         var textStyle = __assign({}, macroStyle);
         delete textStyle["backgroundColor"];
+        delete macroStyle["borderRadius"];
+        delete macroStyle["marginTop"];
+        delete macroStyle["border"];
         return (preact_1.factory(exports.TableCell, __assign({ className: className.join(" "), data: {
                 x: cell.x,
                 y: cell.y,

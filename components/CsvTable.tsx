@@ -229,10 +229,26 @@ export const CsvTable = ({
       if (step3) {
         return { ...macroStyle, ...m.style };
       }
+      if (cell.value.indexOf("@") === 0) {
+        return {
+          ...macroStyle,
+          color: "white",
+          backgroundColor: "gray",
+          fontWeight: "bold",
+          textAlign: "center",
+          borderRadius: 5,
+          border: "solid 1px white",
+          marginRight: 2,
+          marginTop: 1,
+        };
+      }
       return macroStyle;
     }, {});
     const textStyle = { ...macroStyle };
     delete textStyle["backgroundColor"];
+    delete macroStyle["borderRadius"];
+    delete macroStyle["marginTop"];
+    delete macroStyle["border"];
     return (
       <TableCell
         className={className.join(" ")}
