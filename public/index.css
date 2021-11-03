@@ -53,11 +53,6 @@ section {
   margin-left: 1px;
 }
 
-.thumb-table-cell {
-  /* background-color: transparent;
-  opacity: 0; */
-}
-
 .csv-control-panel {
   display: block;
   position: fixed;
@@ -137,8 +132,4 @@ section {
   font-size: 0.9em;
   margin-left: 10px;
   margin-bottom: 2px;
-}
-
-.bg-pink {
-  background-color: pink;
 }
