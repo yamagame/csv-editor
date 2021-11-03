@@ -33,7 +33,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const tableTopLeft = element.querySelector(".table-top-left");
   const tableRightBottom = element.querySelector(".table-right-bottom");
   const markerAll = element.querySelectorAll(".table-marker");
-  // const borderThick = 1;
   const topOffset = tableTopLeft.getBoundingClientRect().height * 2;
 
   function TableCell(element, controller) {
@@ -324,7 +323,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             height: 2,
             x: cell.x,
             y: cell.y - 1,
-            // backgroundColor: "blue",
             cursor: "row-resize",
           })
         );
@@ -337,7 +335,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             height: 2,
             x: cell.x,
             y: cell.y,
-            // backgroundColor: "blue",
             cursor: "row-resize",
           })
         );
@@ -352,7 +349,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             height: height + 1,
             x: cell.x - 1,
             y: cell.y,
-            // backgroundColor: "lightgray",
             cursor: "col-resize",
           })
         );
@@ -365,7 +361,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             height: height + 1,
             x: cell.x,
             y: cell.y,
-            // backgroundColor: "lightgray",
             cursor: "col-resize",
           })
         );
@@ -577,9 +572,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       const addwidth = this.rowWidth[this.rowWidth.length - 1];
 
       tableTop.style.width = `${parseInt(tableTop.style.width) + addwidth}px`;
-      // tableRightBottom.style.width = `${
-      //   parseInt(tableRightBottom.style.width) + addwidth
-      // }px`;
       element.style.width = `${parseInt(element.style.width) + addwidth}px`;
 
       this.cells = [...this.cells, ...newCells];
@@ -1140,20 +1132,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         : [];
     }
   );
-
-  // function ajustTableSize() {
-  //   const top = parseInt(element.style.top, 10);
-  //   const left = parseInt(element.style.left, 10);
-  //   const width = window.innerWidth - borderThick - left;
-  //   const height = window.innerHeight - borderThick - top;
-  //   element.style.setProperty("width", `${width}px`);
-  //   element.style.setProperty("height", `${height}px`);
-  // }
-  // ajustTableSize();
-
-  // window.addEventListener("resize", () => {
-  //   ajustTableSize();
-  // });
 
   const moveSelect = (e, dx, dy) => {
     if (controller.currentSelectedCell) {
