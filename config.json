@@ -1,25 +1,50 @@
 {
   "directories": [
     {
-      "id": "csv-viewer",
-      "name": "CSVファイル",
-      "dir": "./test-csv",
-      "extension": ".csv",
-      "viewer": "csv/view",
-      "cellWidth": [],
-      "cellHeight": [],
+      "name": "CSVファイル1",
+      "dir": "./test-csv/data1",
       "form": [
         {
-          "range": "",
-          "expression": "",
+          "range": "B1",
+          "expression": "$B0 != ''",
           "style": {
-            "backgrundColor": "pink"
+            "backgroundColor": "#FFE0E0"
+          }
+        },
+        {
+          "range": "E0:X0",
+          "expression": "true",
+          "style": {
+            "backgroundColor": "#0000FF"
           }
         }
       ]
     },
     {
-      "id": "env-viewer",
+      "name": "CSVファイル2",
+      "dir": "./test-csv/data2"
+    },
+    {
+      "name": "CSVファイル",
+      "dir": "./test-csv",
+      "form": [
+        {
+          "expression": "A0 == 'NG'",
+          "style": {
+            "color": "red",
+            "fontWeight": "bold"
+          }
+        },
+        {
+          "range": "B2",
+          "expression": "$B0 != ''",
+          "style": {
+            "backgroundColor": "#FFE0E0"
+          }
+        }
+      ]
+    },
+    {
       "name": "ENVファイル",
       "dir": "./test-csv",
       "files": ["sample-env"],

@@ -12,6 +12,8 @@ function parse(src, _a) {
     var i = 0;
     var val = "";
     var quat = "";
+    if (src.length <= 0)
+        return [[{ value: "" }]];
     do {
         if (src[i] === delim) {
             col.push({ value: val, quat: quat });

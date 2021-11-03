@@ -4,7 +4,7 @@ import express from "express";
 import { CsvTable } from "components/CsvTable";
 import { Container } from "components/Container";
 
-export function EnvViewRouter(options: any = {}, optionReader: () => {}) {
+export function EnvViewRouter(config: any = {}) {
   const router = express.Router();
   const rowSize = [0, 150, 400];
   const colSize = [0, 0];

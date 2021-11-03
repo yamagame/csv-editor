@@ -46,67 +46,44 @@ var utils_1 = require("libs/utils");
 var Container_1 = require("components/Container");
 var env_router_1 = require("routers/env-router");
 var csv_router_1 = require("routers/csv-router");
-var promises_1 = require("fs/promises");
 var CONFIG_PATH = process.env.CONFIG_PATH || "./config.json";
-var loadConfig = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var data;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, promises_1.readFile(CONFIG_PATH, "utf-8")];
-            case 1:
-                data = _a.sent();
-                return [2 /*return*/, JSON.parse(data)];
-        }
-    });
-}); };
 var app = express_1.default();
 var port = process.env.PORT || 3000;
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static("public"));
-app.use("/csv", csv_router_1.CsvRouter({}, function () { return __awaiter(void 0, void 0, void 0, function () {
-    var directories;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, loadConfig()];
-            case 1:
-                directories = (_a.sent()).directories;
-                return [2 /*return*/, directories.find(function (group) { return group.id === "csv-viewer"; })];
-        }
-    });
-}); }));
-app.use("/env", env_router_1.EnvViewRouter({}, function () { return __awaiter(void 0, void 0, void 0, function () {
-    var directories;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, loadConfig()];
-            case 1:
-                directories = (_a.sent()).directories;
-                return [2 /*return*/, directories.find(function (group) { return group.id === "env-viewer"; })];
-        }
-    });
-}); }));
+app.use("/csv", csv_router_1.CsvRouter({
+    path: CONFIG_PATH,
+    id: "csv-viewer",
+}));
+app.use("/env", env_router_1.EnvViewRouter({
+    path: CONFIG_PATH,
+    id: "env-viewer",
+}));
 app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var directories, container;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, loadConfig()];
+            case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
             case 1:
                 directories = (_a.sent()).directories;
                 container = (preact_1.factory(Container_1.Container, { title: "Top" },
                     directories.map(function (group) { return (preact_1.factory("section", null,
                         preact_1.factory("p", { className: "group-name" }, group.name),
                         utils_1.readDir(group.dir, function (filepath) {
-                            if (group.extension) {
-                                var ext = path.extname(filepath);
-                                return ext !== "" && group.extension.indexOf(ext) >= 0;
-                            }
                             if (group.files) {
                                 var basename = path.basename(filepath);
                                 return group.files.indexOf(basename) >= 0;
                             }
-                        }).map(function (v) { return (preact_1.factory("div", { className: "group-item" },
-                            preact_1.factory("a", { href: group.viewer + "?file=" + encodeURI(v) }, v))); }))); }),
+                            if (group.extension) {
+                                var ext = path.extname(filepath);
+                                return ext !== "" && group.extension.indexOf(ext) >= 0;
+                            }
+                        }).map(function (v) {
+                            var file = encodeURI(v);
+                            return (preact_1.factory("div", { className: "group-item" },
+                                preact_1.factory("a", { href: group.viewer + "?file=" + file }, v)));
+                        }))); }),
                     preact_1.factory("script", { type: "text/javascript", src: "/index.js" })));
                 res.send(preact_1.render(container));
                 return [2 /*return*/];

@@ -7,6 +7,7 @@ function parse(src, { debug: boolean }) {
   let i = 0;
   let val = "";
   let quat = "";
+  if (src.length <= 0) return [[{ value: "" }]];
   do {
     if (src[i] === delim) {
       col.push({ value: val, quat });

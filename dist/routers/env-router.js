@@ -24,8 +24,8 @@ var preact_1 = require("libs/preact");
 var express_1 = __importDefault(require("express"));
 var CsvTable_1 = require("components/CsvTable");
 var Container_1 = require("components/Container");
-function EnvViewRouter(options, optionReader) {
-    if (options === void 0) { options = {}; }
+function EnvViewRouter(config) {
+    if (config === void 0) { config = {}; }
     var router = express_1.default.Router();
     var rowSize = [0, 150, 400];
     var colSize = [0, 0];

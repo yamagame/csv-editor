@@ -1,6 +1,7 @@
 import { factory, Fragment } from "libs/preact";
 import fs from "fs";
 import path from "path";
+import { readFile } from "fs/promises";
 
 export function escapeHtml(string: string) {
   if (typeof string !== "string") {
@@ -67,7 +68,14 @@ export const saveJson = (basepath: string, params: any) => {
   const dir = path.dirname(basepath);
   const filepath = path.format({ dir, name, ext: ".json" });
   try {
-    const data = JSON.parse(fs.readFileSync(filepath, "utf-8"));
+    const readJson = () => {
+      try {
+        return JSON.parse(fs.readFileSync(filepath, "utf-8"));
+      } catch {
+        return {};
+      }
+    };
+    const data = readJson();
     let updated = false;
     Object.keys(params).forEach(key => {
       if (params[key]) {
@@ -81,4 +89,29 @@ export const saveJson = (basepath: string, params: any) => {
   } catch {
     return {};
   }
+};
+
+export const defaultConfig = {
+  extension: ".csv",
+  viewer: "csv/view",
+};
+
+export const loadConfig = async config => {
+  const data = await readFile(config, "utf-8");
+  const configJson = JSON.parse(data);
+  configJson.directories = configJson.directories.map(group => {
+    return { ...defaultConfig, ...group };
+  });
+  console.log(configJson.directories);
+  return configJson;
+};
+
+export const findConfig = async (config, filepath, defaultConfig) => {
+  const configJson = await loadConfig(config);
+  return {
+    ...defaultConfig,
+    ...configJson.directories.find(
+      group => filepath.indexOf(path.join(group.dir)) === 0
+    ),
+  };
 };

@@ -99,14 +99,22 @@ section {
 }
 
 .csv-save-button {
+  margin-left: 10px;
   font-size: 0.7em;
   padding: 0px;
   margin-right: 10px;
   width: 80px;
+  float: right;
 }
 
 .csv-data-input {
+  margin-left: 10px;
   width: 100px;
+}
+
+.csv-data-name {
+  font-size: 0.7em;
+  margin-left: 10px;
 }
 
 .csv-cell-button {

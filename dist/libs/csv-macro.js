@@ -16,6 +16,8 @@ var TOKEN = {
     end: "end",
     and: "and",
     or: "or",
+    true: "true",
+    false: "false",
 };
 var token = function (str) {
     var token = [];
@@ -84,6 +86,8 @@ var token = function (str) {
                 { reg: /^&&/, type: TOKEN.and },
                 { reg: /^||/, type: TOKEN.or },
                 { reg: /^\s*/, type: TOKEN.space },
+                { reg: /^true/, type: TOKEN.true },
+                { reg: /^false/, type: TOKEN.false },
             ];
             if (!tokens.some(function (token) {
                 var w = str.substr(i).match(token.reg);
@@ -224,6 +228,9 @@ var expression = function (token) {
         if (token[p].type === TOKEN.string) {
             return ["string", { string: token[p++].word }];
         }
+        if (token[p].type === TOKEN.true || token[p].type === TOKEN.false) {
+            return ["bool", { bool: token[p++].word }];
+        }
         var node = func();
         if (node) {
             return node;
@@ -263,6 +270,8 @@ var execute = function (cell, node, range, callback) {
             case "eq":
             case "not":
                 return callback(node[0], exec(node[1]), exec(node[2]));
+            case "bool":
+                return node[1].bool;
             default:
                 throw new Error("undefined operator " + node[0]);
         }
@@ -301,6 +310,10 @@ var operator = function (offset, getCellText) {
                 return args[0] || args[1];
             case "add":
                 return args[0] + args[1];
+            case "true":
+                return true;
+            case "false":
+                return false;
             default:
                 throw new Error("undefined operator " + operator);
         }

@@ -1,15 +1,15 @@
 import { factory, Fragment, render } from "libs/preact";
-import { loadJson, saveJson } from "libs/utils";
+import { loadJson, saveJson, findConfig, defaultConfig } from "libs/utils";
 import fs = require("fs");
 import path = require("path");
 import express from "express";
 import { CsvTable } from "components/CsvTable";
 import { Container } from "components/Container";
 
-export function CsvRouter(options: any = {}, optionReader: () => {}) {
+export function CsvRouter(config: any = {}) {
   const router = express.Router();
-  const rowSize = options.cellWidth || [40, 40];
-  const colSize = options.cellHeight || [0];
+  const rowSize = config.cellWidth || [40, 40];
+  const colSize = config.cellHeight || [0];
 
   interface CsvParserOptions {
     defaultCellSize?: { width: number; height: number };
@@ -95,29 +95,18 @@ export function CsvRouter(options: any = {}, optionReader: () => {}) {
     res.send({ result: "OK" });
   });
 
-  router.post("/view/*", (req, res) => {
+  router.post("/view/*", async (req, res) => {
+    const configData = await findConfig(
+      config.path,
+      req.params[0],
+      defaultConfig
+    );
     const data = csvParser(req.params[0], {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
       colSize,
     });
-    const form = [
-      {
-        expression: "A0 == 'NG'",
-        style: {
-          color: "red",
-          fontWeight: "bold",
-        },
-      },
-      {
-        range: "B2",
-        expression: "$B0 != ''",
-        style: {
-          backgroundColor: "yellow",
-        },
-      },
-    ];
-    data.form = form;
+    data.form = configData.form;
     res.send(
       Object.entries(req.body).reduce((a, [k, v]) => {
         a[k] = data[k];
@@ -126,37 +115,30 @@ export function CsvRouter(options: any = {}, optionReader: () => {}) {
     );
   });
 
-  router.get("/view", (req, res) => {
+  router.get("/view", async (req, res) => {
+    const configData = await findConfig(
+      config.path,
+      req.query.file,
+      defaultConfig
+    );
     const data = csvParser(req.query.file, {
       fixedPoint: { x: 0, y: 0 },
       rowSize,
     });
-    const form = [
-      {
-        expression: "A0 == 'NG'",
-        style: {
-          color: "red",
-          fontWeight: "bold",
-        },
-      },
-      {
-        range: "B2",
-        expression: "$B0 != ''",
-        style: {
-          backgroundColor: "yellow",
-        },
-      },
-    ];
     const container = (
       <Container title="Top">
         <div className="csv-control-panel">
+          <a href="/">
+            <span className="csv-data-name">{configData.name}</span>
+          </a>
+          :<span className="csv-data-name">{data.dataname}</span>
+          <input className="csv-data-input" type="text" />
           <input
             className="csv-save-button"
             type="button"
             value="セーブ"
             onClick="save();"
           />
-          <input className="csv-data-input" type="text" />
         </div>
         <CsvTable
           id="csv-table"
@@ -168,7 +150,7 @@ export function CsvRouter(options: any = {}, optionReader: () => {}) {
           fixedPoint={data.fixedPoint}
           rowSize={data.rowSize}
           colSize={data.colSize}
-          form={form}
+          form={configData.form}
         />
         <script type="text/javascript" src="/csv-index.js"></script>
       </Container>

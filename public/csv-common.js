@@ -12,6 +12,7 @@ function postRequest(url, body, callback) {
 }
 
 function CsvTable(env, tableId, inputSelctor, onclick) {
+  const SELECT_COLOR = "#40FFFF";
   const macro = CsvMacro();
 
   const dataInput = document.querySelector(inputSelctor);
@@ -150,7 +151,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       e.preventDefault();
     });
     this.setSelect = () => {
-      this.element.style.setProperty("background-color", "pink");
+      this.element.style.setProperty("background-color", SELECT_COLOR);
       this.selected = true;
       controller.currentSelectedCell = this;
     };
@@ -497,6 +498,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         cell.element.parentElement.insertBefore(element, cell.element);
         const newCell = new TableCell(element, controller);
         newCell.backgroundColor = cell.backgroundColor;
+        newCell.baseBackgroundColor = cell.baseBackgroundColor;
         newCell.color = cell.color;
         newCell.selected = true;
         newCells.push(newCell);
@@ -554,6 +556,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         cell.element.parentElement.insertBefore(element, cell.element);
         const newCell = new TableCell(element, controller);
         newCell.backgroundColor = cell.backgroundColor;
+        newCell.baseBackgroundColor = cell.baseBackgroundColor;
         newCell.color = cell.color;
         newCell.selected = true;
         newCells.push(newCell);
@@ -1128,11 +1131,13 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       controller.updateThumb();
       controller.loaded = true;
       controller.form = res.form;
-      controller.macros = res.form.map(f => ({
-        range: macro.range(f.range || ""),
-        macro: macro.compile(f.expression || ""),
-        style: f.style || "",
-      }));
+      controller.macros = res.form
+        ? res.form.map(f => ({
+            range: macro.range(f.range || ""),
+            macro: macro.compile(f.expression || ""),
+            style: f.style || "",
+          }))
+        : [];
     }
   );
 
