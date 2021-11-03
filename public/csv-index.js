@@ -5,8 +5,10 @@ function main() {
     "/csv/view",
     "csv-table",
     ".csv-data-input",
-    (tableName, text) => {
-      console.log(tableName, text);
+    (file, text) => {
+      postRequest("/csv/command", { file, text }, res => {
+        console.log(res);
+      });
     }
   );
 }

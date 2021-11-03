@@ -1,7 +1,8 @@
+const fs = require("fs");
+const path = require("path");
+const { spawn } = require("child_process");
 import { factory, Fragment, render } from "libs/preact";
 import { loadJson, saveJson, findConfig, defaultConfig } from "libs/utils";
-import fs = require("fs");
-import path = require("path");
 import express from "express";
 import { CsvTable } from "components/CsvTable";
 import { Container } from "components/Container";
@@ -52,6 +53,31 @@ export function CsvRouter(config: any = {}) {
       },
     };
   }
+
+  router.post("/command", async (req, res) => {
+    const { file, text } = req.body;
+    const configData = await findConfig(config.path, file, defaultConfig);
+    if (configData.command) {
+      try {
+        console.log(configData.command, file, text);
+        const cmd = spawn(`${configData.command}`, [file, text], {
+          shell: true,
+        });
+        cmd.stdout.on("data", data => {
+          console.log(data.toString());
+        });
+        cmd.stderr.on("data", data => {
+          console.error(data.toString());
+        });
+        cmd.on("exit", code => {
+          console.log(`Child exited with code ${code}`);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    res.sendStatus(200);
+  });
 
   router.post("/save/*", async (req, res) => {
     const configData = await findConfig(

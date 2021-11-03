@@ -97,20 +97,34 @@ export const defaultConfig = {
 };
 
 export const loadConfig = async config => {
-  const data = await readFile(config, "utf-8");
-  const configJson = JSON.parse(data);
-  configJson.directories = configJson.directories.map(group => {
-    return { ...defaultConfig, ...group };
-  });
-  return configJson;
+  try {
+    const data = await readFile(config, "utf-8");
+    const configJson = JSON.parse(data);
+    if (configJson.directories) {
+      configJson.directories = configJson.directories.map(group => {
+        return { ...defaultConfig, ...group };
+      });
+    }
+    return configJson;
+  } catch {
+    //
+  }
+  return {};
 };
 
 export const findConfig = async (config, filepath, defaultConfig) => {
+  const localConfig = await loadConfig(
+    path.join(path.dirname(filepath), `.config.json`)
+  );
   const configJson = await loadConfig(config);
-  return {
+  const retVal = {
     ...defaultConfig,
     ...configJson.directories.find(
       group => filepath.indexOf(path.join(group.dir)) === 0
     ),
+    ...localConfig,
   };
+  console.log(retVal);
+  console.log(localConfig);
+  return retVal;
 };

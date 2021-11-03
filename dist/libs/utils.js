@@ -156,29 +156,43 @@ exports.defaultConfig = {
     viewer: "csv/view",
 };
 var loadConfig = function (config) { return __awaiter(void 0, void 0, void 0, function () {
-    var data, configJson;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, promises_1.readFile(config, "utf-8")];
+    var data, configJson, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, promises_1.readFile(config, "utf-8")];
             case 1:
-                data = _a.sent();
+                data = _b.sent();
                 configJson = JSON.parse(data);
-                configJson.directories = configJson.directories.map(function (group) {
-                    return __assign(__assign({}, exports.defaultConfig), group);
-                });
+                if (configJson.directories) {
+                    configJson.directories = configJson.directories.map(function (group) {
+                        return __assign(__assign({}, exports.defaultConfig), group);
+                    });
+                }
                 return [2 /*return*/, configJson];
+            case 2:
+                _a = _b.sent();
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/, {}];
         }
     });
 }); };
 exports.loadConfig = loadConfig;
 var findConfig = function (config, filepath, defaultConfig) { return __awaiter(void 0, void 0, void 0, function () {
-    var configJson;
+    var localConfig, configJson, retVal;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, exports.loadConfig(config)];
+            case 0: return [4 /*yield*/, exports.loadConfig(path_1.default.join(path_1.default.dirname(filepath), ".config.json"))];
             case 1:
+                localConfig = _a.sent();
+                return [4 /*yield*/, exports.loadConfig(config)];
+            case 2:
                 configJson = _a.sent();
-                return [2 /*return*/, __assign(__assign({}, defaultConfig), configJson.directories.find(function (group) { return filepath.indexOf(path_1.default.join(group.dir)) === 0; }))];
+                retVal = __assign(__assign(__assign({}, defaultConfig), configJson.directories.find(function (group) { return filepath.indexOf(path_1.default.join(group.dir)) === 0; })), localConfig);
+                console.log(retVal);
+                console.log(localConfig);
+                return [2 /*return*/, retVal];
         }
     });
 }); };

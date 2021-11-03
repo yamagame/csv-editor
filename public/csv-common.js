@@ -1,7 +1,15 @@
 function postRequest(url, body, callback) {
   const XHR = new XMLHttpRequest();
   XHR.addEventListener("load", function (event) {
-    if (callback) callback(JSON.parse(XHR.response));
+    const response = () => {
+      try {
+        return JSON.parse(XHR.response);
+      } catch {
+        //
+      }
+      return XHR.response;
+    };
+    if (callback) callback(response());
   });
   XHR.addEventListener("error", function (event) {
     console.error(event);

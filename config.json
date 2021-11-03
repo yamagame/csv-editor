@@ -19,7 +19,8 @@
             "backgroundColor": "#0000FF"
           }
         }
-      ]
+      ],
+      "command": "echo"
     },
     {
       "name": "CSVファイル2",

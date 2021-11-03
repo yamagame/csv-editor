@@ -56,10 +56,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CsvRouter = void 0;
-var preact_1 = require("libs/preact");
-var utils_1 = require("libs/utils");
 var fs = require("fs");
 var path = require("path");
+var spawn = require("child_process").spawn;
+var preact_1 = require("libs/preact");
+var utils_1 = require("libs/utils");
 var express_1 = __importDefault(require("express"));
 var CsvTable_1 = require("components/CsvTable");
 var Container_1 = require("components/Container");
@@ -92,6 +93,40 @@ function CsvRouter(config) {
         ], v); });
         return __assign({ csv: csv }, __assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson));
     }
+    router.post("/command", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        var _a, file, text, configData, cmd;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = req.body, file = _a.file, text = _a.text;
+                    return [4 /*yield*/, utils_1.findConfig(config.path, file, utils_1.defaultConfig)];
+                case 1:
+                    configData = _b.sent();
+                    if (configData.command) {
+                        try {
+                            console.log(configData.command, file, text);
+                            cmd = spawn("" + configData.command, [file, text], {
+                                shell: true,
+                            });
+                            cmd.stdout.on("data", function (data) {
+                                console.log(data.toString());
+                            });
+                            cmd.stderr.on("data", function (data) {
+                                console.error(data.toString());
+                            });
+                            cmd.on("exit", function (code) {
+                                console.log("Child exited with code " + code);
+                            });
+                        }
+                        catch (err) {
+                            console.error(err);
+                        }
+                    }
+                    res.sendStatus(200);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     router.post("/save/*", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var configData, data, _a, maxRow, maxCol, csvParser_1, csvData, csvString, csvPath, _b, rowSize_1, colSize_1, csvFilePath;
         return __generator(this, function (_c) {
