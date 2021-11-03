@@ -190,7 +190,7 @@ var CsvTable = function (_a) {
                 left: left,
                 backgroundColor: props.backgroundColor,
             }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props, macroStyle, { color: "black" }),
-            preact_1.factory("div", { style: __assign({ color: color, top: 1 }, textStyle) }, utils_1.escapeHtml(cell.value))));
+            preact_1.factory("div", { style: __assign({ color: color, top: 1 }, textStyle) }, utils_1.escapeHtml(cell.value).replace(/\n/g, "<br>"))));
     };
     var leftOffset = rowWidth.reduce(function (a, v, i) { return (i <= fixedPoint.x ? a + v : a); }, 0) * 2;
     var topOffset = colHeight.reduce(function (a, v, i) { return (i <= fixedPoint.y ? a + v : a); }, 0) * 2;

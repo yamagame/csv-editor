@@ -267,7 +267,7 @@ export const CsvTable = ({
         {...macroStyle}
         color="black">
         <div style={{ color, top: 1, ...textStyle }}>
-          {escapeHtml(cell.value)}
+          {escapeHtml(cell.value).replace(/\n/g, "<br>")}
         </div>
       </TableCell>
     );
