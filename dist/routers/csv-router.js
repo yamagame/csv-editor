@@ -92,40 +92,49 @@ function CsvRouter(config) {
         ], v); });
         return __assign({ csv: csv }, __assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson));
     }
-    router.post("/save/*", function (req, res) {
-        var data = csvParser(req.params[0], {
-            fixedPoint: { x: 0, y: 0 },
-            rowSize: rowSize,
+    router.post("/save/*", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        var configData, data, _a, maxRow, maxCol, csvParser_1, csvData, csvString, csvPath, _b, rowSize_1, colSize_1, csvFilePath;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.params[0], utils_1.defaultConfig)];
+                case 1:
+                    configData = _c.sent();
+                    data = csvParser(req.params[0], {
+                        fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
+                        rowSize: rowSize,
+                    });
+                    _a = req.body, maxRow = _a.maxRow, maxCol = _a.maxCol;
+                    req.body.csv.forEach(function (cell) {
+                        if (data.csv.length <= cell.y) {
+                            data.csv = __spreadArray(__spreadArray([], data.csv), new Array(cell.y - data.csv.length + 1).fill([]));
+                        }
+                        if (data.csv[cell.y].length <= cell.x) {
+                            data.csv[cell.y] = __spreadArray(__spreadArray([], data.csv[cell.y]), new Array(cell.x - data.csv[cell.y].length + 1).fill({
+                                value: "",
+                            }));
+                        }
+                        try {
+                            data.csv[cell.y][cell.x] = { value: cell.value };
+                        }
+                        catch (_a) { }
+                    });
+                    {
+                        csvParser_1 = require("libs/csv-parser");
+                        csvData = __spreadArray([], data.csv).slice(1).map(function (col) { return col.slice(1); });
+                        csvString = csvParser_1.stringify(csvData.map(function (v) { return v.slice(0, maxRow - 1); }).slice(0, maxCol - 1));
+                        csvPath = req.params[0];
+                        fs.writeFileSync(csvPath, csvString);
+                    }
+                    {
+                        _b = req.body, rowSize_1 = _b.rowSize, colSize_1 = _b.colSize;
+                        csvFilePath = req.params[0];
+                        utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
+                    }
+                    res.send({ result: "OK" });
+                    return [2 /*return*/];
+            }
         });
-        var _a = req.body, maxRow = _a.maxRow, maxCol = _a.maxCol;
-        req.body.csv.forEach(function (cell) {
-            if (data.csv.length <= cell.y) {
-                data.csv = __spreadArray(__spreadArray([], data.csv), new Array(cell.y - data.csv.length + 1).fill([]));
-            }
-            if (data.csv[cell.y].length <= cell.x) {
-                data.csv[cell.y] = __spreadArray(__spreadArray([], data.csv[cell.y]), new Array(cell.x - data.csv[cell.y].length + 1).fill({
-                    value: "",
-                }));
-            }
-            try {
-                data.csv[cell.y][cell.x] = { value: cell.value };
-            }
-            catch (_a) { }
-        });
-        {
-            var csvParser_1 = require("libs/csv-parser");
-            var csvData = __spreadArray([], data.csv).slice(1).map(function (col) { return col.slice(1); });
-            var csvString = csvParser_1.stringify(csvData.map(function (v) { return v.slice(0, maxRow - 1); }).slice(0, maxCol - 1));
-            var csvPath = req.params[0];
-            fs.writeFileSync(csvPath, csvString);
-        }
-        {
-            var _b = req.body, rowSize_1 = _b.rowSize, colSize_1 = _b.colSize;
-            var csvFilePath = req.params[0];
-            utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
-        }
-        res.send({ result: "OK" });
-    });
+    }); });
     router.post("/view/*", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var configData, data;
         return __generator(this, function (_a) {
@@ -134,7 +143,7 @@ function CsvRouter(config) {
                 case 1:
                     configData = _a.sent();
                     data = csvParser(req.params[0], {
-                        fixedPoint: { x: 0, y: 0 },
+                        fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
                         rowSize: rowSize,
                         colSize: colSize,
                     });
@@ -156,7 +165,7 @@ function CsvRouter(config) {
                 case 1:
                     configData = _a.sent();
                     data = csvParser(req.query.file, {
-                        fixedPoint: { x: 0, y: 0 },
+                        fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
                         rowSize: rowSize,
                     });
                     container = (preact_1.factory(Container_1.Container, { title: "Top" },

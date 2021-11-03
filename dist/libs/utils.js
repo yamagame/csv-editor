@@ -166,7 +166,6 @@ var loadConfig = function (config) { return __awaiter(void 0, void 0, void 0, fu
                 configJson.directories = configJson.directories.map(function (group) {
                     return __assign(__assign({}, exports.defaultConfig), group);
                 });
-                console.log(configJson.directories);
                 return [2 /*return*/, configJson];
         }
     });

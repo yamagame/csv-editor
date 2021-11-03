@@ -3,6 +3,7 @@
     {
       "name": "CSVファイル1",
       "dir": "./test-csv/data1",
+      "fixedV": 1,
       "form": [
         {
           "range": "B1",

@@ -102,7 +102,6 @@ export const loadConfig = async config => {
   configJson.directories = configJson.directories.map(group => {
     return { ...defaultConfig, ...group };
   });
-  console.log(configJson.directories);
   return configJson;
 };
 

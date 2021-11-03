@@ -53,9 +53,14 @@ export function CsvRouter(config: any = {}) {
     };
   }
 
-  router.post("/save/*", (req, res) => {
+  router.post("/save/*", async (req, res) => {
+    const configData = await findConfig(
+      config.path,
+      req.params[0],
+      defaultConfig
+    );
     const data = csvParser(req.params[0], {
-      fixedPoint: { x: 0, y: 0 },
+      fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
       rowSize,
     });
     const { maxRow, maxCol } = req.body;
@@ -102,7 +107,7 @@ export function CsvRouter(config: any = {}) {
       defaultConfig
     );
     const data = csvParser(req.params[0], {
-      fixedPoint: { x: 0, y: 0 },
+      fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
       rowSize,
       colSize,
     });
@@ -122,7 +127,7 @@ export function CsvRouter(config: any = {}) {
       defaultConfig
     );
     const data = csvParser(req.query.file, {
-      fixedPoint: { x: 0, y: 0 },
+      fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
       rowSize,
     });
     const container = (
