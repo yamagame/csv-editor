@@ -190,8 +190,6 @@ var findConfig = function (config, filepath, defaultConfig) { return __awaiter(v
             case 2:
                 configJson = _a.sent();
                 retVal = __assign(__assign(__assign({}, defaultConfig), configJson.directories.find(function (group) { return filepath.indexOf(path_1.default.join(group.dir)) === 0; })), localConfig);
-                console.log(retVal);
-                console.log(localConfig);
                 return [2 /*return*/, retVal];
         }
     });

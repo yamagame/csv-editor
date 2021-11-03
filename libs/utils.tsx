@@ -124,7 +124,5 @@ export const findConfig = async (config, filepath, defaultConfig) => {
     ),
     ...localConfig,
   };
-  console.log(retVal);
-  console.log(localConfig);
   return retVal;
 };
