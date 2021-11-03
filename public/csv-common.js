@@ -196,15 +196,17 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           this.backgroundColor
         );
       }
-      Object.entries(style).forEach(([k, v]) => {
-        const _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
-        if (_k === "background-color") {
-          this.element.style.setProperty(_k, v);
-          this.backgroundColor = v;
-        } else {
-          div.style.setProperty(_k, v);
-        }
-      });
+      if (Object.keys(style).length > 0) {
+        Object.entries(style).forEach(([k, v]) => {
+          const _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
+          if (_k === "background-color") {
+            this.element.style.setProperty(_k, v);
+            this.backgroundColor = v;
+          } else {
+            div.style.setProperty(_k, v);
+          }
+        });
+      }
     };
     this.macroStyle = () => {
       const cell = this;
@@ -252,7 +254,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         div.style = `${commonStyle()} color: ${this.color};`;
         div.removeEventListener("click", this.clickButton);
       }
-      this.updateMacroStyle();
       controller.updateMacroStyle();
     };
     this.getText = () => {
@@ -1063,10 +1064,25 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
       delete this.mousePosition;
     };
+    let updateIndex = 0;
+    let updateInterval = null;
     this.updateMacroStyle = () => {
-      this.cells.forEach(cell => {
-        cell.updateMacroStyle();
-      });
+      updateIndex = 0;
+      if (updateInterval) clearInterval(updateInterval);
+      updateInterval = setInterval(() => {
+        const length = 1000;
+        for (
+          let i = updateIndex;
+          i < updateIndex + length && i < this.cells.length;
+          i++
+        ) {
+          this.cells[i].updateMacroStyle();
+        }
+        updateIndex += length;
+        if (updateIndex >= this.cells.length) {
+          clearInterval(updateInterval);
+        }
+      }, 100);
     };
   }
 
