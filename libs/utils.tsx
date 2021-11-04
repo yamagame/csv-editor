@@ -1,7 +1,7 @@
 import { factory, Fragment } from "libs/preact";
 import fs from "fs";
 import path from "path";
-import { readFile } from "fs/promises";
+const { readFile } = fs.promises;
 
 export function escapeHtml(string: string) {
   if (typeof string !== "string") {

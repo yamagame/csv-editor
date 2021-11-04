@@ -58,7 +58,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.findConfig = exports.loadConfig = exports.defaultConfig = exports.saveJson = exports.loadJson = exports.readDir = exports.removeQuote = exports.escapeHtml = void 0;
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
-var promises_1 = require("fs/promises");
+var readFile = fs_1.default.promises.readFile;
 function escapeHtml(string) {
     if (typeof string !== "string") {
         return string;
@@ -161,7 +161,7 @@ var loadConfig = function (config) { return __awaiter(void 0, void 0, void 0, fu
         switch (_b.label) {
             case 0:
                 _b.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, promises_1.readFile(config, "utf-8")];
+                return [4 /*yield*/, readFile(config, "utf-8")];
             case 1:
                 data = _b.sent();
                 configJson = JSON.parse(data);
