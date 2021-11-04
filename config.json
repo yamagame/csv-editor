@@ -13,6 +13,13 @@
           }
         },
         {
+          "expression": "A0 == 'NG'",
+          "style": {
+            "color": "red",
+            "fontWeight": "bold"
+          }
+        },
+        {
           "range": "E0:X0",
           "expression": "true",
           "style": {
@@ -24,7 +31,7 @@
     },
     {
       "name": "CSVファイル2",
-      "dir": "./test-csv/data2"
+      "dir": "../csv-sample-data/"
     },
     {
       "name": "CSVファイル",

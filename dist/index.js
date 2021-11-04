@@ -49,8 +49,8 @@ var csv_router_1 = require("routers/csv-router");
 var CONFIG_PATH = process.env.CONFIG_PATH || "./config.json";
 var app = express_1.default();
 var port = process.env.PORT || 3000;
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
+app.use(express_1.default.json({ limit: "10mb" }));
+app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express_1.default.static("public"));
 app.use("/csv", csv_router_1.CsvRouter({
     path: CONFIG_PATH,
@@ -80,7 +80,7 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
                                 return ext !== "" && group.extension.indexOf(ext) >= 0;
                             }
                         }).map(function (v) {
-                            var file = encodeURI(v);
+                            var file = encodeURI(path.join(group.dir, v));
                             return (preact_1.factory("div", { className: "group-item" },
                                 preact_1.factory("a", { href: group.viewer + "?file=" + file }, v)));
                         }))); }),

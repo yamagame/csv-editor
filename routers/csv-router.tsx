@@ -82,10 +82,10 @@ export function CsvRouter(config: any = {}) {
   router.post("/save/*", async (req, res) => {
     const configData = await findConfig(
       config.path,
-      req.params[0],
+      req.query.file,
       defaultConfig
     );
-    const data = csvParser(req.params[0], {
+    const data = csvParser(req.query.file, {
       fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
       rowSize,
     });
@@ -115,12 +115,12 @@ export function CsvRouter(config: any = {}) {
       const csvString = csvParser.stringify(
         csvData.map(v => v.slice(0, maxRow - 1)).slice(0, maxCol - 1)
       );
-      const csvPath = req.params[0];
+      const csvPath = req.query.file;
       fs.writeFileSync(csvPath, csvString);
     }
     {
       const { rowSize, colSize } = req.body;
-      const csvFilePath = req.params[0];
+      const csvFilePath = req.query.file.toString();
       saveJson(csvFilePath, { rowSize, colSize, maxCol, maxRow });
     }
     res.send({ result: "OK" });
@@ -129,10 +129,10 @@ export function CsvRouter(config: any = {}) {
   router.post("/view/*", async (req, res) => {
     const configData = await findConfig(
       config.path,
-      req.params[0],
+      req.query.file,
       defaultConfig
     );
-    const data = csvParser(req.params[0], {
+    const data = csvParser(req.query.file, {
       fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
       rowSize,
       colSize,

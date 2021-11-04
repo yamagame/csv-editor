@@ -59,12 +59,13 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const markerAll = element.querySelectorAll(".table-marker");
   const topOffset = tableTopLeft.getBoundingClientRect().height * 2;
 
-  function TableCell(element, controller) {
+  function TableCell(element, initialText, controller) {
     this.element = element;
     this.x = parseInt(element.getAttribute("data-x"), 10);
     this.y = parseInt(element.getAttribute("data-y"), 10);
     this.backgroundColor = element.style["background-color"];
     this.baseBackgroundColor = element.getAttribute("data-background-color");
+    this.elementDiv = element.querySelector("div");
     this.color = element.querySelector("div").style["color"];
     this.selected = false;
     this.buttonStyle = false;
@@ -216,16 +217,20 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       const div = this.element.querySelector("div");
       if (this.backgroundColor !== this.baseBackgroundColor) {
         this.backgroundColor = this.baseBackgroundColor;
-        this.element.style.setProperty(
-          "background-color",
-          this.backgroundColor
-        );
+        if (!this.selected) {
+          this.element.style.setProperty(
+            "background-color",
+            this.backgroundColor
+          );
+        }
       }
       if (Object.keys(style).length > 0) {
         Object.entries(style).forEach(([k, v]) => {
           const _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
           if (_k === "background-color") {
-            this.element.style.setProperty(_k, v);
+            if (!this.selected) {
+              this.element.style.setProperty(_k, v);
+            }
             this.backgroundColor = v;
           } else {
             div.style.setProperty(_k, v);
@@ -269,9 +274,15 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       return macroStyle;
     };
     this.updateStyle = () => {
+      if ("newText" in this) {
+        const div = this.elementDiv;
+        div.innerText = this.newText;
+        delete this.newText;
+      }
       this.setStyle(this.macroStyle());
     };
     this.updateButtonStyle = text => {
+      const div = this.elementDiv;
       const buttonStyle = text.indexOf("@") === 0;
       if (this.buttonStyle != buttonStyle) {
         this.buttonStyle = buttonStyle;
@@ -284,18 +295,24 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       }
     };
-    this.setText = text => {
-      const div = this.element.querySelector("div");
+    this.setText = (text, update = true) => {
+      const div = this.elementDiv;
       if (div.innerText === text) return;
-      div.innerText = text;
+      this.newText = text;
+      if (update) {
+        div.innerText = text;
+      }
       this.updateButtonStyle(text);
-      controller.updateStyle();
+      if (update) {
+        controller.updateStyle();
+      }
     };
     this.getText = () => {
-      return this.element.querySelector("div").innerText;
+      return this.elementDiv.innerText;
     };
-    const div = element.querySelector("div");
-    this.updateButtonStyle(div.innerText);
+    this.updateButtonStyle(
+      initialText !== null ? initialText : this.elementDiv.innerText
+    );
   }
 
   function CellController(tableCell, topOffset) {
@@ -307,7 +324,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.colHeight = [];
     this.topOffset = topOffset;
     tableCell.forEach(element => {
-      this.cells.push(new TableCell(element, this));
+      this.cells.push(new TableCell(element, null, this));
     });
 
     function makeThumb(props) {
@@ -505,7 +522,17 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       [...this.rowWidth].slice(0, x).reduce((a, v, i) => {
         return a + v;
       }, 0);
+
+    const sortCell = (a, b) => {
+      const d = a.y - b.y;
+      if (d === 0) {
+        return a.x - b.x;
+      }
+      return d;
+    };
+
     this.insertColLine = () => {
+      console.log("col");
       const selectedCell = this.currentSelectedCell;
       const colCells = this.cells.filter(cell => {
         return cell.y === selectedCell.y;
@@ -515,7 +542,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       colCells.reverse().forEach(cell => {
         const element = makeCell(cell);
         cell.element.parentElement.insertBefore(element, cell.element);
-        const newCell = new TableCell(element, controller);
+        const newCell = new TableCell(element, "", controller);
         newCell.backgroundColor = cell.backgroundColor;
         newCell.baseBackgroundColor = cell.baseBackgroundColor;
         newCell.color = cell.color;
@@ -542,8 +569,8 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }px`;
       element.style.height = `${parseInt(element.style.height) + addheight}px`;
 
-      this.cells = [...this.cells, ...newCells];
-      this.resetIndexNumber();
+      this.cells = [...this.cells, ...newCells].sort(sortCell);
+      this.resetIndexNumber(0, 0);
 
       const lastCell = this.cells.find(
         cell => cell.x === 0 && cell.y === this.maxCol - 1
@@ -562,18 +589,23 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           }
         });
       });
+
+      this.updateStyle();
     };
     this.insertRowLine = () => {
+      let c = 0;
+      console.log("row", c++);
       const selectedCell = this.currentSelectedCell;
       const rowCells = this.cells.filter(cell => {
         return cell.x === selectedCell.x;
       });
       const newCells = [];
 
+      console.log("row", c++);
       rowCells.reverse().forEach(cell => {
         const element = makeCell(cell);
         cell.element.parentElement.insertBefore(element, cell.element);
-        const newCell = new TableCell(element, controller);
+        const newCell = new TableCell(element, "", controller);
         newCell.backgroundColor = cell.backgroundColor;
         newCell.baseBackgroundColor = cell.baseBackgroundColor;
         newCell.color = cell.color;
@@ -581,6 +613,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         newCells.push(newCell);
       });
 
+      console.log("row", c++);
       const x = selectedCell.x;
       const width = this.rowWidth[x + 1];
       this.rowWidth.push(this.rowWidth[this.rowWidth.length - 1]);
@@ -593,14 +626,17 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       });
 
+      console.log("row", c++);
       const addwidth = this.rowWidth[this.rowWidth.length - 1];
 
       tableTop.style.width = `${parseInt(tableTop.style.width) + addwidth}px`;
       element.style.width = `${parseInt(element.style.width) + addwidth}px`;
 
-      this.cells = [...this.cells, ...newCells];
-      this.resetIndexNumber();
+      console.log("row", c++);
+      this.cells = [...this.cells, ...newCells].sort(sortCell);
+      this.resetIndexNumber(0, 0);
 
+      console.log("row", c++);
       const lastCell = this.cells.find(
         cell => cell.y === 0 && cell.x === this.maxRow - 1
       );
@@ -609,6 +645,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         thumbs.forEach(thumb => tableTop.appendChild(thumb));
       }
 
+      console.log("row", c++);
       this.updateThumb();
 
       Object.entries(resizeMarkers).forEach(([k, v]) => {
@@ -618,27 +655,30 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           }
         });
       });
+
+      console.log("row", c++);
+      this.updateStyle();
     };
-    this.resetIndexNumber = () => {
+    this.resetIndexNumber = (x, y) => {
       this.cells
-        .filter(cell => cell.x === 0)
+        .filter(cell => cell.x === 0 && cell.y >= y)
         .sort((a, b) => {
           if (a.y < b.y) return -1;
           if (a.y > b.y) return 1;
           return 0;
         })
         .forEach((cell, i) => {
-          cell.setText(`${i}`);
+          cell.setText(`${i}`, false);
         });
       this.cells
-        .filter(cell => cell.y === 0)
+        .filter(cell => cell.x >= x && cell.y === 0)
         .sort((a, b) => {
           if (a.x < b.x) return -1;
           if (a.x > b.x) return 1;
           return 0;
         })
         .forEach((cell, i) => {
-          cell.setText(`${i}`);
+          cell.setText(`${i}`, false);
         });
     };
     this.selectCellWithPosition = (x, y) => {
@@ -658,7 +698,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     this.delete = () => {
       const selectedCell = this.currentSelectedCell;
       const selectLine = (dx, dy) => {
-        this.resetIndexNumber();
+        this.resetIndexNumber(0, 0);
         this.resize();
         this.clearSelectAll();
         const selectCell = (x, y) => {
@@ -720,6 +760,8 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             {
               const topHeight = parseInt(tableTop.style.height);
               tableLeft.style.height = `${topHeight + dy}px`;
+              const leftHeight = parseInt(tableLeft.style.height);
+              tableLeft.style.height = `${leftHeight + dy}px`;
               const tableHeight = parseInt(element.style.height);
               element.style.height = `${tableHeight + dy}px`;
             }
@@ -768,10 +810,13 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             }
           }
         } else {
-          selectedCell.setText("");
+          selectedCell.setText("", true);
           dataInput.value = "";
         }
         removeElements.forEach(el => el.remove());
+        if (removeElements.length > 0) {
+          this.updateStyle();
+        }
       }
     };
     this.save = url => {
@@ -781,7 +826,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         value: cell.getText(),
       }));
       postRequest(
-        `${url}/${dataName}`,
+        `${url}/?file=${dataName}`,
         {
           csv,
           colSize: this.colSize,
@@ -1099,13 +1144,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
       delete this.mousePosition;
     };
+
     let updateIndex = 0;
     let updateInterval = null;
     this.updateStyle = () => {
       updateIndex = 0;
       if (updateInterval) clearInterval(updateInterval);
       const update = () => {
-        const length = 1000;
+        const length = 100;
         for (
           let i = updateIndex;
           i < updateIndex + length && i < this.cells.length;
@@ -1120,7 +1166,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         if (update()) {
           clearInterval(updateInterval);
         }
-      }, 1);
+      }, 0);
       update();
     };
   }
@@ -1128,7 +1174,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
   const controller = new CellController(tableCell, topOffset);
 
   postRequest(
-    `${env}/${dataName}`,
+    `${env}/?file=${dataName}`,
     {
       rowSize: true,
       colSize: true,
@@ -1247,6 +1293,16 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             controller.currentSelectedCell.setText("◯");
           }
           moveSelect(e, 0, 1);
+        }
+      }
+      if (e.key === "Tab") {
+        if (controller.currentSelectedCell) {
+          if (controller.currentSelectedCell.getText() !== "") {
+            controller.currentSelectedCell.setText("");
+          } else {
+            controller.currentSelectedCell.setText("◯");
+          }
+          moveSelect(e, 1, 0);
         }
       }
       if (e.key === "Enter") {

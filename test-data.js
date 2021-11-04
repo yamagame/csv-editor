@@ -1,5 +1,5 @@
-const row = process.argv[2] || 50;
-const col = process.argv[3] || 50;
+const row = process.argv[2] || 21;
+const col = process.argv[3] || 208;
 
 for (let y = 0; y < col; y++) {
   let s = "";

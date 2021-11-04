@@ -11,8 +11,8 @@ const CONFIG_PATH = process.env.CONFIG_PATH || "./config.json";
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(express.static("public"));
 
@@ -49,7 +49,7 @@ app.get("/", async (req, res) => {
               return ext !== "" && group.extension.indexOf(ext) >= 0;
             }
           }).map(v => {
-            const file = encodeURI(v);
+            const file = encodeURI(path.join(group.dir, v));
             return (
               <div className="group-item">
                 <a href={`${group.viewer}?file=${file}`}>{v}</a>

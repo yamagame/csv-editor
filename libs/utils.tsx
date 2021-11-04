@@ -30,26 +30,31 @@ export function removeQuote(value) {
   return value;
 }
 
-export const readDir = (rootDir: string, callback) => {
+export const readDir = (targetDir: string, callback) => {
+  const workDir = path.join(targetDir, "");
   const _readDir = (dir: string) => {
     let result = [];
-    const files = fs.readdirSync(dir);
-    files.forEach(file => {
-      const filepath = path.join(dir, file);
-      const stat = fs.statSync(filepath);
-      if (stat.isDirectory()) {
-        if (path.parse(filepath).name !== "node_modules") {
-          result = [...result, ..._readDir(filepath)];
+    try {
+      const files = fs.readdirSync(dir);
+      files.forEach(file => {
+        const filepath = path.join(dir, file);
+        const stat = fs.statSync(filepath);
+        if (stat.isDirectory()) {
+          if (path.parse(filepath).name !== "node_modules") {
+            result = [...result, ..._readDir(filepath)];
+          }
+        } else if (stat.isFile()) {
+          if (callback(filepath)) {
+            result.push(filepath.replace(workDir, "").replace(/^\//,"");
+          }
         }
-      } else if (stat.isFile()) {
-        if (callback(filepath)) {
-          result.push(filepath.replace(rootDir, ""));
-        }
-      }
-    });
+      });
+    } catch(err) {
+      console.error(err);
+    }
     return result;
   };
-  return _readDir(rootDir);
+  return _readDir(workDir);
 };
 
 export const loadJson = (basepath: string) => {

@@ -131,10 +131,10 @@ function CsvRouter(config) {
         var configData, data, _a, maxRow, maxCol, csvParser_1, csvData, csvString, csvPath, _b, rowSize_1, colSize_1, csvFilePath;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.params[0], utils_1.defaultConfig)];
+                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.query.file, utils_1.defaultConfig)];
                 case 1:
                     configData = _c.sent();
-                    data = csvParser(req.params[0], {
+                    data = csvParser(req.query.file, {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
                         rowSize: rowSize,
                     });
@@ -157,12 +157,12 @@ function CsvRouter(config) {
                         csvParser_1 = require("libs/csv-parser");
                         csvData = __spreadArray([], data.csv).slice(1).map(function (col) { return col.slice(1); });
                         csvString = csvParser_1.stringify(csvData.map(function (v) { return v.slice(0, maxRow - 1); }).slice(0, maxCol - 1));
-                        csvPath = req.params[0];
+                        csvPath = req.query.file;
                         fs.writeFileSync(csvPath, csvString);
                     }
                     {
                         _b = req.body, rowSize_1 = _b.rowSize, colSize_1 = _b.colSize;
-                        csvFilePath = req.params[0];
+                        csvFilePath = req.query.file.toString();
                         utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
                     }
                     res.send({ result: "OK" });
@@ -174,10 +174,10 @@ function CsvRouter(config) {
         var configData, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.params[0], utils_1.defaultConfig)];
+                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.query.file, utils_1.defaultConfig)];
                 case 1:
                     configData = _a.sent();
-                    data = csvParser(req.params[0], {
+                    data = csvParser(req.query.file, {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
                         rowSize: rowSize,
                         colSize: colSize,

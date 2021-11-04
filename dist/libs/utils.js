@@ -86,27 +86,33 @@ function removeQuote(value) {
     return value;
 }
 exports.removeQuote = removeQuote;
-var readDir = function (rootDir, callback) {
+var readDir = function (targetDir, callback) {
+    var workDir = path_1.default.join(targetDir, "");
     var _readDir = function (dir) {
         var result = [];
-        var files = fs_1.default.readdirSync(dir);
-        files.forEach(function (file) {
-            var filepath = path_1.default.join(dir, file);
-            var stat = fs_1.default.statSync(filepath);
-            if (stat.isDirectory()) {
-                if (path_1.default.parse(filepath).name !== "node_modules") {
-                    result = __spreadArray(__spreadArray([], result), _readDir(filepath));
+        try {
+            var files = fs_1.default.readdirSync(dir);
+            files.forEach(function (file) {
+                var filepath = path_1.default.join(dir, file);
+                var stat = fs_1.default.statSync(filepath);
+                if (stat.isDirectory()) {
+                    if (path_1.default.parse(filepath).name !== "node_modules") {
+                        result = __spreadArray(__spreadArray([], result), _readDir(filepath));
+                    }
                 }
-            }
-            else if (stat.isFile()) {
-                if (callback(filepath)) {
-                    result.push(filepath.replace(rootDir, ""));
+                else if (stat.isFile()) {
+                    if (callback(filepath)) {
+                        result.push(filepath.replace(workDir, "").replace(/^\//, ""));
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch (err) {
+            console.error(err);
+        }
         return result;
     };
-    return _readDir(rootDir);
+    return _readDir(workDir);
 };
 exports.readDir = readDir;
 var loadJson = function (basepath) {
