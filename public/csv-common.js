@@ -1192,7 +1192,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
     }
     if (e.target == document.querySelector("body")) {
-      if (e.metaKey) {
+      if (e.metaKey || e.ctrlKey) {
         if (e.key === "x") {
           const selCell = controller.selectedCellTopLeft();
           if (selCell) {
