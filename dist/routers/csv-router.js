@@ -225,7 +225,7 @@ function CsvRouter(config) {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
                         rowSize: rowSize,
                     });
-                    container = (preact_1.factory(Container_1.Container, { title: "Top" },
+                    container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
                         preact_1.factory("div", { className: "csv-control-panel" },
                             preact_1.factory("a", { href: "/" },
                                 preact_1.factory("span", { className: "csv-data-name" }, configData.name)),

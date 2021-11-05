@@ -59,7 +59,7 @@ export function EnvViewRouter(config: any = {}) {
       rowSize,
     });
     const container = (
-      <Container title="Top">
+      <Container title="ENV-Viewer">
         <div className="csv-control-panel">
           <input className="csv-data-input" type="text" />
         </div>

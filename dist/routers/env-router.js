@@ -57,7 +57,7 @@ function EnvViewRouter(config) {
         var data = envParser(req.query.file, {
             rowSize: rowSize,
         });
-        var container = (preact_1.factory(Container_1.Container, { title: "Top" },
+        var container = (preact_1.factory(Container_1.Container, { title: "ENV-Viewer" },
             preact_1.factory("div", { className: "csv-control-panel" },
                 preact_1.factory("input", { className: "csv-data-input", type: "text" })),
             preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize }),

@@ -35,7 +35,7 @@ app.use(
 app.get("/", async (req, res) => {
   const { directories } = await loadConfig(CONFIG_PATH);
   const container = (
-    <Container title="Top">
+    <Container title="CSV-Editor">
       {directories.map(group => (
         <section>
           <p className="group-name">{group.name}</p>

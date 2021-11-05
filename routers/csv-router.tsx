@@ -173,7 +173,7 @@ export function CsvRouter(config: any = {}) {
       rowSize,
     });
     const container = (
-      <Container title="Top">
+      <Container title="CSV-Editor">
         <div className="csv-control-panel">
           <a href="/">
             <span className="csv-data-name">{configData.name}</span>

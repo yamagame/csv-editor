@@ -67,7 +67,7 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
             case 1:
                 directories = (_a.sent()).directories;
-                container = (preact_1.factory(Container_1.Container, { title: "Top" },
+                container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
                     directories.map(function (group) { return (preact_1.factory("section", null,
                         preact_1.factory("p", { className: "group-name" }, group.name),
                         utils_1.readDir(group.dir, function (filepath) {
