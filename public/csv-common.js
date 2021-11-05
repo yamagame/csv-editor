@@ -122,11 +122,16 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (!controller.loaded) return;
       if (this.y === 0 && this.x > 0) {
         this.select(e, cell => cell.y >= 0 && cell.x === this.x);
+        dataInput.value = "";
+        dataInput.disabled = true;
         controller.setMarker(this);
       } else if (this.x === 0 && this.y > 0) {
         this.select(e, cell => cell.x >= 0 && cell.y === this.y);
+        dataInput.value = "";
+        dataInput.disabled = true;
         controller.setMarker(this);
       } else {
+        dataInput.disabled = false;
         if (!this.selected) {
           if (!e.shiftKey && !e.altKey) {
             controller.clearSelectAll();
@@ -164,9 +169,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             this.clearSelect();
             delete controller.editCell;
           } else {
+            controller.editCell = this;
+            this.setSelect();
+            controller.setInput(this);
             dataInput.focus();
             dataInput.select();
-            controller.editCell = this;
           }
         }
         controller.setMarker(this);
@@ -304,7 +311,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
       this.updateButtonStyle(text);
       if (update) {
-        controller.updateStyle();
+        controller.updateStyle(this.y);
       }
     };
     this.getText = () => {
@@ -532,7 +539,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
 
     this.insertColLine = () => {
-      console.log("col");
       const selectedCell = this.currentSelectedCell;
       const colCells = this.cells.filter(cell => {
         return cell.y === selectedCell.y;
@@ -593,15 +599,12 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       this.updateStyle();
     };
     this.insertRowLine = () => {
-      let c = 0;
-      console.log("row", c++);
       const selectedCell = this.currentSelectedCell;
       const rowCells = this.cells.filter(cell => {
         return cell.x === selectedCell.x;
       });
       const newCells = [];
 
-      console.log("row", c++);
       rowCells.reverse().forEach(cell => {
         const element = makeCell(cell);
         cell.element.parentElement.insertBefore(element, cell.element);
@@ -613,7 +616,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         newCells.push(newCell);
       });
 
-      console.log("row", c++);
       const x = selectedCell.x;
       const width = this.rowWidth[x + 1];
       this.rowWidth.push(this.rowWidth[this.rowWidth.length - 1]);
@@ -626,17 +628,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       });
 
-      console.log("row", c++);
       const addwidth = this.rowWidth[this.rowWidth.length - 1];
 
       tableTop.style.width = `${parseInt(tableTop.style.width) + addwidth}px`;
       element.style.width = `${parseInt(element.style.width) + addwidth}px`;
 
-      console.log("row", c++);
       this.cells = [...this.cells, ...newCells].sort(sortCell);
       this.resetIndexNumber(0, 0);
 
-      console.log("row", c++);
       const lastCell = this.cells.find(
         cell => cell.y === 0 && cell.x === this.maxRow - 1
       );
@@ -645,7 +644,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         thumbs.forEach(thumb => tableTop.appendChild(thumb));
       }
 
-      console.log("row", c++);
       this.updateThumb();
 
       Object.entries(resizeMarkers).forEach(([k, v]) => {
@@ -656,7 +654,6 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         });
       });
 
-      console.log("row", c++);
       this.updateStyle();
     };
     this.resetIndexNumber = (x, y) => {
@@ -693,7 +690,9 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       const text = cell.element
         .querySelector("div")
         .innerText.replace(/\n/g, "\\n");
-      dataInput.value = text;
+      setTimeout(() => {
+        dataInput.value = text;
+      }, 0);
     };
     this.delete = () => {
       const selectedCell = this.currentSelectedCell;
@@ -815,7 +814,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
         removeElements.forEach(el => el.remove());
         if (removeElements.length > 0) {
-          this.updateStyle();
+          this.updateStyle(selectedCell.y);
         }
       }
     };
@@ -1147,7 +1146,8 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
 
     let updateIndex = 0;
     let updateInterval = null;
-    this.updateStyle = () => {
+    this.updateStyle = startY => {
+      const startIndex = this.cells.findIndex(cell => cell.y === startY);
       updateIndex = 0;
       if (updateInterval) clearInterval(updateInterval);
       const update = () => {
@@ -1157,7 +1157,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           i < updateIndex + length && i < this.cells.length;
           i++
         ) {
-          this.cells[i].updateStyle();
+          let t = startIndex + ((i % 2) * -2 + 1) * parseInt(i / 2);
+          if (t < 0) t += this.cells.length;
+          if (t >= this.cells.length) t -= this.cells.length;
+          this.cells[t].updateStyle();
         }
         updateIndex += length;
         return updateIndex >= this.cells.length;
@@ -1287,22 +1290,28 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
       if (e.key === " ") {
         if (controller.currentSelectedCell) {
-          if (controller.currentSelectedCell.getText() !== "") {
-            controller.currentSelectedCell.setText("");
-          } else {
-            controller.currentSelectedCell.setText("◯");
+          const cell = controller.currentSelectedCell;
+          if (cell.x > 0 && cell.y > 0) {
+            if (cell.getText() !== "") {
+              cell.setText("");
+            } else {
+              cell.setText("◯");
+            }
+            moveSelect(e, 0, 1);
           }
-          moveSelect(e, 0, 1);
         }
       }
       if (e.key === "Tab") {
         if (controller.currentSelectedCell) {
-          if (controller.currentSelectedCell.getText() !== "") {
-            controller.currentSelectedCell.setText("");
-          } else {
-            controller.currentSelectedCell.setText("◯");
+          const cell = controller.currentSelectedCell;
+          if (cell.x > 0 && cell.y > 0) {
+            if (cell.getText() !== "") {
+              cell.setText("");
+            } else {
+              cell.setText("◯");
+            }
+            moveSelect(e, 1, 0);
           }
-          moveSelect(e, 1, 0);
         }
       }
       if (e.key === "Enter") {
