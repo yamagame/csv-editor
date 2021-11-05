@@ -45,11 +45,11 @@ export const readDir = (targetDir: string, callback) => {
           }
         } else if (stat.isFile()) {
           if (callback(filepath)) {
-            result.push(filepath.replace(workDir, "").replace(/^\//,"");
+            result.push(filepath.replace(workDir, "").replace(/^\//, ""));
           }
         }
       });
-    } catch(err) {
+    } catch (err) {
       console.error(err);
     }
     return result;
