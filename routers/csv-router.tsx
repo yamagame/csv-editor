@@ -80,12 +80,9 @@ export function CsvRouter(config: any = {}) {
   });
 
   router.post("/save/*", async (req, res) => {
-    const configData = await findConfig(
-      config.path,
-      req.query.file,
-      defaultConfig
-    );
-    const data = csvParser(req.query.file, {
+    const { file } = req.query;
+    const configData = await findConfig(config.path, file, defaultConfig);
+    const data = csvParser(file, {
       fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
       rowSize,
     });
@@ -122,6 +119,25 @@ export function CsvRouter(config: any = {}) {
       const { rowSize, colSize } = req.body;
       const csvFilePath = req.query.file.toString();
       saveJson(csvFilePath, { rowSize, colSize, maxCol, maxRow });
+    }
+    if (configData.execute) {
+      try {
+        console.log(configData.execute, file);
+        const cmd = spawn(`${configData.execute}`, [file], {
+          shell: true,
+        });
+        cmd.stdout.on("data", data => {
+          console.log(data.toString());
+        });
+        cmd.stderr.on("data", data => {
+          console.error(data.toString());
+        });
+        cmd.on("exit", code => {
+          console.log(`Child exited with code ${code}`);
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
     res.send({ result: "OK" });
   });

@@ -51,7 +51,8 @@
             "backgroundColor": "#FFE0E0"
           }
         }
-      ]
+      ],
+      "execute": "echo"
     },
     {
       "name": "ENVファイル",

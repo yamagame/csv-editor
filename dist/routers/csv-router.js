@@ -128,13 +128,15 @@ function CsvRouter(config) {
         });
     }); });
     router.post("/save/*", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-        var configData, data, _a, maxRow, maxCol, csvParser_1, csvData, csvString, csvPath, _b, rowSize_1, colSize_1, csvFilePath;
+        var file, configData, data, _a, maxRow, maxCol, csvParser_1, csvData, csvString, csvPath, _b, rowSize_1, colSize_1, csvFilePath, cmd;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.query.file, utils_1.defaultConfig)];
+                case 0:
+                    file = req.query.file;
+                    return [4 /*yield*/, utils_1.findConfig(config.path, file, utils_1.defaultConfig)];
                 case 1:
                     configData = _c.sent();
-                    data = csvParser(req.query.file, {
+                    data = csvParser(file, {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
                         rowSize: rowSize,
                     });
@@ -164,6 +166,26 @@ function CsvRouter(config) {
                         _b = req.body, rowSize_1 = _b.rowSize, colSize_1 = _b.colSize;
                         csvFilePath = req.query.file.toString();
                         utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
+                    }
+                    if (configData.execute) {
+                        try {
+                            console.log(configData.execute, file);
+                            cmd = spawn("" + configData.execute, [file], {
+                                shell: true,
+                            });
+                            cmd.stdout.on("data", function (data) {
+                                console.log(data.toString());
+                            });
+                            cmd.stderr.on("data", function (data) {
+                                console.error(data.toString());
+                            });
+                            cmd.on("exit", function (code) {
+                                console.log("Child exited with code " + code);
+                            });
+                        }
+                        catch (err) {
+                            console.error(err);
+                        }
                     }
                     res.send({ result: "OK" });
                     return [2 /*return*/];
