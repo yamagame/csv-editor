@@ -65,5 +65,5 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`env-manager app listening at http://localhost:${port}`);
+  console.log(`CSV-Editor app listening at http://localhost:${port}`);
 });

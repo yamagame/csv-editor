@@ -91,6 +91,6 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); });
 app.listen(port, function () {
-    console.log("env-manager app listening at http://localhost:" + port);
+    console.log("CSV-Editor app listening at http://localhost:" + port);
 });
 //# sourceMappingURL=index.js.map
