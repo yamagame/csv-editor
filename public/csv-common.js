@@ -1263,12 +1263,15 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         if (e.key === "x") {
           const selCell = controller.selectedCellTopLeft();
           if (selCell) {
-            const data = controller.selectedCells().map(cell => ({
-              x: cell.x - selCell.x,
-              y: cell.y - selCell.y,
-              text: cell.getText(),
-              cell,
-            }));
+            const data = controller
+              .selectedCells()
+              .filter(v => v.x !== 0 && v.y !== 0)
+              .map(cell => ({
+                x: cell.x - selCell.x,
+                y: cell.y - selCell.y,
+                text: cell.getText(),
+                cell,
+              }));
             copyToClipboard(data.map(v => v.text));
             controller.setPasteboard("cut", data);
           }
@@ -1276,12 +1279,15 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         if (e.key === "c") {
           const selCell = controller.selectedCellTopLeft();
           if (selCell) {
-            const data = controller.selectedCells().map(cell => ({
-              x: cell.x - selCell.x,
-              y: cell.y - selCell.y,
-              text: cell.getText(),
-              cell,
-            }));
+            const data = controller
+              .selectedCells()
+              .filter(v => v.x !== 0 && v.y !== 0)
+              .map(cell => ({
+                x: cell.x - selCell.x,
+                y: cell.y - selCell.y,
+                text: cell.getText(),
+                cell,
+              }));
             copyToClipboard(data.map(v => v.text));
             controller.setPasteboard("copy", data);
           }
