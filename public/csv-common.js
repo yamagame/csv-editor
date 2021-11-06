@@ -826,8 +826,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           }
         } else {
           this.cells.forEach(cell => {
-            if (cell.selected) {
-              cell.setText("", true);
+            if (cell.x > 0 && cell.y > 0) {
+              if (cell.selected) {
+                cell.setText("", true);
+              }
             }
           });
           dataInput.value = "";
