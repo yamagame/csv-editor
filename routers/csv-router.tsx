@@ -9,7 +9,7 @@ import { Container } from "components/Container";
 
 export function CsvRouter(config: any = {}) {
   const router = express.Router();
-  const rowSize = config.cellWidth || [40, 40];
+  const rowSize = config.cellWidth || [40, 0];
   const colSize = config.cellHeight || [0];
 
   interface CsvParserOptions {

@@ -68,7 +68,7 @@ function CsvRouter(config) {
     var _this = this;
     if (config === void 0) { config = {}; }
     var router = express_1.default.Router();
-    var rowSize = config.cellWidth || [40, 40];
+    var rowSize = config.cellWidth || [40, 0];
     var colSize = config.cellHeight || [0];
     function csvParser(filename, options) {
         if (options === void 0) { options = {}; }

@@ -545,6 +545,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       });
       const newCells = [];
 
+      this.cells.forEach(cell => {
+        if (selectedCell.y !== cell.y) {
+          cell.clearSelect();
+        } else {
+          cell.selected = false;
+        }
+      });
+
       colCells.reverse().forEach(cell => {
         const element = makeCell(cell);
         cell.element.parentElement.insertBefore(element, cell.element);
@@ -596,7 +604,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         });
       });
 
-      this.updateStyle();
+      this.updateStyle(y);
     };
     this.insertRowLine = () => {
       const selectedCell = this.currentSelectedCell;
@@ -604,6 +612,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         return cell.x === selectedCell.x;
       });
       const newCells = [];
+
+      this.cells.forEach(cell => {
+        if (selectedCell.x !== cell.x) {
+          cell.clearSelect();
+        } else {
+          cell.selected = false;
+        }
+      });
 
       rowCells.reverse().forEach(cell => {
         const element = makeCell(cell);
@@ -654,7 +670,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         });
       });
 
-      this.updateStyle();
+      this.updateStyle(0);
     };
     this.resetIndexNumber = (x, y) => {
       this.cells
@@ -1147,7 +1163,9 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     let updateIndex = 0;
     let updateInterval = null;
     this.updateStyle = startY => {
-      const startIndex = this.cells.findIndex(cell => cell.y === startY);
+      const startIndex = startY
+        ? this.cells.findIndex(cell => cell.y === startY)
+        : 0;
       updateIndex = 0;
       if (updateInterval) clearInterval(updateInterval);
       const update = () => {
