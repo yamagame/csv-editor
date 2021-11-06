@@ -825,7 +825,11 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             }
           }
         } else {
-          selectedCell.setText("", true);
+          this.cells.forEach(cell => {
+            if (cell.selected) {
+              cell.setText("", true);
+            }
+          });
           dataInput.value = "";
         }
         removeElements.forEach(el => el.remove());
@@ -1314,28 +1318,32 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       }
       if (e.key === " ") {
         if (controller.currentSelectedCell) {
-          const cell = controller.currentSelectedCell;
-          if (cell.x > 0 && cell.y > 0) {
-            if (cell.getText() !== "") {
-              cell.setText("");
-            } else {
-              cell.setText("◯");
+          const cells = controller.cells.filter(cell => cell.selected);
+          cells.forEach(cell => {
+            if (cell.x > 0 && cell.y > 0) {
+              if (cell.getText() !== "") {
+                cell.setText("");
+              } else {
+                cell.setText("◯");
+              }
             }
-            moveSelect(e, 0, 1);
-          }
+          });
+          moveSelect(e, 0, 1);
         }
       }
       if (e.key === "Tab") {
         if (controller.currentSelectedCell) {
-          const cell = controller.currentSelectedCell;
-          if (cell.x > 0 && cell.y > 0) {
-            if (cell.getText() !== "") {
-              cell.setText("");
-            } else {
-              cell.setText("◯");
+          const cells = controller.cells.filter(cell => cell.selected);
+          cells.forEach(cell => {
+            if (cell.x > 0 && cell.y > 0) {
+              if (cell.getText() !== "") {
+                cell.setText("");
+              } else {
+                cell.setText("◯");
+              }
             }
-            moveSelect(e, 1, 0);
-          }
+          });
+          moveSelect(e, 1, 0);
         }
       }
       if (e.key === "Enter") {
