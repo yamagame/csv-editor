@@ -93,7 +93,7 @@ section {
   padding: 0px;
 }
 
-.csv-save-button {
+.csv-button {
   font-size: 0.7em;
   padding: 0px;
   margin-right: 10px;
@@ -106,8 +106,12 @@ section {
   font-weight: bold;
 }
 
-.csv-save-button:active {
+.csv-button:active {
   background-color: gray;
+}
+
+.csv-script-button {
+  float: right;
 }
 
 .csv-data-input {
@@ -147,4 +151,22 @@ section {
   font-size: 0.9em;
   margin-left: 10px;
   margin-bottom: 2px;
+}
+
+.csv-list-container {
+  display: flex;
+}
+
+.csv-row {
+  flex: 1;
+}
+
+.csv-instruction {
+  font-size: 0.9em;
+  height: 90%;
+}
+
+.csv-group-active {
+  color: red;
+  font-weight: bold;
 }

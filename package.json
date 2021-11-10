@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc -w -p tsconfig.json & NODE_PATH=./dist nodemon --config nodemon.json",
+    "start": "tsc -w -p tsconfig.json & SCRIPT_CMD=./script-cmd.js README_CMD=./readme.js NODE_PATH=./dist nodemon --config nodemon.json",
     "build": "tsc -p tsconfig.json",
     "test": "NODE_PATH=dist jest"
   },

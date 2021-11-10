@@ -183,7 +183,7 @@ export function CsvRouter(config: any = {}) {
           <input className="csv-data-input" type="text" />
           {configData.edit !== false ? (
             <input
-              className="csv-save-button"
+              className="csv-button"
               type="button"
               value="セーブ"
               onClick="save();"

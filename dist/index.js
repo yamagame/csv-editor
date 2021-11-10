@@ -40,6 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var preact_1 = require("libs/preact");
+var spawn = require("child_process").spawn;
 var path = require("path");
 var express_1 = __importDefault(require("express"));
 var utils_1 = require("libs/utils");
@@ -60,6 +61,48 @@ app.use("/env", env_router_1.EnvViewRouter({
     path: CONFIG_PATH,
     id: "env-viewer",
 }));
+app.post("/exec/:groupId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var cmd;
+    return __generator(this, function (_a) {
+        if (process.env.SCRIPT_CMD) {
+            cmd = spawn("node", [process.env.SCRIPT_CMD, req.params.groupId], {
+                shell: true,
+            });
+            cmd.stdout.on("data", function (data) {
+                console.error(data.toString());
+            });
+            cmd.stderr.on("data", function (data) {
+                console.error(data.toString());
+            });
+            cmd.on("exit", function (code) {
+                console.log("Child exited with code " + code);
+            });
+        }
+        res.sendStatus(200);
+        return [2 /*return*/];
+    });
+}); });
+app.get("/readme/:groupId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var cmd;
+    return __generator(this, function (_a) {
+        if (process.env.README_CMD) {
+            cmd = spawn("node", [process.env.README_CMD, req.params.groupId], {
+                shell: true,
+            });
+            cmd.stderr.on("data", function (data) {
+                console.error(data.toString());
+            });
+            cmd.on("exit", function (code) {
+                console.log("Child exited with code " + code);
+            });
+            cmd.stdout.pipe(res);
+        }
+        else {
+            res.send("No Document");
+        }
+        return [2 /*return*/];
+    });
+}); });
 app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var directories, container;
     return __generator(this, function (_a) {
@@ -68,22 +111,28 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 1:
                 directories = (_a.sent()).directories;
                 container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
-                    directories.map(function (group) { return (preact_1.factory("section", null,
-                        preact_1.factory("p", { className: "group-name" }, group.name),
-                        utils_1.readDir(group.dir, function (filepath) {
-                            if (group.files) {
-                                var basename = path.basename(filepath);
-                                return group.files.indexOf(basename) >= 0;
-                            }
-                            if (group.extension) {
-                                var ext = path.extname(filepath);
-                                return ext !== "" && group.extension.indexOf(ext) >= 0;
-                            }
-                        }).map(function (v) {
-                            var file = encodeURI(path.join(group.dir, v));
-                            return (preact_1.factory("div", { className: "group-item" },
-                                preact_1.factory("a", { href: group.viewer + "?file=" + file }, v)));
-                        }))); }),
+                    preact_1.factory("div", { className: "csv-list-container" },
+                        preact_1.factory("div", { className: "csv-row" }, directories.map(function (group, i) { return (preact_1.factory("section", null,
+                            preact_1.factory("p", { className: "group-name", onClick: "loadReadme(this, " + i + ")" }, group.name),
+                            utils_1.readDir(group.dir, function (filepath) {
+                                if (group.files) {
+                                    var basename = path.basename(filepath);
+                                    return group.files.indexOf(basename) >= 0;
+                                }
+                                if (group.extension) {
+                                    var ext = path.extname(filepath);
+                                    return ext !== "" && group.extension.indexOf(ext) >= 0;
+                                }
+                            }).map(function (v) {
+                                var file = encodeURI(path.join(group.dir, v));
+                                return (preact_1.factory("div", { className: "group-item" },
+                                    preact_1.factory("a", { href: group.viewer + "?file=" + file }, v)));
+                            }))); })),
+                        preact_1.factory("div", { className: "csv-row" },
+                            preact_1.factory("section", { className: "csv-instruction" },
+                                preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: true, onClick: "exec();" }),
+                                preact_1.factory("pre", null,
+                                    preact_1.factory("code", { className: "csv-instrcution-container" }))))),
                     preact_1.factory("script", { type: "text/javascript", src: "/index.js" })));
                 res.send(preact_1.render(container));
                 return [2 /*return*/];
