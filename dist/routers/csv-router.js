@@ -205,6 +205,7 @@ function CsvRouter(config) {
                         colSize: colSize,
                     });
                     data.form = configData.form;
+                    data.edit = configData.edit;
                     res.send(Object.entries(req.body).reduce(function (a, _a) {
                         var k = _a[0], v = _a[1];
                         a[k] = data[k];
@@ -232,7 +233,7 @@ function CsvRouter(config) {
                             ":",
                             preact_1.factory("span", { className: "csv-data-name" }, data.dataname),
                             preact_1.factory("input", { className: "csv-data-input", type: "text" }),
-                            preact_1.factory("input", { className: "csv-save-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" })),
+                            configData.edit !== false ? (preact_1.factory("input", { className: "csv-save-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" })) : null),
                         preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize, form: configData.form }),
                         preact_1.factory("script", { type: "text/javascript", src: "/csv-index.js" })));
                     res.send(preact_1.render(container));

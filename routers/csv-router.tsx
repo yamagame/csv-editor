@@ -154,6 +154,7 @@ export function CsvRouter(config: any = {}) {
       colSize,
     });
     data.form = configData.form;
+    data.edit = configData.edit;
     res.send(
       Object.entries(req.body).reduce((a, [k, v]) => {
         a[k] = data[k];
@@ -180,12 +181,14 @@ export function CsvRouter(config: any = {}) {
           </a>
           :<span className="csv-data-name">{data.dataname}</span>
           <input className="csv-data-input" type="text" />
-          <input
-            className="csv-save-button"
-            type="button"
-            value="セーブ"
-            onClick="save();"
-          />
+          {configData.edit !== false ? (
+            <input
+              className="csv-save-button"
+              type="button"
+              value="セーブ"
+              onClick="save();"
+            />
+          ) : null}
         </div>
         <CsvTable
           id="csv-table"

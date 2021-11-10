@@ -131,7 +131,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         dataInput.disabled = true;
         controller.setMarker(this);
       } else {
-        dataInput.disabled = false;
+        dataInput.disabled = !controller.edit;
         if (!this.selected) {
           if (!e.shiftKey && !e.altKey) {
             controller.clearSelectAll();
@@ -1207,6 +1207,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       colSize: true,
       defaultCellSize: true,
       fixedPoint: true,
+      edit: true,
       form: true,
     },
     res => {
@@ -1223,6 +1224,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       controller.updateThumb();
       controller.loaded = true;
       controller.form = res.form;
+      controller.edit = res.edit !== false;
       controller.macros = res.form
         ? res.form.map(f => ({
             range: macro.range(f.range || ""),
@@ -1262,10 +1264,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (e.key === "Enter") {
         dataInput.blur();
         moveSelect(e, 0, 1);
+        setTimeout(() => {
+          dataInput.focus();
+          dataInput.select();
+        }, 0);
       }
     }
     if (e.target == document.querySelector("body")) {
-      if (e.metaKey || e.ctrlKey) {
+      if ((e.metaKey || e.ctrlKey) && controller.edit) {
         if (e.key === "x") {
           const selCell = controller.selectedCellTopLeft();
           if (selCell) {
@@ -1318,7 +1324,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           }
         }
       }
-      if (e.key === " ") {
+      if (e.key === " " && controller.edit) {
         if (controller.currentSelectedCell) {
           const cells = controller.cells.filter(cell => cell.selected);
           cells.forEach(cell => {
@@ -1333,7 +1339,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           moveSelect(e, 0, 1);
         }
       }
-      if (e.key === "Tab") {
+      if (e.key === "Tab" && controller.edit) {
         if (controller.currentSelectedCell) {
           const cells = controller.cells.filter(cell => cell.selected);
           cells.forEach(cell => {
@@ -1349,7 +1355,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
         }
       }
       if (e.key === "Enter") {
-        if (controller.currentSelectedCell) {
+        if (controller.currentSelectedCell && controller.edit) {
           if (
             controller.currentSelectedCell.x === 0 &&
             controller.currentSelectedCell.y > 0
@@ -1385,10 +1391,10 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
       if (e.key === "ArrowRight") {
         moveSelect(e, 1, 0);
       }
-      if (e.key === "Backspace") {
+      if (e.key === "Backspace" && controller.edit) {
         controller.delete();
       }
-      if (e.key === "Delete") {
+      if (e.key === "Delete" && controller.edit) {
         controller.delete();
       }
     }

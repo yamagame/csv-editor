@@ -94,7 +94,6 @@ section {
 }
 
 .csv-save-button {
-  margin-left: 10px;
   font-size: 0.7em;
   padding: 0px;
   margin-right: 10px;
@@ -114,6 +113,7 @@ section {
 .csv-data-input {
   flex-grow: 1;
   margin-left: 10px;
+  margin-right: 10px;
   width: 100px;
   border: solid 1px lightgray;
   border-radius: 5px;
