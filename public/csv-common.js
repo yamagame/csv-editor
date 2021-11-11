@@ -165,7 +165,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             controller.setInput(this);
           }
         } else {
-          if (controller.editCell === this) {
+          if (controller.editCell === this || !controller.edit) {
             this.clearSelect();
             delete controller.editCell;
           } else {

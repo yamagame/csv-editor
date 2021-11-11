@@ -23,23 +23,19 @@ function main() {
   //
 }
 
-let activeGroup = -1;
-
-function exec() {
-  if (activeGroup < 0) return;
-  request("post", `exec/${activeGroup}`, {}, response => {
+function exec(groupId) {
+  if (groupId < 0) return;
+  request("post", `/exec/${groupId}`, {}, response => {
     console.log(response);
   });
 }
 
-function loadReadme(element, groupId) {
+function loadReadme(groupId) {
+  if (groupId < 0) return;
   const groups = document.querySelectorAll(".group-name");
-  groups.forEach(group => group.classList.remove("csv-group-active"));
   const scriptButton = document.querySelector(".csv-script-button");
   scriptButton.disabled = false;
-  element.classList.add("csv-group-active");
-  activeGroup = groupId;
-  request("get", `readme/${groupId}`, {}, response => {
+  request("get", `/readme/${groupId}`, {}, response => {
     const element = document.querySelector(".csv-instrcution-container");
     element.innerText = response;
   });

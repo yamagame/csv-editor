@@ -125,7 +125,7 @@ export const findConfig = async (config, filepath, defaultConfig) => {
   const retVal = {
     ...defaultConfig,
     ...configJson.directories.find(
-      group => filepath.indexOf(path.join(group.dir)) === 0
+      group => filepath.indexOf(path.join(group.path)) === 0
     ),
     ...localConfig,
   };

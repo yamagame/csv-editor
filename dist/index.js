@@ -69,10 +69,10 @@ app.post("/exec/:groupId", function (req, res) { return __awaiter(void 0, void 0
                 shell: true,
             });
             cmd.stdout.on("data", function (data) {
-                console.error(data.toString());
+                process.stdout.write(data.toString());
             });
             cmd.stderr.on("data", function (data) {
-                console.error(data.toString());
+                process.stderr.write(data.toString());
             });
             cmd.on("exit", function (code) {
                 console.log("Child exited with code " + code);
@@ -103,38 +103,68 @@ app.get("/readme/:groupId", function (req, res) { return __awaiter(void 0, void 
         return [2 /*return*/];
     });
 }); });
-app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var directories, container;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
-            case 1:
-                directories = (_a.sent()).directories;
-                container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
-                    preact_1.factory("div", { className: "csv-list-container" },
-                        preact_1.factory("div", { className: "csv-row" }, directories.map(function (group, i) { return (preact_1.factory("section", null,
-                            preact_1.factory("p", { className: "group-name", onClick: "loadReadme(this, " + i + ")" }, group.name),
-                            utils_1.readDir(group.dir, function (filepath) {
-                                if (group.files) {
-                                    var basename = path.basename(filepath);
-                                    return group.files.indexOf(basename) >= 0;
-                                }
-                                if (group.extension) {
-                                    var ext = path.extname(filepath);
-                                    return ext !== "" && group.extension.indexOf(ext) >= 0;
-                                }
-                            }).map(function (v) {
-                                var file = encodeURI(path.join(group.dir, v));
-                                return (preact_1.factory("div", { className: "group-item" },
-                                    preact_1.factory("a", { href: group.viewer + "?file=" + file }, v)));
-                            }))); })),
-                        preact_1.factory("div", { className: "csv-row" },
-                            preact_1.factory("section", { className: "csv-instruction" },
-                                preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: true, onClick: "exec();" }),
+var renderContainer = function (groupId) {
+    if (groupId === void 0) { groupId = -1; }
+    return __awaiter(void 0, void 0, void 0, function () {
+        var directories, group, container;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
+                case 1:
+                    directories = (_a.sent()).directories;
+                    group = directories.find(function (g, i) { return i === groupId; });
+                    container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
+                        preact_1.factory("div", { className: "csv-list-container" },
+                            preact_1.factory("div", { className: "csv-row-1" }, directories.map(function (group, i) { return (preact_1.factory("div", null,
+                                preact_1.factory("a", { className: "group-name " + (i === groupId ? "csv-group-active" : ""), href: "/list/" + i }, group.name))); })),
+                            preact_1.factory("div", { className: "csv-row-2" }, group &&
+                                utils_1.readDir(group.path, function (filepath) {
+                                    if (group.files) {
+                                        var basename = path.basename(filepath);
+                                        return group.files.indexOf(basename) >= 0;
+                                    }
+                                    if (group.extension) {
+                                        var ext = path.extname(filepath);
+                                        return ext !== "" && group.extension.indexOf(ext) >= 0;
+                                    }
+                                }).map(function (v) {
+                                    var file = encodeURI(path.join(group.path, v));
+                                    return (preact_1.factory("div", { className: "group-item" },
+                                        preact_1.factory("a", { href: "/" + group.viewer + "?file=" + file }, v)));
+                                })),
+                            preact_1.factory("div", { className: "csv-row-2" },
+                                preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: groupId >= 0 ? false : true, onClick: "exec(" + groupId + ");" }),
                                 preact_1.factory("pre", null,
-                                    preact_1.factory("code", { className: "csv-instrcution-container" }))))),
-                    preact_1.factory("script", { type: "text/javascript", src: "/index.js" })));
-                res.send(preact_1.render(container));
+                                    preact_1.factory("code", { className: "csv-instrcution-container" })))),
+                        preact_1.factory("script", { type: "text/javascript", src: "/index.js" }),
+                        preact_1.factory("script", { type: "text/javascript" }, "loadReadme(" + groupId + ")")));
+                    return [2 /*return*/, preact_1.render(container)];
+            }
+        });
+    });
+};
+app.get("/list/:groupId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                _b = (_a = res).send;
+                return [4 /*yield*/, renderContainer(parseInt(req.params.groupId))];
+            case 1:
+                _b.apply(_a, [_c.sent()]);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                _b = (_a = res).send;
+                return [4 /*yield*/, renderContainer()];
+            case 1:
+                _b.apply(_a, [_c.sent()]);
                 return [2 /*return*/];
         }
     });

@@ -40,10 +40,10 @@ app.post("/exec/:groupId", async (req, res) => {
       shell: true,
     });
     cmd.stdout.on("data", data => {
-      console.error(data.toString());
+      process.stdout.write(data.toString());
     });
     cmd.stderr.on("data", data => {
-      console.error(data.toString());
+      process.stderr.write(data.toString());
     });
     cmd.on("exit", code => {
       console.log(`Child exited with code ${code}`);
@@ -69,56 +69,71 @@ app.get("/readme/:groupId", async (req, res) => {
   }
 });
 
-app.get("/", async (req, res) => {
+const renderContainer = async (groupId = -1) => {
   const { directories } = await loadConfig(CONFIG_PATH);
+  const group = directories.find((g, i) => i === groupId);
   const container = (
     <Container title="CSV-Editor">
       <div className="csv-list-container">
-        <div className="csv-row">
+        <div className="csv-row-1">
           {directories.map((group, i) => (
-            <section>
-              <p className="group-name" onClick={`loadReadme(this, ${i})`}>
+            <div>
+              <a
+                className={`group-name ${
+                  i === groupId ? "csv-group-active" : ""
+                }`}
+                href={`/list/${i}`}>
                 {group.name}
-              </p>
-              {readDir(group.dir, filepath => {
-                if (group.files) {
-                  const basename = path.basename(filepath);
-                  return group.files.indexOf(basename) >= 0;
-                }
-                if (group.extension) {
-                  const ext = path.extname(filepath);
-                  return ext !== "" && group.extension.indexOf(ext) >= 0;
-                }
-              }).map(v => {
-                const file = encodeURI(path.join(group.dir, v));
-                return (
-                  <div className="group-item">
-                    <a href={`${group.viewer}?file=${file}`}>{v}</a>
-                  </div>
-                );
-              })}
-            </section>
+              </a>
+            </div>
           ))}
         </div>
-        <div className="csv-row">
-          <section className="csv-instruction">
-            <input
-              className="csv-button csv-script-button"
-              type="button"
-              value="スクリプト実行"
-              disabled
-              onClick={`exec();`}
-            />
-            <pre>
-              <code className="csv-instrcution-container"></code>
-            </pre>
-          </section>
+        <div className="csv-row-2">
+          {group &&
+            readDir(group.path, filepath => {
+              if (group.files) {
+                const basename = path.basename(filepath);
+                return group.files.indexOf(basename) >= 0;
+              }
+              if (group.extension) {
+                const ext = path.extname(filepath);
+                return ext !== "" && group.extension.indexOf(ext) >= 0;
+              }
+            }).map(v => {
+              const file = encodeURI(path.join(group.path, v));
+              return (
+                <div className="group-item">
+                  <a href={`/${group.viewer}?file=${file}`}>{v}</a>
+                </div>
+              );
+            })}
+        </div>
+        <div className="csv-row-2">
+          <input
+            className="csv-button csv-script-button"
+            type="button"
+            value="スクリプト実行"
+            disabled={groupId >= 0 ? false : true}
+            onClick={`exec(${groupId});`}
+          />
+          <pre>
+            <code className="csv-instrcution-container"></code>
+          </pre>
         </div>
       </div>
       <script type="text/javascript" src="/index.js"></script>
+      <script type="text/javascript">{`loadReadme(${groupId})`}</script>
     </Container>
   );
-  res.send(render(container));
+  return render(container);
+};
+
+app.get("/list/:groupId", async (req, res) => {
+  res.send(await renderContainer(parseInt(req.params.groupId)));
+});
+
+app.get("/", async (req, res) => {
+  res.send(await renderContainer());
 });
 
 app.listen(port, () => {

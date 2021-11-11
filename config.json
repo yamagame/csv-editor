@@ -2,8 +2,9 @@
   "directories": [
     {
       "name": "CSVファイル1",
-      "dir": "./test-csv/data1",
+      "path": "./test-csv/data1",
       "fixedV": 0,
+      "edit": false,
       "form": [
         {
           "range": "B1",
@@ -31,11 +32,11 @@
     },
     {
       "name": "CSVファイル2",
-      "dir": "../csv-sample-data/"
+      "path": "../csv-sample-data/"
     },
     {
       "name": "CSVファイル",
-      "dir": "./test-csv",
+      "path": "./test-csv",
       "form": [
         {
           "expression": "A0 == 'NG'",
@@ -56,7 +57,7 @@
     },
     {
       "name": "ENVファイル",
-      "dir": "./test-csv",
+      "path": "./test-csv",
       "files": ["sample-env"],
       "viewer": "env/view"
     }
