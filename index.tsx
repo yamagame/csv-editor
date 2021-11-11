@@ -52,22 +52,29 @@ app.post("/exec/:groupId", async (req, res) => {
   res.sendStatus(200);
 });
 
-app.get("/readme/:groupId", async (req, res) => {
+const readReademe = groupId => {
   if (process.env.README_CMD) {
-    const cmd = spawn("node", [process.env.README_CMD, req.params.groupId], {
-      shell: true,
+    return new Promise(resolve => {
+      let readme = "";
+      const cmd = spawn("node", [process.env.README_CMD, groupId], {
+        shell: true,
+      });
+      cmd.stdout.on("data", data => {
+        console.error(data.toString());
+        readme += data.toString();
+      });
+      cmd.stderr.on("data", data => {
+        console.error(data.toString());
+      });
+      cmd.on("exit", code => {
+        console.log(`Child exited with code ${code}`);
+        resolve(readme);
+      });
     });
-    cmd.stderr.on("data", data => {
-      console.error(data.toString());
-    });
-    cmd.on("exit", code => {
-      console.log(`Child exited with code ${code}`);
-    });
-    cmd.stdout.pipe(res);
   } else {
-    res.send("No Document");
+    return "";
   }
-});
+};
 
 const renderContainer = async (groupId = -1) => {
   const { directories } = await loadConfig(CONFIG_PATH);
@@ -117,12 +124,13 @@ const renderContainer = async (groupId = -1) => {
             onClick={`exec(${groupId});`}
           />
           <pre>
-            <code className="csv-instrcution-container"></code>
+            <code className="csv-instrcution-container">
+              {await readReademe(groupId)}
+            </code>
           </pre>
         </div>
       </div>
       <script type="text/javascript" src="/index.js"></script>
-      <script type="text/javascript">{`loadReadme(${groupId})`}</script>
     </Container>
   );
   return render(container);

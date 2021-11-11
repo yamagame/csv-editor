@@ -29,14 +29,3 @@ function exec(groupId) {
     console.log(response);
   });
 }
-
-function loadReadme(groupId) {
-  if (groupId < 0) return;
-  const groups = document.querySelectorAll(".group-name");
-  const scriptButton = document.querySelector(".csv-script-button");
-  scriptButton.disabled = false;
-  request("get", `/readme/${groupId}`, {}, response => {
-    const element = document.querySelector(".csv-instrcution-container");
-    element.innerText = response;
-  });
-}

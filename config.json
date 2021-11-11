@@ -37,6 +37,8 @@
     {
       "name": "CSVファイル",
       "path": "./test-csv",
+      "fixedH": 0,
+      "fixedV": 2,
       "form": [
         {
           "expression": "A0 == 'NG'",
