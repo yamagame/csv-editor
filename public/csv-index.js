@@ -16,3 +16,7 @@ function main() {
 function save() {
   controller.save("/csv/save");
 }
+
+function download() {
+  controller.download("/csv/download");
+}

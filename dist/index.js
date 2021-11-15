@@ -117,30 +117,36 @@ var renderContainer = function (groupId) {
                     directories = (_l.sent()).directories;
                     group = directories.find(function (g, i) { return i === groupId; });
                     _a = preact_1.factory;
-                    _b = [Container_1.Container, { title: "CSV-Editor" }];
+                    _b = [Container_1.Container, { title: "CSV-Editor" }, preact_1.factory("div", { className: "csv-control-panel" },
+                            preact_1.factory("div", { className: "csv-control-panel-grow" }),
+                            preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: groupId >= 0 && group.script ? false : true, onClick: "exec(" + groupId + ");" }))];
                     _c = preact_1.factory;
-                    _d = ["div", { className: "csv-list-container" }, preact_1.factory("div", { className: "csv-row-1" }, directories.map(function (group, i) { return (preact_1.factory("div", null,
-                            preact_1.factory("a", { className: "group-name " + (i === groupId ? "csv-group-active" : ""), href: "/list/" + i }, group.name))); })), preact_1.factory("div", { className: "csv-row-2" }, group &&
-                            utils_1.readDir(group.path, function (filepath) {
-                                if (group.files) {
-                                    var basename = path.basename(filepath);
-                                    return group.files.indexOf(basename) >= 0;
-                                }
-                                if (group.extension) {
-                                    var ext = path.extname(filepath);
-                                    return ext !== "" && group.extension.indexOf(ext) >= 0;
-                                }
-                            }).map(function (v) {
-                                var file = encodeURI(path.join(group.path, v));
-                                return (preact_1.factory("div", { className: "group-item" },
-                                    preact_1.factory("a", { href: "/" + group.viewer + "?file=" + file }, v)));
-                            }))];
+                    _d = ["div", { className: "csv-list-container" }, preact_1.factory("div", { className: "csv-row-1" },
+                            preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30B0\u30EB\u30FC\u30D7\u540D"),
+                            directories.map(function (group, i) { return (preact_1.factory("div", { className: "csv-list-item " + (i === groupId ? "csv-group-active-cell" : ""), onclick: "window.location.href='/list/" + i + "';" },
+                                preact_1.factory("a", { className: "group-name " + (i === groupId ? "csv-group-active" : ""), href: "/list/" + i }, group.name))); })), preact_1.factory("div", { className: "csv-row-2" },
+                            preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30D5\u30A1\u30A4\u30EB\u540D"),
+                            group &&
+                                utils_1.readDir(group.path, function (filepath) {
+                                    if (group.files) {
+                                        var basename = path.basename(filepath);
+                                        return group.files.indexOf(basename) >= 0;
+                                    }
+                                    if (group.extension) {
+                                        var ext = path.extname(filepath);
+                                        return ext !== "" && group.extension.indexOf(ext) >= 0;
+                                    }
+                                }).map(function (v) {
+                                    var file = encodeURI(path.join(group.path, v));
+                                    return (preact_1.factory("div", { className: "csv-list-item" },
+                                        preact_1.factory("a", { href: "/" + group.viewer + "?file=" + file }, v)));
+                                }))];
                     _e = preact_1.factory;
-                    _f = ["div", { className: "csv-row-2" }, preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: groupId >= 0 ? false : true, onClick: "exec(" + groupId + ");" })];
+                    _f = ["div", { className: "csv-row-3" }];
                     _g = preact_1.factory;
-                    _h = ["pre", null];
+                    _h = ["pre", { className: "csv-instrcution-container" }];
                     _j = preact_1.factory;
-                    _k = ["code", { className: "csv-instrcution-container" }];
+                    _k = ["code", null];
                     return [4 /*yield*/, readReademe(groupId)];
                 case 2:
                     container = (_a.apply(void 0, _b.concat([_c.apply(void 0, _d.concat([_e.apply(void 0, _f.concat([_g.apply(void 0, _h.concat([_j.apply(void 0, _k.concat([_l.sent()]))]))]))])), preact_1.factory("script", { type: "text/javascript", src: "/index.js" })])));

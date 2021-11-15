@@ -68,6 +68,11 @@ section {
   width: 100%;
   padding: 4px;
   background-color: #fafafa;
+  border-bottom: solid 1px #909090;
+}
+
+.csv-control-panel-grow {
+  flex-grow: 1;
 }
 
 .table-marker {
@@ -101,9 +106,10 @@ section {
 .csv-button {
   font-size: 0.7em;
   padding: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
   margin-right: 10px;
-  width: 80px;
-  border: solid 1px lightgray;
+  border: solid 1px gray;
   background-color: #e0e0e0;
   border-radius: 5px;
   outline: none;
@@ -164,15 +170,23 @@ section {
 }
 
 .csv-row-1 {
-  padding: 10px;
-  flex: 1;
-  border-right: solid 1px black;
+  /* padding: 10px; */
+  padding-top: 32px;
+  flex: 2;
+  border-right: solid 1px #909090;
 }
 
 .csv-row-2 {
+  /* padding: 10px; */
+  padding-top: 32px;
+  flex: 3;
+  border-right: solid 1px #909090;
+}
+
+.csv-row-3 {
   padding: 10px;
-  flex: 2;
-  border-right: solid 1px black;
+  padding-top: 32px;
+  flex: 1;
 }
 
 .csv-section {
@@ -181,6 +195,28 @@ section {
 }
 
 .csv-group-active {
-  color: red;
   font-weight: bold;
+}
+
+.csv-group-active-cell {
+  background-color: antiquewhite;
+}
+
+.csv-instrcution-container {
+  font-size: 0.8em;
+  margin-top: 0px;
+}
+
+.csv-list-item {
+  font-size: 0.8em;
+  height: 20px;
+  padding-left: 10px;
+  border-bottom: solid 1px lightgray;
+}
+
+.csv-list-title {
+  font-weight: bold;
+  padding-left: 0px;
+  background-color: #d5f0ff;
+  text-align: center;
 }

@@ -127,6 +127,25 @@ function CsvRouter(config) {
             }
         });
     }); });
+    router.get("/download/*", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        var file, data;
+        return __generator(this, function (_a) {
+            file = req.query.file;
+            try {
+                if (!fs.existsSync(file)) {
+                    return [2 /*return*/, res.sendStatus(404)];
+                }
+                data = fs.readFileSync(file, { encoding: "utf-8" });
+                res.setHeader("content-disposition", "attachment; filename=" + path.basename(file));
+                res.setHeader("content-type", "text/csv; charset=UTF-8");
+                res.send(data);
+            }
+            catch (err) {
+                res.sendStatus(404);
+            }
+            return [2 /*return*/];
+        });
+    }); });
     router.post("/save/*", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var file, configData, data, _a, maxRow, maxCol, csvParser_1, csvData, csvString, csvPath, _b, rowSize_1, colSize_1, csvFilePath, cmd;
         return __generator(this, function (_c) {
@@ -228,11 +247,12 @@ function CsvRouter(config) {
                     });
                     container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
                         preact_1.factory("div", { className: "csv-control-panel" },
-                            preact_1.factory("a", { href: "/" },
+                            preact_1.factory("a", { href: "/list/" + configData.groupIndex },
                                 preact_1.factory("span", { className: "csv-data-name" }, configData.name)),
                             ":",
                             preact_1.factory("span", { className: "csv-data-name" }, data.dataname),
                             preact_1.factory("input", { className: "csv-data-input", type: "text" }),
+                            preact_1.factory("input", { className: "csv-button", type: "button", value: "\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9", onClick: "download();" }),
                             configData.edit !== false ? (preact_1.factory("input", { className: "csv-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" })) : null),
                         preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize, form: configData.form }),
                         preact_1.factory("script", { type: "text/javascript", src: "/csv-index.js" })));

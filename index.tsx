@@ -81,10 +81,25 @@ const renderContainer = async (groupId = -1) => {
   const group = directories.find((g, i) => i === groupId);
   const container = (
     <Container title="CSV-Editor">
+      <div className="csv-control-panel">
+        <div className="csv-control-panel-grow"></div>
+        <input
+          className="csv-button csv-script-button"
+          type="button"
+          value="スクリプト実行"
+          disabled={groupId >= 0 && group.script ? false : true}
+          onClick={`exec(${groupId});`}
+        />
+      </div>
       <div className="csv-list-container">
         <div className="csv-row-1">
+          <div className="csv-list-item csv-list-title">グループ名</div>
           {directories.map((group, i) => (
-            <div>
+            <div
+              className={`csv-list-item ${
+                i === groupId ? "csv-group-active-cell" : ""
+              }`}
+              onclick={`window.location.href='/list/${i}';`}>
               <a
                 className={`group-name ${
                   i === groupId ? "csv-group-active" : ""
@@ -96,6 +111,7 @@ const renderContainer = async (groupId = -1) => {
           ))}
         </div>
         <div className="csv-row-2">
+          <div className="csv-list-item csv-list-title">ファイル名</div>
           {group &&
             readDir(group.path, filepath => {
               if (group.files) {
@@ -109,24 +125,15 @@ const renderContainer = async (groupId = -1) => {
             }).map(v => {
               const file = encodeURI(path.join(group.path, v));
               return (
-                <div className="group-item">
+                <div className="csv-list-item">
                   <a href={`/${group.viewer}?file=${file}`}>{v}</a>
                 </div>
               );
             })}
         </div>
-        <div className="csv-row-2">
-          <input
-            className="csv-button csv-script-button"
-            type="button"
-            value="スクリプト実行"
-            disabled={groupId >= 0 ? false : true}
-            onClick={`exec(${groupId});`}
-          />
-          <pre>
-            <code className="csv-instrcution-container">
-              {await readReademe(groupId)}
-            </code>
+        <div className="csv-row-3">
+          <pre className="csv-instrcution-container">
+            <code>{await readReademe(groupId)}</code>
           </pre>
         </div>
       </div>

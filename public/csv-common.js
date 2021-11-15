@@ -1,25 +1,33 @@
-function postRequest(url, body, callback) {
-  const XHR = new XMLHttpRequest();
-  XHR.addEventListener("load", function (event) {
-    const response = () => {
-      try {
-        return JSON.parse(XHR.response);
-      } catch {
-        //
-      }
-      return XHR.response;
-    };
-    if (callback) callback(response());
-  });
-  XHR.addEventListener("error", function (event) {
-    console.error(event);
-  });
-  XHR.open("post", url);
-  XHR.setRequestHeader("content-type", "application/json");
-  XHR.send(JSON.stringify(body));
-}
-
 function CsvTable(env, tableId, inputSelctor, onclick) {
+  function request(method, url, body, callback) {
+    const XHR = new XMLHttpRequest();
+    XHR.addEventListener("load", function (event) {
+      const response = () => {
+        try {
+          return JSON.parse(XHR.response);
+        } catch {
+          //
+        }
+        return XHR.response;
+      };
+      if (callback) callback(response());
+    });
+    XHR.addEventListener("error", function (event) {
+      console.error(event);
+    });
+    XHR.open(method, url);
+    XHR.setRequestHeader("content-type", "application/json");
+    XHR.send(JSON.stringify(body));
+  }
+
+  function postRequest(url, body, callback) {
+    request("post", url, body, callback);
+  }
+
+  function getRequest(url, body, callback) {
+    request("get", url, body, callback);
+  }
+
   const SELECT_COLOR = "#40FFFF";
   const macro = CsvMacro();
 
@@ -859,6 +867,12 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           console.log(message);
         }
       );
+    };
+    this.download = url => {
+      const download = document.createElement("a");
+      download.href = `${url}/?file=${dataName}`;
+      download.download = dataName;
+      download.click();
     };
     this.selectedCells = () => {
       return this.cells.filter(cell => cell.selected);

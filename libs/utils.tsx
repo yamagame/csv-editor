@@ -121,13 +121,13 @@ export const findConfig = async (config, filepath, defaultConfig) => {
   const localConfig = await loadConfig(
     path.join(path.dirname(filepath), `.config.json`)
   );
+  const findGroup = group => filepath.indexOf(path.join(group.path)) === 0;
   const configJson = await loadConfig(config);
   const retVal = {
     ...defaultConfig,
-    ...configJson.directories.find(
-      group => filepath.indexOf(path.join(group.path)) === 0
-    ),
+    ...configJson.directories.find(findGroup),
     ...localConfig,
+    groupIndex: configJson.directories.findIndex(findGroup),
   };
   return retVal;
 };

@@ -79,6 +79,24 @@ export function CsvRouter(config: any = {}) {
     res.sendStatus(200);
   });
 
+  router.get("/download/*", async (req, res) => {
+    const { file } = req.query;
+    try {
+      if (!fs.existsSync(file)) {
+        return res.sendStatus(404);
+      }
+      const data = fs.readFileSync(file, { encoding: "utf-8" });
+      res.setHeader(
+        "content-disposition",
+        `attachment; filename=${path.basename(file)}`
+      );
+      res.setHeader("content-type", "text/csv; charset=UTF-8");
+      res.send(data);
+    } catch (err) {
+      res.sendStatus(404);
+    }
+  });
+
   router.post("/save/*", async (req, res) => {
     const { file } = req.query;
     const configData = await findConfig(config.path, file, defaultConfig);
@@ -176,11 +194,17 @@ export function CsvRouter(config: any = {}) {
     const container = (
       <Container title="CSV-Editor">
         <div className="csv-control-panel">
-          <a href="/">
+          <a href={`/list/${configData.groupIndex}`}>
             <span className="csv-data-name">{configData.name}</span>
           </a>
           :<span className="csv-data-name">{data.dataname}</span>
           <input className="csv-data-input" type="text" />
+          <input
+            className="csv-button"
+            type="button"
+            value="ダウンロード"
+            onClick="download();"
+          />
           {configData.edit !== false ? (
             <input
               className="csv-button"
