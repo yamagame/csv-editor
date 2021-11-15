@@ -96,7 +96,7 @@ const renderContainer = async (groupId = -1) => {
           <div className="csv-list-item csv-list-title">グループ名</div>
           {directories.map((group, i) => (
             <div
-              className={`csv-list-item ${
+              className={`csv-list-item csv-list-hover ${
                 i === groupId ? "csv-group-active-cell" : ""
               }`}
               onclick={`window.location.href='/list/${i}';`}>
@@ -125,7 +125,9 @@ const renderContainer = async (groupId = -1) => {
             }).map(v => {
               const file = encodeURI(path.join(group.path, v));
               return (
-                <div className="csv-list-item">
+                <div
+                  className="csv-list-item csv-list-hover"
+                  onclick={`window.location.href='/${group.viewer}?file=${file}';`}>
                   <a href={`/${group.viewer}?file=${file}`}>{v}</a>
                 </div>
               );

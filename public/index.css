@@ -220,3 +220,7 @@ section {
   background-color: #d5f0ff;
   text-align: center;
 }
+
+.csv-list-hover:hover {
+  background-color: #d5fff0;
+}

@@ -123,7 +123,7 @@ var renderContainer = function (groupId) {
                     _c = preact_1.factory;
                     _d = ["div", { className: "csv-list-container" }, preact_1.factory("div", { className: "csv-row-1" },
                             preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30B0\u30EB\u30FC\u30D7\u540D"),
-                            directories.map(function (group, i) { return (preact_1.factory("div", { className: "csv-list-item " + (i === groupId ? "csv-group-active-cell" : ""), onclick: "window.location.href='/list/" + i + "';" },
+                            directories.map(function (group, i) { return (preact_1.factory("div", { className: "csv-list-item csv-list-hover " + (i === groupId ? "csv-group-active-cell" : ""), onclick: "window.location.href='/list/" + i + "';" },
                                 preact_1.factory("a", { className: "group-name " + (i === groupId ? "csv-group-active" : ""), href: "/list/" + i }, group.name))); })), preact_1.factory("div", { className: "csv-row-2" },
                             preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30D5\u30A1\u30A4\u30EB\u540D"),
                             group &&
@@ -138,7 +138,7 @@ var renderContainer = function (groupId) {
                                     }
                                 }).map(function (v) {
                                     var file = encodeURI(path.join(group.path, v));
-                                    return (preact_1.factory("div", { className: "csv-list-item" },
+                                    return (preact_1.factory("div", { className: "csv-list-item csv-list-hover", onclick: "window.location.href='/" + group.viewer + "?file=" + file + "';" },
                                         preact_1.factory("a", { href: "/" + group.viewer + "?file=" + file }, v)));
                                 }))];
                     _e = preact_1.factory;

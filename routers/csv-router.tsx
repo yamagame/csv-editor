@@ -11,6 +11,7 @@ export function CsvRouter(config: any = {}) {
   const router = express.Router();
   const rowSize = config.cellWidth || [40, 0];
   const colSize = config.cellHeight || [0];
+  const defaultCellSize = { width: 130, height: 18 };
 
   interface CsvParserOptions {
     defaultCellSize?: { width: number; height: number };
@@ -22,9 +23,10 @@ export function CsvRouter(config: any = {}) {
 
   function csvParser(filename, options: CsvParserOptions = {}) {
     const defaultOptions = {
-      defaultCellSize: { width: 130, height: 18 },
+      defaultCellSize,
       fixedPoint: { x: 0, y: 0 },
       rowSize: [],
+      colSize: [],
     };
     const csvParser = require("libs/csv-parser");
     const csvFilePath = path.join(filename);
@@ -50,6 +52,7 @@ export function CsvRouter(config: any = {}) {
         maxRow: maxRow + 1,
         maxCol: maxCol + 1,
         ...csvJson,
+        defaultCellSize: { ...defaultCellSize, ...options.defaultCellSize },
       },
     };
   }
@@ -102,7 +105,9 @@ export function CsvRouter(config: any = {}) {
     const configData = await findConfig(config.path, file, defaultConfig);
     const data = csvParser(file, {
       fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
-      rowSize,
+      rowSize: configData.rowSize || rowSize,
+      colSize: configData.colSize || colSize,
+      defaultCellSize: configData.defaultCellSize || defaultCellSize,
     });
     const { maxRow, maxCol } = req.body;
     req.body.csv.forEach(cell => {
@@ -168,8 +173,9 @@ export function CsvRouter(config: any = {}) {
     );
     const data = csvParser(req.query.file, {
       fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
-      rowSize,
-      colSize,
+      rowSize: configData.rowSize || rowSize,
+      colSize: configData.colSize || colSize,
+      defaultCellSize: configData.defaultCellSize || defaultCellSize,
     });
     data.form = configData.form;
     data.edit = configData.edit;
@@ -189,7 +195,9 @@ export function CsvRouter(config: any = {}) {
     );
     const data = csvParser(req.query.file, {
       fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
-      rowSize,
+      rowSize: configData.rowSize || rowSize,
+      colSize: configData.colSize || colSize,
+      defaultCellSize: configData.defaultCellSize || defaultCellSize,
     });
     const container = (
       <Container title="CSV-Editor">

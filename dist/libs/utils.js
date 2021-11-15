@@ -186,17 +186,24 @@ var loadConfig = function (config) { return __awaiter(void 0, void 0, void 0, fu
 }); };
 exports.loadConfig = loadConfig;
 var findConfig = function (config, filepath, defaultConfig) { return __awaiter(void 0, void 0, void 0, function () {
-    var localConfig, findGroup, configJson, retVal;
+    var localConfig, fileConfig, findGroup, configJson, groupJson, dotConfigJson, retVal;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, exports.loadConfig(path_1.default.join(path_1.default.dirname(filepath), ".config.json"))];
             case 1:
                 localConfig = _a.sent();
+                return [4 /*yield*/, exports.loadConfig(filepath + ".json")];
+            case 2:
+                fileConfig = _a.sent();
                 findGroup = function (group) { return filepath.indexOf(path_1.default.join(group.path)) === 0; };
                 return [4 /*yield*/, exports.loadConfig(config)];
-            case 2:
+            case 3:
                 configJson = _a.sent();
-                retVal = __assign(__assign(__assign(__assign({}, defaultConfig), configJson.directories.find(findGroup)), localConfig), { groupIndex: configJson.directories.findIndex(findGroup) });
+                groupJson = configJson.directories.find(findGroup);
+                return [4 /*yield*/, exports.loadConfig(path_1.default.join(groupJson.path, ".config.json"))];
+            case 4:
+                dotConfigJson = _a.sent();
+                retVal = __assign(__assign(__assign(__assign(__assign(__assign({}, defaultConfig), groupJson), dotConfigJson), localConfig), fileConfig), { groupIndex: configJson.directories.findIndex(findGroup) });
                 return [2 /*return*/, retVal];
         }
     });

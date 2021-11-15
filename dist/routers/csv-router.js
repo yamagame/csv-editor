@@ -70,12 +70,14 @@ function CsvRouter(config) {
     var router = express_1.default.Router();
     var rowSize = config.cellWidth || [40, 0];
     var colSize = config.cellHeight || [0];
+    var defaultCellSize = { width: 130, height: 18 };
     function csvParser(filename, options) {
         if (options === void 0) { options = {}; }
         var defaultOptions = {
-            defaultCellSize: { width: 130, height: 18 },
+            defaultCellSize: defaultCellSize,
             fixedPoint: { x: 0, y: 0 },
             rowSize: [],
+            colSize: [],
         };
         var csvParser = require("libs/csv-parser");
         var csvFilePath = path.join(filename);
@@ -91,7 +93,7 @@ function CsvRouter(config) {
         var csv = __spreadArray([header], csvArray).map(function (v, i) { return __spreadArray([
             { value: "" + i, color: "white", backgroundColor: "gray" }
         ], v); });
-        return __assign({ csv: csv }, __assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson));
+        return __assign({ csv: csv }, __assign(__assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson), { defaultCellSize: __assign(__assign({}, defaultCellSize), options.defaultCellSize) }));
     }
     router.post("/command", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var _a, file, text, configData, cmd;
@@ -157,7 +159,9 @@ function CsvRouter(config) {
                     configData = _c.sent();
                     data = csvParser(file, {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
-                        rowSize: rowSize,
+                        rowSize: configData.rowSize || rowSize,
+                        colSize: configData.colSize || colSize,
+                        defaultCellSize: configData.defaultCellSize || defaultCellSize,
                     });
                     _a = req.body, maxRow = _a.maxRow, maxCol = _a.maxCol;
                     req.body.csv.forEach(function (cell) {
@@ -220,8 +224,9 @@ function CsvRouter(config) {
                     configData = _a.sent();
                     data = csvParser(req.query.file, {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
-                        rowSize: rowSize,
-                        colSize: colSize,
+                        rowSize: configData.rowSize || rowSize,
+                        colSize: configData.colSize || colSize,
+                        defaultCellSize: configData.defaultCellSize || defaultCellSize,
                     });
                     data.form = configData.form;
                     data.edit = configData.edit;
@@ -243,7 +248,9 @@ function CsvRouter(config) {
                     configData = _a.sent();
                     data = csvParser(req.query.file, {
                         fixedPoint: { x: configData.fixedH || 0, y: configData.fixedV || 0 },
-                        rowSize: rowSize,
+                        rowSize: configData.rowSize || rowSize,
+                        colSize: configData.colSize || colSize,
+                        defaultCellSize: configData.defaultCellSize || defaultCellSize,
                     });
                     container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
                         preact_1.factory("div", { className: "csv-control-panel" },
