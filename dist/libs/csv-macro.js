@@ -325,6 +325,7 @@ var position = function (pos) {
     var zCode = "Z".charCodeAt(0);
     var zeroCode = "0".charCodeAt(0);
     var nineCode = "9".charCodeAt(0);
+    var alpha = "";
     var x = 0;
     var y = 0;
     var step = 0;
@@ -341,8 +342,7 @@ var position = function (pos) {
             }
         }
         else if (c >= aCode && c <= zCode) {
-            x *= zCode - aCode + 1;
-            x += c - aCode;
+            alpha += str[i];
             step = 1;
         }
         else if (c >= zeroCode && c <= nineCode) {
@@ -352,6 +352,15 @@ var position = function (pos) {
         else {
             throw new Error("invalid range character code: " + str[i]);
         }
+    }
+    if (alpha.length > 0) {
+        if (alpha.length > 1) {
+            for (i = 0; i < alpha.length - 1; i++) {
+                x = x * (zCode - aCode + 1) + (alpha.charCodeAt(i) - aCode + 1);
+            }
+            x = x * (zCode - aCode + 1);
+        }
+        x += alpha.charCodeAt(alpha.length - 1) - aCode;
     }
     return { x: x, y: y, absolute: { x: absoluteX, y: absoluteY } };
 };
