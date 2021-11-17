@@ -265,7 +265,7 @@ export const CsvTable = ({
         height={colHeight[cell.y] - 1}
         {...props}
         {...macroStyle}
-        color="black">
+        color="lightgray">
         <div style={{ color, top: 1, ...textStyle }}>
           {escapeHtml(cell.value).replace(/\n/g, "<br>")}
         </div>

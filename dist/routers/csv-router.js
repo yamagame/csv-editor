@@ -71,6 +71,18 @@ function CsvRouter(config) {
     var rowSize = config.cellWidth || [40, 0];
     var colSize = config.cellHeight || [0];
     var defaultCellSize = { width: 130, height: 18 };
+    var alphabetNumber = function (index) {
+        var char = "ABCDEFGHIJKLMNOPQRSTUVWX";
+        var length = char.length;
+        var ret = "";
+        ret = char[index % length] + ret;
+        index = Math.floor(index / length);
+        while (index > 0) {
+            ret = char[((index - 1) % length) % length] + ret;
+            index = Math.floor((index - 1) / length);
+        }
+        return ret;
+    };
     function csvParser(filename, options) {
         if (options === void 0) { options = {}; }
         var defaultOptions = {
@@ -85,14 +97,16 @@ function CsvRouter(config) {
         var csvJson = utils_1.loadJson(csvFilePath);
         var maxRow = csvArray.reduce(function (a, v) { return (a < v.length ? v.length : a); }, 0);
         var maxCol = csvArray.length;
-        var header = new Array(maxRow).fill(0).map(function (v, i) { return ({
-            value: "" + (i + 1),
+        var header = new Array(maxRow + 1).fill(0).map(function (v, i) { return ({
+            value: "" + alphabetNumber(i),
             color: "white",
             backgroundColor: "gray",
         }); });
-        var csv = __spreadArray([header], csvArray).map(function (v, i) { return __spreadArray([
-            { value: "" + i, color: "white", backgroundColor: "gray" }
-        ], v); });
+        var csv = __spreadArray([
+            header
+        ], csvArray.map(function (v, i) { return __spreadArray([
+            { value: "" + (i + 1), color: "white", backgroundColor: "gray" }
+        ], v); }));
         return __assign({ csv: csv }, __assign(__assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson), { defaultCellSize: __assign(__assign({}, defaultCellSize), options.defaultCellSize) }));
     }
     router.post("/command", function (req, res) { return __awaiter(_this, void 0, void 0, function () {

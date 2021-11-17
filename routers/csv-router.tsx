@@ -21,6 +21,19 @@ export function CsvRouter(config: any = {}) {
     dataname?: string;
   }
 
+  const alphabetNumber = index => {
+    const char = "ABCDEFGHIJKLMNOPQRSTUVWX";
+    let length = char.length;
+    let ret = "";
+    ret = char[index % length] + ret;
+    index = Math.floor(index / length);
+    while (index > 0) {
+      ret = char[((index - 1) % length) % length] + ret;
+      index = Math.floor((index - 1) / length);
+    }
+    return ret;
+  };
+
   function csvParser(filename, options: CsvParserOptions = {}) {
     const defaultOptions = {
       defaultCellSize,
@@ -34,15 +47,18 @@ export function CsvRouter(config: any = {}) {
     const csvJson = loadJson(csvFilePath);
     const maxRow = csvArray.reduce((a, v) => (a < v.length ? v.length : a), 0);
     const maxCol = csvArray.length;
-    const header = new Array(maxRow).fill(0).map((v, i) => ({
-      value: `${i + 1}`,
+    const header = new Array(maxRow + 1).fill(0).map((v, i) => ({
+      value: `${alphabetNumber(i)}`,
       color: "white",
       backgroundColor: "gray",
     }));
-    const csv = [header, ...csvArray].map((v, i) => [
-      { value: `${i}`, color: "white", backgroundColor: "gray" },
-      ...v,
-    ]);
+    const csv = [
+      header,
+      ...csvArray.map((v, i) => [
+        { value: `${i + 1}`, color: "white", backgroundColor: "gray" },
+        ...v,
+      ]),
+    ];
     return {
       csv,
       ...{

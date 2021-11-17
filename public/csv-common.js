@@ -1,4 +1,17 @@
 function CsvTable(env, tableId, inputSelctor, onclick) {
+  const alphabetNumber = index => {
+    const char = "ABCDEFGHIJKLMNOPQRSTUVWX";
+    let length = char.length;
+    let ret = "";
+    ret = char[index % length] + ret;
+    index = Math.floor(index / length);
+    while (index > 0) {
+      ret = char[((index - 1) % length) % length] + ret;
+      index = Math.floor((index - 1) / length);
+    }
+    return ret;
+  };
+
   function request(method, url, body, callback) {
     const XHR = new XMLHttpRequest();
     XHR.addEventListener("load", function (event) {
@@ -682,14 +695,14 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     };
     this.resetIndexNumber = (x, y) => {
       this.cells
-        .filter(cell => cell.x === 0 && cell.y >= y)
+        .filter(cell => cell.x === 0 && cell.y >= y && cell.y > 0)
         .sort((a, b) => {
           if (a.y < b.y) return -1;
           if (a.y > b.y) return 1;
           return 0;
         })
         .forEach((cell, i) => {
-          cell.setText(`${i}`, false);
+          cell.setText(`${i + 1}`, false);
         });
       this.cells
         .filter(cell => cell.x >= x && cell.y === 0)
@@ -699,7 +712,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           return 0;
         })
         .forEach((cell, i) => {
-          cell.setText(`${i}`, false);
+          cell.setText(`${alphabetNumber(i)}`, false);
         });
     };
     this.selectCellWithPosition = (x, y) => {
