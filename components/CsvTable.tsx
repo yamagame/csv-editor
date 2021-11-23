@@ -42,7 +42,7 @@ export const TableThumbs = ({
                     left,
                     top,
                     width,
-                    height: `2px`,
+                    height: `4px`,
                     cursor: "row-resize",
                     // backgroundColor: "blue",
                   }}
@@ -55,7 +55,7 @@ export const TableThumbs = ({
                   top: top + height - 1,
                   left,
                   width,
-                  height: `2px`,
+                  height: `4px`,
                   cursor: "row-resize",
                   // backgroundColor: "blue",
                 }}
@@ -73,7 +73,7 @@ export const TableThumbs = ({
                     top,
                     height,
                     cursor: "col-resize",
-                    width: `2px`,
+                    width: `4px`,
                     // backgroundColor: "lightgray",
                   }}
                   dataX={cell.x - 1}
@@ -86,7 +86,7 @@ export const TableThumbs = ({
                   top,
                   height,
                   cursor: "col-resize",
-                  width: `2px`,
+                  width: `4px`,
                   // backgroundColor: "lightgray",
                 }}
                 dataX={cell.x}

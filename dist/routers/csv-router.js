@@ -72,7 +72,7 @@ function CsvRouter(config) {
     var colSize = config.cellHeight || [0];
     var defaultCellSize = { width: 130, height: 18 };
     var alphabetNumber = function (index) {
-        var char = "ABCDEFGHIJKLMNOPQRSTUVWX";
+        var char = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         var length = char.length;
         var ret = "";
         ret = char[index % length] + ret;

@@ -203,7 +203,7 @@ var findConfig = function (config, filepath, defaultConfig) { return __awaiter(v
                 return [4 /*yield*/, exports.loadConfig(path_1.default.join(groupJson.path, ".config.json"))];
             case 4:
                 dotConfigJson = _a.sent();
-                retVal = __assign(__assign(__assign(__assign(__assign(__assign({}, defaultConfig), groupJson), dotConfigJson), localConfig), fileConfig), { groupIndex: configJson.directories.findIndex(findGroup) });
+                retVal = __assign(__assign(__assign(__assign({}, defaultConfig), groupJson), fileConfig), { groupIndex: configJson.directories.findIndex(findGroup) });
                 return [2 /*return*/, retVal];
         }
     });

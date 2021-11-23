@@ -25,7 +25,13 @@ function main() {
 
 function exec(groupId) {
   if (groupId < 0) return;
-  request("post", `/exec/${groupId}`, {}, response => {
+  const inputs = Array.from(document.querySelectorAll(".csv-option-input"));
+  const options = Array.from(document.querySelectorAll(".csv-option-selector"));
+  const body = [...options, ...inputs].map(v => ({
+    name: v.getAttribute("name"),
+    value: v.value,
+  }));
+  request("post", `/exec/${groupId}`, body, response => {
     console.log(response);
   });
 }

@@ -1,6 +1,6 @@
 function CsvTable(env, tableId, inputSelctor, onclick) {
   const alphabetNumber = index => {
-    const char = "ABCDEFGHIJKLMNOPQRSTUVWX";
+    const char = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let length = char.length;
     let ret = "";
     ret = char[index % length] + ret;

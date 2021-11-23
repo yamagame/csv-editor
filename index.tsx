@@ -1,5 +1,4 @@
 import { factory, render } from "libs/preact";
-import fs = require("fs");
 const { spawn } = require("child_process");
 import path = require("path");
 import express from "express";
@@ -36,9 +35,17 @@ app.use(
 
 app.post("/exec/:groupId", async (req, res) => {
   if (process.env.SCRIPT_CMD) {
-    const cmd = spawn("node", [process.env.SCRIPT_CMD, req.params.groupId], {
-      shell: true,
-    });
+    const cmd = spawn(
+      "node",
+      [
+        process.env.SCRIPT_CMD,
+        req.params.groupId,
+        `"${JSON.stringify(req.body)}"`,
+      ],
+      {
+        shell: true,
+      }
+    );
     cmd.stdout.on("data", data => {
       process.stdout.write(data.toString());
     });
@@ -77,12 +84,42 @@ const readReademe = groupId => {
 };
 
 const renderContainer = async (groupId = -1) => {
-  const { directories } = await loadConfig(CONFIG_PATH);
+  const { directories, options } = await loadConfig(CONFIG_PATH);
   const group = directories.find((g, i) => i === groupId);
   const container = (
     <Container title="CSV-Editor">
       <div className="csv-control-panel">
         <div className="csv-control-panel-grow"></div>
+        <form>
+          {group.password ? (
+            <input
+              className="csv-option-input"
+              type="text"
+              name="id"
+              placeholder="ID"
+            />
+          ) : null}
+          {group.password ? (
+            <input
+              className="csv-option-input"
+              type="password"
+              name="password"
+              placeholder="PASS"
+              autocomplete="off"
+            />
+          ) : null}
+        </form>
+        {Object.entries(options)
+          .filter(([key, v]) => key !== "id" && key !== "password")
+          .map(([key, option]: [string, string[]]) => (
+            <select
+              name={key}
+              className="csv-option-selector csv-script-button">
+              {option.map(value => (
+                <option value={value}>{value}</option>
+              ))}
+            </select>
+          ))}
         <input
           className="csv-button csv-script-button"
           type="button"

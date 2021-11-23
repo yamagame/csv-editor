@@ -203,8 +203,8 @@ section {
 }
 
 .csv-instrcution-container {
-  font-size: 0.8em;
-  margin-top: 0px;
+  font-size: 1em;
+  margin-top: 10px;
 }
 
 .csv-list-item {
@@ -223,4 +223,28 @@ section {
 
 .csv-list-hover:hover {
   background-color: #d5fff0;
+}
+
+.csv-option-selector {
+  padding: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-right: 10px;
+  border: solid 1px gray;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  outline: none;
+  height: 22px;
+}
+
+.csv-option-input {
+  width: 80px;
+  padding: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-right: 10px;
+  border: solid 1px gray;
+  border-radius: 5px;
+  outline: none;
+  height: 20px;
 }

@@ -38,7 +38,7 @@ var TableThumbs = function (_a) {
                             left: left,
                             top: top,
                             width: width,
-                            height: "2px",
+                            height: "4px",
                             cursor: "row-resize",
                             // backgroundColor: "blue",
                         }, dataX: cell.x, dataY: cell.y - 1 })) : null,
@@ -46,7 +46,7 @@ var TableThumbs = function (_a) {
                             top: top + height - 1,
                             left: left,
                             width: width,
-                            height: "2px",
+                            height: "4px",
                             cursor: "row-resize",
                             // backgroundColor: "blue",
                         }, dataX: cell.x, dataY: cell.y }))) : null,
@@ -56,7 +56,7 @@ var TableThumbs = function (_a) {
                             top: top,
                             height: height,
                             cursor: "col-resize",
-                            width: "2px",
+                            width: "4px",
                             // backgroundColor: "lightgray",
                         }, dataX: cell.x - 1, dataY: cell.y })) : null,
                     preact_1.factory("div", { className: "table-thumb col-resize", style: {
@@ -64,7 +64,7 @@ var TableThumbs = function (_a) {
                             top: top,
                             height: height,
                             cursor: "col-resize",
-                            width: "2px",
+                            width: "4px",
                             // backgroundColor: "lightgray",
                         }, dataX: cell.x, dataY: cell.y }))) : null));
         });

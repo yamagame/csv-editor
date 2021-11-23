@@ -65,7 +65,11 @@ app.post("/exec/:groupId", function (req, res) { return __awaiter(void 0, void 0
     var cmd;
     return __generator(this, function (_a) {
         if (process.env.SCRIPT_CMD) {
-            cmd = spawn("node", [process.env.SCRIPT_CMD, req.params.groupId], {
+            cmd = spawn("node", [
+                process.env.SCRIPT_CMD,
+                req.params.groupId,
+                "\"" + JSON.stringify(req.body) + "\"",
+            ], {
                 shell: true,
             });
             cmd.stdout.on("data", function (data) {
@@ -109,19 +113,31 @@ var readReademe = function (groupId) {
 var renderContainer = function (groupId) {
     if (groupId === void 0) { groupId = -1; }
     return __awaiter(void 0, void 0, void 0, function () {
-        var directories, group, container, _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-        return __generator(this, function (_l) {
-            switch (_l.label) {
+        var _a, directories, options, group, container, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        return __generator(this, function (_m) {
+            switch (_m.label) {
                 case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
                 case 1:
-                    directories = (_l.sent()).directories;
+                    _a = _m.sent(), directories = _a.directories, options = _a.options;
                     group = directories.find(function (g, i) { return i === groupId; });
-                    _a = preact_1.factory;
-                    _b = [Container_1.Container, { title: "CSV-Editor" }, preact_1.factory("div", { className: "csv-control-panel" },
+                    _b = preact_1.factory;
+                    _c = [Container_1.Container, { title: "CSV-Editor" }, preact_1.factory("div", { className: "csv-control-panel" },
                             preact_1.factory("div", { className: "csv-control-panel-grow" }),
+                            preact_1.factory("form", null,
+                                group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "text", name: "id", placeholder: "ID" })) : null,
+                                group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "password", name: "password", placeholder: "PASS", autocomplete: "off" })) : null),
+                            Object.entries(options)
+                                .filter(function (_a) {
+                                var key = _a[0], v = _a[1];
+                                return key !== "id" && key !== "password";
+                            })
+                                .map(function (_a) {
+                                var key = _a[0], option = _a[1];
+                                return (preact_1.factory("select", { name: key, className: "csv-option-selector csv-script-button" }, option.map(function (value) { return (preact_1.factory("option", { value: value }, value)); })));
+                            }),
                             preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: groupId >= 0 && group.script ? false : true, onClick: "exec(" + groupId + ");" }))];
-                    _c = preact_1.factory;
-                    _d = ["div", { className: "csv-list-container" }, preact_1.factory("div", { className: "csv-row-1" },
+                    _d = preact_1.factory;
+                    _e = ["div", { className: "csv-list-container" }, preact_1.factory("div", { className: "csv-row-1" },
                             preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30B0\u30EB\u30FC\u30D7\u540D"),
                             directories.map(function (group, i) { return (preact_1.factory("div", { className: "csv-list-item csv-list-hover " + (i === groupId ? "csv-group-active-cell" : ""), onclick: "window.location.href='/list/" + i + "';" },
                                 preact_1.factory("a", { className: "group-name " + (i === groupId ? "csv-group-active" : ""), href: "/list/" + i }, group.name))); })), preact_1.factory("div", { className: "csv-row-2" },
@@ -141,15 +157,15 @@ var renderContainer = function (groupId) {
                                     return (preact_1.factory("div", { className: "csv-list-item csv-list-hover", onclick: "window.location.href='/" + group.viewer + "?file=" + file + "';" },
                                         preact_1.factory("a", { href: "/" + group.viewer + "?file=" + file }, v)));
                                 }))];
-                    _e = preact_1.factory;
-                    _f = ["div", { className: "csv-row-3" }];
-                    _g = preact_1.factory;
-                    _h = ["pre", { className: "csv-instrcution-container" }];
-                    _j = preact_1.factory;
-                    _k = ["code", null];
+                    _f = preact_1.factory;
+                    _g = ["div", { className: "csv-row-3" }];
+                    _h = preact_1.factory;
+                    _j = ["pre", { className: "csv-instrcution-container" }];
+                    _k = preact_1.factory;
+                    _l = ["code", null];
                     return [4 /*yield*/, readReademe(groupId)];
                 case 2:
-                    container = (_a.apply(void 0, _b.concat([_c.apply(void 0, _d.concat([_e.apply(void 0, _f.concat([_g.apply(void 0, _h.concat([_j.apply(void 0, _k.concat([_l.sent()]))]))]))])), preact_1.factory("script", { type: "text/javascript", src: "/index.js" })])));
+                    container = (_b.apply(void 0, _c.concat([_d.apply(void 0, _e.concat([_f.apply(void 0, _g.concat([_h.apply(void 0, _j.concat([_k.apply(void 0, _l.concat([_m.sent()]))]))]))])), preact_1.factory("script", { type: "text/javascript", src: "/index.js" })])));
                     return [2 /*return*/, preact_1.render(container)];
             }
         });

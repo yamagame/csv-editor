@@ -131,8 +131,8 @@ export const findConfig = async (config, filepath, defaultConfig) => {
   const retVal = {
     ...defaultConfig,
     ...groupJson,
-    ...dotConfigJson,
-    ...localConfig,
+    // ...dotConfigJson,
+    // ...localConfig,
     ...fileConfig,
     groupIndex: configJson.directories.findIndex(findGroup),
   };

@@ -345,7 +345,7 @@ const position = pos => {
   }
   if (alpha.length > 0) {
     if (alpha.length > 1) {
-      for (i = 0; i < alpha.length - 1; i++) {
+      for (let i = 0; i < alpha.length - 1; i++) {
         x = x * (zCode - aCode + 1) + (alpha.charCodeAt(i) - aCode + 1);
       }
       x = x * (zCode - aCode + 1);

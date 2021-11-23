@@ -22,7 +22,7 @@ export function CsvRouter(config: any = {}) {
   }
 
   const alphabetNumber = index => {
-    const char = "ABCDEFGHIJKLMNOPQRSTUVWX";
+    const char = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let length = char.length;
     let ret = "";
     ret = char[index % length] + ret;
