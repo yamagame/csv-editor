@@ -41,7 +41,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     request("get", url, body, callback);
   }
 
-  const SELECT_COLOR = "#C0C0FF";
+  const SELECT_COLOR = "#D0D0FF";
   const macro = CsvMacro();
 
   const copyToClipboard = str => {
@@ -96,7 +96,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
           controller.clearSelectAll();
         }
         if (
-          e.altKey &&
+          !e.altKey &&
           controller.currentSelectedCell &&
           (controller.currentSelectedCell.x === this.x ||
             controller.currentSelectedCell.y === this.y)
@@ -158,7 +158,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
             controller.clearSelectAll();
           }
           if (
-            e.altKey &&
+            !e.altKey &&
             controller.currentSelectedCell &&
             controller.currentSelectedCell.x > 0 &&
             controller.currentSelectedCell.y > 0
