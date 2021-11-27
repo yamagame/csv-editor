@@ -40,7 +40,7 @@ app.post("/exec/:groupId", async (req, res) => {
       [
         process.env.SCRIPT_CMD,
         req.params.groupId,
-        `"${JSON.stringify(req.body)}"`,
+        `'${JSON.stringify(req.body)}'`,
       ],
       {
         shell: true,
@@ -91,7 +91,7 @@ const renderContainer = async (groupId = -1) => {
       <div className="csv-control-panel">
         <div className="csv-control-panel-grow"></div>
         <form>
-          {group.password ? (
+          {group && group.password ? (
             <input
               className="csv-option-input"
               type="text"
@@ -99,7 +99,7 @@ const renderContainer = async (groupId = -1) => {
               placeholder="ID"
             />
           ) : null}
-          {group.password ? (
+          {group && group.password ? (
             <input
               className="csv-option-input"
               type="password"
@@ -171,9 +171,9 @@ const renderContainer = async (groupId = -1) => {
             })}
         </div>
         <div className="csv-row-3">
-          <pre className="csv-instrcution-container">
-            <code>{await readReademe(groupId)}</code>
-          </pre>
+          <div className="csv-instrcution-container">
+            {await readReademe(groupId)}
+          </div>
         </div>
       </div>
       <script type="text/javascript" src="/index.js"></script>

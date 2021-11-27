@@ -68,7 +68,7 @@ app.post("/exec/:groupId", function (req, res) { return __awaiter(void 0, void 0
             cmd = spawn("node", [
                 process.env.SCRIPT_CMD,
                 req.params.groupId,
-                "\"" + JSON.stringify(req.body) + "\"",
+                "'" + JSON.stringify(req.body) + "'",
             ], {
                 shell: true,
             });
@@ -113,19 +113,19 @@ var readReademe = function (groupId) {
 var renderContainer = function (groupId) {
     if (groupId === void 0) { groupId = -1; }
     return __awaiter(void 0, void 0, void 0, function () {
-        var _a, directories, options, group, container, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-        return __generator(this, function (_m) {
-            switch (_m.label) {
+        var _a, directories, options, group, container, _b, _c, _d, _e, _f, _g, _h, _j;
+        return __generator(this, function (_k) {
+            switch (_k.label) {
                 case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
                 case 1:
-                    _a = _m.sent(), directories = _a.directories, options = _a.options;
+                    _a = _k.sent(), directories = _a.directories, options = _a.options;
                     group = directories.find(function (g, i) { return i === groupId; });
                     _b = preact_1.factory;
                     _c = [Container_1.Container, { title: "CSV-Editor" }, preact_1.factory("div", { className: "csv-control-panel" },
                             preact_1.factory("div", { className: "csv-control-panel-grow" }),
                             preact_1.factory("form", null,
-                                group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "text", name: "id", placeholder: "ID" })) : null,
-                                group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "password", name: "password", placeholder: "PASS", autocomplete: "off" })) : null),
+                                group && group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "text", name: "id", placeholder: "ID" })) : null,
+                                group && group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "password", name: "password", placeholder: "PASS", autocomplete: "off" })) : null),
                             Object.entries(options)
                                 .filter(function (_a) {
                                 var key = _a[0], v = _a[1];
@@ -160,12 +160,10 @@ var renderContainer = function (groupId) {
                     _f = preact_1.factory;
                     _g = ["div", { className: "csv-row-3" }];
                     _h = preact_1.factory;
-                    _j = ["pre", { className: "csv-instrcution-container" }];
-                    _k = preact_1.factory;
-                    _l = ["code", null];
+                    _j = ["div", { className: "csv-instrcution-container" }];
                     return [4 /*yield*/, readReademe(groupId)];
                 case 2:
-                    container = (_b.apply(void 0, _c.concat([_d.apply(void 0, _e.concat([_f.apply(void 0, _g.concat([_h.apply(void 0, _j.concat([_k.apply(void 0, _l.concat([_m.sent()]))]))]))])), preact_1.factory("script", { type: "text/javascript", src: "/index.js" })])));
+                    container = (_b.apply(void 0, _c.concat([_d.apply(void 0, _e.concat([_f.apply(void 0, _g.concat([_h.apply(void 0, _j.concat([_k.sent()]))]))])), preact_1.factory("script", { type: "text/javascript", src: "/index.js" })])));
                     return [2 /*return*/, preact_1.render(container)];
             }
         });
