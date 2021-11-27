@@ -41,7 +41,7 @@ function CsvTable(env, tableId, inputSelctor, onclick) {
     request("get", url, body, callback);
   }
 
-  const SELECT_COLOR = "#40FFFF";
+  const SELECT_COLOR = "#C0C0FF";
   const macro = CsvMacro();
 
   const copyToClipboard = str => {
