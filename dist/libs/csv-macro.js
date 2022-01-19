@@ -273,7 +273,7 @@ var execute = function (cell, node, range, callback) {
             case "bool":
                 return node[1].bool;
             default:
-                throw new Error("undefined operator " + node[0]);
+                throw new Error("undefined operator ".concat(node[0]));
         }
     };
     return exec(node);
@@ -315,7 +315,7 @@ var operator = function (offset, getCellText) {
             case "false":
                 return false;
             default:
-                throw new Error("undefined operator " + operator);
+                throw new Error("undefined operator ".concat(operator));
         }
     };
 };
@@ -350,7 +350,7 @@ var position = function (pos) {
             y += c - zeroCode;
         }
         else {
-            throw new Error("invalid range character code: " + str[i]);
+            throw new Error("invalid range character code: ".concat(str[i]));
         }
     }
     if (alpha.length > 0) {
@@ -405,9 +405,9 @@ module.exports.compile = function (macro) {
 if (require.main === module) {
     var assert = function (a, v, message) {
         if (a !== v) {
-            throw new Error("NG: " + message + "\n  expected: " + v + "\n  actual: " + a);
+            throw new Error("NG: ".concat(message, "\n  expected: ").concat(v, "\n  actual: ").concat(a));
         }
-        console.log("OK: " + message);
+        console.log("OK: ".concat(message));
     };
     /**
      * 以下、使用例

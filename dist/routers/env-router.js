@@ -10,10 +10,14 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -44,25 +48,26 @@ function EnvViewRouter(config) {
         var maxRow = csvArray.reduce(function (a, v) { return (a < v.length ? v.length : a); }, 0);
         var maxCol = csvArray.length;
         var header = new Array(maxRow).fill(0).map(function (v, i) { return ({
-            value: "" + (i + 1),
+            value: "".concat(i + 1),
             color: "white",
             backgroundColor: "gray",
         }); });
-        var csv = __spreadArray([header], csvArray).map(function (v, i) { return __spreadArray([
-            { value: "" + i, color: "white", backgroundColor: "gray" },
-        ], v); });
+        var csv = __spreadArray([header], csvArray, true).map(function (v, i) { return __spreadArray([
+            { value: "".concat(i), color: "white", backgroundColor: "gray" },
+            ,
+        ], v, true); });
         return __assign({ csv: csv }, __assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1, rowSize: rowSize, colSize: colSize }));
     }
     router.get("/view", function (req, res) {
         var data = envParser(req.query.file, {
             rowSize: rowSize,
         });
-        var container = (preact_1.factory(Container_1.Container, { title: "ENV-Viewer" },
-            preact_1.factory("div", { className: "csv-control-panel" },
-                preact_1.factory("input", { className: "csv-data-input", type: "text" })),
-            preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize }),
-            preact_1.factory("script", { type: "text/javascript", src: "/env-index.js" })));
-        res.send(preact_1.render(container));
+        var container = ((0, preact_1.factory)(Container_1.Container, { title: "ENV-Viewer" },
+            (0, preact_1.factory)("div", { className: "csv-control-panel" },
+                (0, preact_1.factory)("input", { className: "csv-data-input", type: "text" })),
+            (0, preact_1.factory)(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize }),
+            (0, preact_1.factory)("script", { type: "text/javascript", src: "/env-index.js" })));
+        res.send((0, preact_1.render)(container));
     });
     router.post("/view/*", function (req, res) {
         var data = envParser(req.params[0], {

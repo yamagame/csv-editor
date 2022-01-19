@@ -10,10 +10,14 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.envParser = void 0;
@@ -24,7 +28,7 @@ function envParser(search_dir, filename, options) {
     if (options === void 0) { options = {}; }
     var defaultOptions = __assign({ defaultCellSize: { width: 50, height: 18 }, fixedPoint: { x: 0, y: 0 }, rowSize: rowSize, colSize: colSize }, options);
     var envParser = require("libs/env-parser");
-    var envFiles = utils_1.readDir(search_dir, function (filepath) {
+    var envFiles = (0, utils_1.readDir)(search_dir, function (filepath) {
         return path.basename(filepath) === filename;
     });
     var envData = {};
@@ -61,20 +65,20 @@ function envParser(search_dir, filename, options) {
             return ({
                 value: v,
             });
-        }))
+        }), true)
     ], Object.entries(envData).map(function (env) {
-        return __spreadArray([{ value: env[0] }], env[1]);
-    }));
+        return __spreadArray([{ value: env[0] }], env[1], true);
+    }), true);
     var maxRow = csvArray.reduce(function (a, v) { return (a < v.length ? v.length : a); }, 0);
     var maxCol = csvArray.length;
     var header = new Array(maxRow).fill(0).map(function (v, i) { return ({
-        value: "" + (i + 1),
+        value: "".concat(i + 1),
         color: "white",
         backgroundColor: "gray",
     }); });
-    var csv = __spreadArray([header], csvArray).map(function (v, i) { return __spreadArray([
-        { value: "" + i, color: "white", backgroundColor: "gray" }
-    ], v); });
+    var csv = __spreadArray([header], csvArray, true).map(function (v, i) { return __spreadArray([
+        { value: "".concat(i), color: "white", backgroundColor: "gray" }
+    ], v, true); });
     csv.forEach(function (col, y) {
         if (y <= 0)
             return;

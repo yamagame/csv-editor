@@ -48,16 +48,16 @@ var Container_1 = require("components/Container");
 var env_router_1 = require("routers/env-router");
 var csv_router_1 = require("routers/csv-router");
 var CONFIG_PATH = process.env.CONFIG_PATH || "./config.json";
-var app = express_1.default();
+var app = (0, express_1.default)();
 var port = process.env.PORT || 3000;
 app.use(express_1.default.json({ limit: "10mb" }));
 app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express_1.default.static("public"));
-app.use("/csv", csv_router_1.CsvRouter({
+app.use("/csv", (0, csv_router_1.CsvRouter)({
     path: CONFIG_PATH,
     id: "csv-viewer",
 }));
-app.use("/env", env_router_1.EnvViewRouter({
+app.use("/env", (0, env_router_1.EnvViewRouter)({
     path: CONFIG_PATH,
     id: "env-viewer",
 }));
@@ -68,7 +68,7 @@ app.post("/exec/:groupId", function (req, res) { return __awaiter(void 0, void 0
             cmd = spawn("node", [
                 process.env.SCRIPT_CMD,
                 req.params.groupId,
-                "'" + JSON.stringify(req.body) + "'",
+                "'".concat(JSON.stringify(req.body), "'"),
             ], {
                 shell: true,
             });
@@ -79,7 +79,7 @@ app.post("/exec/:groupId", function (req, res) { return __awaiter(void 0, void 0
                 process.stderr.write(data.toString());
             });
             cmd.on("exit", function (code) {
-                console.log("Child exited with code " + code);
+                console.log("Child exited with code ".concat(code));
             });
         }
         res.sendStatus(200);
@@ -101,7 +101,7 @@ var readReademe = function (groupId) {
                 console.error(data.toString());
             });
             cmd.on("exit", function (code) {
-                console.log("Child exited with code " + code);
+                console.log("Child exited with code ".concat(code));
                 resolve(readme);
             });
         });
@@ -116,34 +116,35 @@ var renderContainer = function (groupId) {
         var _a, directories, options, group, container, _b, _c, _d, _e, _f, _g, _h, _j;
         return __generator(this, function (_k) {
             switch (_k.label) {
-                case 0: return [4 /*yield*/, utils_1.loadConfig(CONFIG_PATH)];
+                case 0: return [4 /*yield*/, (0, utils_1.loadConfig)(CONFIG_PATH)];
                 case 1:
                     _a = _k.sent(), directories = _a.directories, options = _a.options;
                     group = directories.find(function (g, i) { return i === groupId; });
                     _b = preact_1.factory;
-                    _c = [Container_1.Container, { title: "CSV-Editor" }, preact_1.factory("div", { className: "csv-control-panel" },
-                            preact_1.factory("div", { className: "csv-control-panel-grow" }),
-                            preact_1.factory("form", null,
-                                group && group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "text", name: "id", placeholder: "ID" })) : null,
-                                group && group.password ? (preact_1.factory("input", { className: "csv-option-input", type: "password", name: "password", placeholder: "PASS", autocomplete: "off" })) : null),
-                            Object.entries(options)
-                                .filter(function (_a) {
-                                var key = _a[0], v = _a[1];
-                                return key !== "id" && key !== "password";
-                            })
-                                .map(function (_a) {
-                                var key = _a[0], option = _a[1];
-                                return (preact_1.factory("select", { name: key, className: "csv-option-selector csv-script-button" }, option.map(function (value) { return (preact_1.factory("option", { value: value }, value)); })));
-                            }),
-                            preact_1.factory("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: groupId >= 0 && group.script ? false : true, onClick: "exec(" + groupId + ");" }))];
+                    _c = [Container_1.Container, { title: "CSV-Editor" }, (0, preact_1.factory)("div", { className: "csv-control-panel" },
+                            (0, preact_1.factory)("div", { className: "csv-control-panel-grow" }),
+                            (0, preact_1.factory)("form", null,
+                                group && group.password ? ((0, preact_1.factory)("input", { className: "csv-option-input", type: "text", name: "id", placeholder: "ID" })) : null,
+                                group && group.password ? ((0, preact_1.factory)("input", { className: "csv-option-input", type: "password", name: "password", placeholder: "PASS", autocomplete: "off" })) : null),
+                            options &&
+                                Object.entries(options)
+                                    .filter(function (_a) {
+                                    var key = _a[0], v = _a[1];
+                                    return key !== "id" && key !== "password";
+                                })
+                                    .map(function (_a) {
+                                    var key = _a[0], option = _a[1];
+                                    return ((0, preact_1.factory)("select", { name: key, className: "csv-option-selector csv-script-button" }, option.map(function (value) { return ((0, preact_1.factory)("option", { value: value }, value)); })));
+                                }),
+                            (0, preact_1.factory)("input", { className: "csv-button csv-script-button", type: "button", value: "\u30B9\u30AF\u30EA\u30D7\u30C8\u5B9F\u884C", disabled: groupId >= 0 && group.script ? false : true, onClick: "exec(".concat(groupId, ");") }))];
                     _d = preact_1.factory;
-                    _e = ["div", { className: "csv-list-container" }, preact_1.factory("div", { className: "csv-row-1" },
-                            preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30B0\u30EB\u30FC\u30D7\u540D"),
-                            directories.map(function (group, i) { return (preact_1.factory("div", { className: "csv-list-item csv-list-hover " + (i === groupId ? "csv-group-active-cell" : ""), onclick: "window.location.href='/list/" + i + "';" },
-                                preact_1.factory("a", { className: "group-name " + (i === groupId ? "csv-group-active" : ""), href: "/list/" + i }, group.name))); })), preact_1.factory("div", { className: "csv-row-2" },
-                            preact_1.factory("div", { className: "csv-list-item csv-list-title" }, "\u30D5\u30A1\u30A4\u30EB\u540D"),
+                    _e = ["div", { className: "csv-list-container" }, (0, preact_1.factory)("div", { className: "csv-row-1" },
+                            (0, preact_1.factory)("div", { className: "csv-list-item csv-list-title" }, "\u30B0\u30EB\u30FC\u30D7\u540D"),
+                            directories.map(function (group, i) { return ((0, preact_1.factory)("div", { className: "csv-list-item csv-list-hover ".concat(i === groupId ? "csv-group-active-cell" : ""), onclick: "window.location.href='/list/".concat(i, "';") },
+                                (0, preact_1.factory)("a", { className: "group-name ".concat(i === groupId ? "csv-group-active" : ""), href: "/list/".concat(i) }, group.name))); })), (0, preact_1.factory)("div", { className: "csv-row-2" },
+                            (0, preact_1.factory)("div", { className: "csv-list-item csv-list-title" }, "\u30D5\u30A1\u30A4\u30EB\u540D"),
                             group &&
-                                utils_1.readDir(group.path, function (filepath) {
+                                (0, utils_1.readDir)(group.path, function (filepath) {
                                     if (group.files) {
                                         var basename = path.basename(filepath);
                                         return group.files.indexOf(basename) >= 0;
@@ -154,8 +155,8 @@ var renderContainer = function (groupId) {
                                     }
                                 }).map(function (v) {
                                     var file = encodeURI(path.join(group.path, v));
-                                    return (preact_1.factory("div", { className: "csv-list-item csv-list-hover", onclick: "window.location.href='/" + group.viewer + "?file=" + file + "';" },
-                                        preact_1.factory("a", { href: "/" + group.viewer + "?file=" + file }, v)));
+                                    return ((0, preact_1.factory)("div", { className: "csv-list-item csv-list-hover", onclick: "window.location.href='/".concat(group.viewer, "?file=").concat(file, "';") },
+                                        (0, preact_1.factory)("a", { href: "/".concat(group.viewer, "?file=").concat(file) }, v)));
                                 }))];
                     _f = preact_1.factory;
                     _g = ["div", { className: "csv-row-3" }];
@@ -163,8 +164,8 @@ var renderContainer = function (groupId) {
                     _j = ["div", { className: "csv-instrcution-container" }];
                     return [4 /*yield*/, readReademe(groupId)];
                 case 2:
-                    container = (_b.apply(void 0, _c.concat([_d.apply(void 0, _e.concat([_f.apply(void 0, _g.concat([_h.apply(void 0, _j.concat([_k.sent()]))]))])), preact_1.factory("script", { type: "text/javascript", src: "/index.js" })])));
-                    return [2 /*return*/, preact_1.render(container)];
+                    container = (_b.apply(void 0, _c.concat([_d.apply(void 0, _e.concat([_f.apply(void 0, _g.concat([_h.apply(void 0, _j.concat([_k.sent()]))]))])), (0, preact_1.factory)("script", { type: "text/javascript", src: "/index.js" })])));
+                    return [2 /*return*/, (0, preact_1.render)(container)];
             }
         });
     });
@@ -196,6 +197,6 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); });
 app.listen(port, function () {
-    console.log("CSV-Editor app listening at http://localhost:" + port);
+    console.log("CSV-Editor app listening at http://localhost:".concat(port));
 });
 //# sourceMappingURL=index.js.map
