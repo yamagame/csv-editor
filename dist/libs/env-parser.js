@@ -1,7 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 function log(message /*: string */) {
-    console.log("[dotenv][DEBUG] " + message);
+    console.log("[dotenv][DEBUG] ".concat(message));
 }
 var NEWLINE = "\n";
 var RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/;
@@ -48,7 +48,7 @@ function parse(src /*: string | Buffer */, options /*: ?DotenvParseOptions */) {
             // obj.push({});
         }
         else if (debug) {
-            log("did not match key and value when parsing line " + (idx + 1) + ": " + line);
+            log("did not match key and value when parsing line ".concat(idx + 1, ": ").concat(line));
         }
     });
     return obj;
@@ -66,7 +66,7 @@ function config(dotenvPath) {
 function stringify(parsed) {
     var ret = "";
     parsed.forEach(function (env) {
-        ret += env.key + "=" + env.quoted + env.value + env.quoted + "\n";
+        ret += "".concat(env.key, "=").concat(env.quoted).concat(env.value).concat(env.quoted, "\n");
     });
     return ret;
 }

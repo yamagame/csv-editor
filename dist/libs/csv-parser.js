@@ -102,7 +102,7 @@ function stringify(parsed) {
             if (col.value.indexOf(",") >= 0 ||
                 col.value.indexOf('"') >= 0 ||
                 col.value.indexOf("\n") >= 0) {
-                ret += "\"" + col.value.replace(/"/g, '""') + "\"";
+                ret += "\"".concat(col.value.replace(/"/g, '""'), "\"");
             }
             else {
                 ret += col.value;

@@ -109,17 +109,19 @@ const renderContainer = async (groupId = -1) => {
             />
           ) : null}
         </form>
-        {Object.entries(options)
-          .filter(([key, v]) => key !== "id" && key !== "password")
-          .map(([key, option]: [string, string[]]) => (
-            <select
-              name={key}
-              className="csv-option-selector csv-script-button">
-              {option.map(value => (
-                <option value={value}>{value}</option>
-              ))}
-            </select>
-          ))}
+        {options &&
+          Object.entries(options)
+            .filter(([key, v]) => key !== "id" && key !== "password")
+            .map(([key, option]: [string, string[]]) => (
+              <select
+                name={key}
+                className="csv-option-selector csv-script-button"
+              >
+                {option.map(value => (
+                  <option value={value}>{value}</option>
+                ))}
+              </select>
+            ))}
         <input
           className="csv-button csv-script-button"
           type="button"
@@ -136,12 +138,14 @@ const renderContainer = async (groupId = -1) => {
               className={`csv-list-item csv-list-hover ${
                 i === groupId ? "csv-group-active-cell" : ""
               }`}
-              onclick={`window.location.href='/list/${i}';`}>
+              onclick={`window.location.href='/list/${i}';`}
+            >
               <a
                 className={`group-name ${
                   i === groupId ? "csv-group-active" : ""
                 }`}
-                href={`/list/${i}`}>
+                href={`/list/${i}`}
+              >
                 {group.name}
               </a>
             </div>
@@ -164,7 +168,8 @@ const renderContainer = async (groupId = -1) => {
               return (
                 <div
                   className="csv-list-item csv-list-hover"
-                  onclick={`window.location.href='/${group.viewer}?file=${file}';`}>
+                  onclick={`window.location.href='/${group.viewer}?file=${file}';`}
+                >
                   <a href={`/${group.viewer}?file=${file}`}>{v}</a>
                 </div>
               );

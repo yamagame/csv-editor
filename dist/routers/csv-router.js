@@ -46,10 +46,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -94,19 +98,19 @@ function CsvRouter(config) {
         var csvParser = require("libs/csv-parser");
         var csvFilePath = path.join(filename);
         var csvArray = csvParser.load(csvFilePath);
-        var csvJson = utils_1.loadJson(csvFilePath);
+        var csvJson = (0, utils_1.loadJson)(csvFilePath);
         var maxRow = csvArray.reduce(function (a, v) { return (a < v.length ? v.length : a); }, 0);
         var maxCol = csvArray.length;
         var header = new Array(maxRow + 1).fill(0).map(function (v, i) { return ({
-            value: "" + alphabetNumber(i),
+            value: "".concat(alphabetNumber(i)),
             color: "white",
             backgroundColor: "gray",
         }); });
         var csv = __spreadArray([
             header
         ], csvArray.map(function (v, i) { return __spreadArray([
-            { value: "" + (i + 1), color: "white", backgroundColor: "gray" }
-        ], v); }));
+            { value: "".concat(i + 1), color: "white", backgroundColor: "gray" }
+        ], v, true); }), true);
         return __assign({ csv: csv }, __assign(__assign(__assign(__assign(__assign({}, defaultOptions), options), { dataname: filename, maxRow: maxRow + 1, maxCol: maxCol + 1 }), csvJson), { defaultCellSize: __assign(__assign({}, defaultCellSize), options.defaultCellSize) }));
     }
     router.post("/command", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
@@ -115,13 +119,13 @@ function CsvRouter(config) {
             switch (_b.label) {
                 case 0:
                     _a = req.body, file = _a.file, text = _a.text;
-                    return [4 /*yield*/, utils_1.findConfig(config.path, file, utils_1.defaultConfig)];
+                    return [4 /*yield*/, (0, utils_1.findConfig)(config.path, file, utils_1.defaultConfig)];
                 case 1:
                     configData = _b.sent();
                     if (configData.command) {
                         try {
                             console.log(configData.command, file, text);
-                            cmd = spawn("" + configData.command, [file, text], {
+                            cmd = spawn("".concat(configData.command), [file, text], {
                                 shell: true,
                             });
                             cmd.stdout.on("data", function (data) {
@@ -131,7 +135,7 @@ function CsvRouter(config) {
                                 console.error(data.toString());
                             });
                             cmd.on("exit", function (code) {
-                                console.log("Child exited with code " + code);
+                                console.log("Child exited with code ".concat(code));
                             });
                         }
                         catch (err) {
@@ -152,7 +156,7 @@ function CsvRouter(config) {
                     return [2 /*return*/, res.sendStatus(404)];
                 }
                 data = fs.readFileSync(file, { encoding: "utf-8" });
-                res.setHeader("content-disposition", "attachment; filename=" + path.basename(file));
+                res.setHeader("content-disposition", "attachment; filename=".concat(path.basename(file)));
                 res.setHeader("content-type", "text/csv; charset=UTF-8");
                 res.send(data);
             }
@@ -168,7 +172,7 @@ function CsvRouter(config) {
             switch (_c.label) {
                 case 0:
                     file = req.query.file;
-                    return [4 /*yield*/, utils_1.findConfig(config.path, file, utils_1.defaultConfig)];
+                    return [4 /*yield*/, (0, utils_1.findConfig)(config.path, file, utils_1.defaultConfig)];
                 case 1:
                     configData = _c.sent();
                     data = csvParser(file, {
@@ -180,12 +184,12 @@ function CsvRouter(config) {
                     _a = req.body, maxRow = _a.maxRow, maxCol = _a.maxCol;
                     req.body.csv.forEach(function (cell) {
                         if (data.csv.length <= cell.y) {
-                            data.csv = __spreadArray(__spreadArray([], data.csv), new Array(cell.y - data.csv.length + 1).fill([]));
+                            data.csv = __spreadArray(__spreadArray([], data.csv, true), new Array(cell.y - data.csv.length + 1).fill([]), true);
                         }
                         if (data.csv[cell.y].length <= cell.x) {
-                            data.csv[cell.y] = __spreadArray(__spreadArray([], data.csv[cell.y]), new Array(cell.x - data.csv[cell.y].length + 1).fill({
+                            data.csv[cell.y] = __spreadArray(__spreadArray([], data.csv[cell.y], true), new Array(cell.x - data.csv[cell.y].length + 1).fill({
                                 value: "",
-                            }));
+                            }), true);
                         }
                         try {
                             data.csv[cell.y][cell.x] = { value: cell.value };
@@ -194,7 +198,7 @@ function CsvRouter(config) {
                     });
                     {
                         csvParser_1 = require("libs/csv-parser");
-                        csvData = __spreadArray([], data.csv).slice(1).map(function (col) { return col.slice(1); });
+                        csvData = __spreadArray([], data.csv, true).slice(1).map(function (col) { return col.slice(1); });
                         csvString = csvParser_1.stringify(csvData.map(function (v) { return v.slice(0, maxRow - 1); }).slice(0, maxCol - 1));
                         csvPath = req.query.file;
                         fs.writeFileSync(csvPath, csvString);
@@ -202,12 +206,12 @@ function CsvRouter(config) {
                     {
                         _b = req.body, rowSize_1 = _b.rowSize, colSize_1 = _b.colSize;
                         csvFilePath = req.query.file.toString();
-                        utils_1.saveJson(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
+                        (0, utils_1.saveJson)(csvFilePath, { rowSize: rowSize_1, colSize: colSize_1, maxCol: maxCol, maxRow: maxRow });
                     }
                     if (configData.execute) {
                         try {
                             console.log(configData.execute, file);
-                            cmd = spawn("" + configData.execute, [file], {
+                            cmd = spawn("".concat(configData.execute), [file], {
                                 shell: true,
                             });
                             cmd.stdout.on("data", function (data) {
@@ -217,7 +221,7 @@ function CsvRouter(config) {
                                 console.error(data.toString());
                             });
                             cmd.on("exit", function (code) {
-                                console.log("Child exited with code " + code);
+                                console.log("Child exited with code ".concat(code));
                             });
                         }
                         catch (err) {
@@ -233,7 +237,7 @@ function CsvRouter(config) {
         var configData, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.query.file, utils_1.defaultConfig)];
+                case 0: return [4 /*yield*/, (0, utils_1.findConfig)(config.path, req.query.file, utils_1.defaultConfig)];
                 case 1:
                     configData = _a.sent();
                     data = csvParser(req.query.file, {
@@ -257,7 +261,7 @@ function CsvRouter(config) {
         var configData, data, container;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, utils_1.findConfig(config.path, req.query.file, utils_1.defaultConfig)];
+                case 0: return [4 /*yield*/, (0, utils_1.findConfig)(config.path, req.query.file, utils_1.defaultConfig)];
                 case 1:
                     configData = _a.sent();
                     data = csvParser(req.query.file, {
@@ -266,18 +270,18 @@ function CsvRouter(config) {
                         colSize: configData.colSize || colSize,
                         defaultCellSize: configData.defaultCellSize || defaultCellSize,
                     });
-                    container = (preact_1.factory(Container_1.Container, { title: "CSV-Editor" },
-                        preact_1.factory("div", { className: "csv-control-panel" },
-                            preact_1.factory("a", { href: "/list/" + configData.groupIndex },
-                                preact_1.factory("span", { className: "csv-data-name" }, configData.name)),
+                    container = ((0, preact_1.factory)(Container_1.Container, { title: "CSV-Editor" },
+                        (0, preact_1.factory)("div", { className: "csv-control-panel" },
+                            (0, preact_1.factory)("a", { href: "/list/".concat(configData.groupIndex) },
+                                (0, preact_1.factory)("span", { className: "csv-data-name" }, configData.name)),
                             ":",
-                            preact_1.factory("span", { className: "csv-data-name" }, data.dataname),
-                            preact_1.factory("input", { className: "csv-data-input", type: "text" }),
-                            preact_1.factory("input", { className: "csv-button", type: "button", value: "\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9", onClick: "download();" }),
-                            configData.edit !== false ? (preact_1.factory("input", { className: "csv-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" })) : null),
-                        preact_1.factory(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize, form: configData.form }),
-                        preact_1.factory("script", { type: "text/javascript", src: "/csv-index.js" })));
-                    res.send(preact_1.render(container));
+                            (0, preact_1.factory)("span", { className: "csv-data-name" }, data.dataname),
+                            (0, preact_1.factory)("input", { className: "csv-data-input", type: "text" }),
+                            (0, preact_1.factory)("input", { className: "csv-button", type: "button", value: "\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9", onClick: "download();" }),
+                            configData.edit !== false ? ((0, preact_1.factory)("input", { className: "csv-button", type: "button", value: "\u30BB\u30FC\u30D6", onClick: "save();" })) : null),
+                        (0, preact_1.factory)(CsvTable_1.CsvTable, { id: "csv-table", data: data.csv, left: 0, top: 30, dataname: data.dataname, defaultCellSize: data.defaultCellSize, fixedPoint: data.fixedPoint, rowSize: data.rowSize, colSize: data.colSize, form: configData.form }),
+                        (0, preact_1.factory)("script", { type: "text/javascript", src: "/csv-index.js" })));
+                    res.send((0, preact_1.render)(container));
                     return [2 /*return*/];
             }
         });

@@ -30,7 +30,7 @@ function factory(tag, props) {
         return tag(__assign(__assign({}, props), { children: children }));
     }
     var propStr = props
-        ? ("" + Object.entries(props)
+        ? "".concat(Object.entries(props)
             .map(function (_a) {
             var k = _a[0], v = _a[1];
             if (k === "className")
@@ -55,19 +55,19 @@ function factory(tag, props) {
                     var k = _a[0], v = _a[1];
                     var _k = k.replace(/([A-Z])/g, "-$&").toLocaleLowerCase();
                     if (k === "zIndex")
-                        return _k + ": " + v;
+                        return "".concat(_k, ": ").concat(v);
                     if (k === "opacity")
-                        return _k + ": " + v;
-                    return _k + ": " + (typeof v === "number" ? v + "px" : v);
+                        return "".concat(_k, ": ").concat(v);
+                    return "".concat(_k, ": ").concat(typeof v === "number" ? "".concat(v, "px") : v);
                 })
                     .join("; ");
-                return k + "=\"" + _v + "\"";
+                return "".concat(k, "=\"").concat(_v, "\"");
             }
-            return k + "=\"" + v + "\"";
+            return "".concat(k, "=\"").concat(v, "\"");
         })
             .join(" ")).trim()
         : "";
-    return "<" + tag + (propStr ? " " + propStr : "") + ">" + join(children) + "</" + tag + ">";
+    return "<".concat(tag).concat(propStr ? " ".concat(propStr) : "", ">").concat(join(children), "</").concat(tag, ">");
 }
 exports.factory = factory;
 function Fragment(props) {
@@ -76,7 +76,7 @@ function Fragment(props) {
 }
 exports.Fragment = Fragment;
 function render(content) {
-    return "<!DOCTYPE html>" + content;
+    return "<!DOCTYPE html>".concat(content);
 }
 exports.render = render;
 //# sourceMappingURL=preact.js.map

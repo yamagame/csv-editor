@@ -17,9 +17,9 @@ var utils_1 = require("libs/utils");
 var macro = require("libs/csv-macro");
 var ResizeMarker = function (_a) {
     var _b = _a.topOffset, topOffset = _b === void 0 ? 0 : _b;
-    return (preact_1.factory(preact_1.Fragment, null,
-        preact_1.factory("div", { className: "table-resize-marker horizontal", dataTopOffset: topOffset }),
-        preact_1.factory("div", { className: "table-resize-marker vertical", dataTopOffset: topOffset })));
+    return ((0, preact_1.factory)(preact_1.Fragment, null,
+        (0, preact_1.factory)("div", { className: "table-resize-marker horizontal", dataTopOffset: topOffset }),
+        (0, preact_1.factory)("div", { className: "table-resize-marker vertical", dataTopOffset: topOffset })));
 };
 exports.ResizeMarker = ResizeMarker;
 var TableThumbs = function (_a) {
@@ -32,9 +32,9 @@ var TableThumbs = function (_a) {
             var height = colHeight[cell.y];
             if (cell.x === 0 && cell.y === 0)
                 return null;
-            return (preact_1.factory(preact_1.Fragment, null,
-                direction.match("horizontal") && cell.x === 0 ? (preact_1.factory(preact_1.Fragment, null,
-                    cell.y > 1 ? (preact_1.factory("div", { className: "table-thumb row-resize", style: {
+            return ((0, preact_1.factory)(preact_1.Fragment, null,
+                direction.match("horizontal") && cell.x === 0 ? ((0, preact_1.factory)(preact_1.Fragment, null,
+                    cell.y > 1 ? ((0, preact_1.factory)("div", { className: "table-thumb row-resize", style: {
                             left: left,
                             top: top,
                             width: width,
@@ -42,7 +42,7 @@ var TableThumbs = function (_a) {
                             cursor: "row-resize",
                             // backgroundColor: "blue",
                         }, dataX: cell.x, dataY: cell.y - 1 })) : null,
-                    preact_1.factory("div", { className: "table-thumb row-resize", style: {
+                    (0, preact_1.factory)("div", { className: "table-thumb row-resize", style: {
                             top: top + height - 1,
                             left: left,
                             width: width,
@@ -50,8 +50,8 @@ var TableThumbs = function (_a) {
                             cursor: "row-resize",
                             // backgroundColor: "blue",
                         }, dataX: cell.x, dataY: cell.y }))) : null,
-                direction.match("vertical") && cell.y === 0 ? (preact_1.factory(preact_1.Fragment, null,
-                    cell.x > 1 ? (preact_1.factory("div", { className: "table-thumb col-resize", style: {
+                direction.match("vertical") && cell.y === 0 ? ((0, preact_1.factory)(preact_1.Fragment, null,
+                    cell.x > 1 ? ((0, preact_1.factory)("div", { className: "table-thumb col-resize", style: {
                             left: left,
                             top: top,
                             height: height,
@@ -59,8 +59,8 @@ var TableThumbs = function (_a) {
                             width: "4px",
                             // backgroundColor: "lightgray",
                         }, dataX: cell.x - 1, dataY: cell.y })) : null,
-                    preact_1.factory("div", { className: "table-thumb col-resize", style: {
-                            left: left + width - 2 + "px",
+                    (0, preact_1.factory)("div", { className: "table-thumb col-resize", style: {
+                            left: "".concat(left + width - 2, "px"),
                             top: top,
                             height: height,
                             cursor: "col-resize",
@@ -87,13 +87,13 @@ var TableCell = function (props) {
     var dataProps = data
         ? Object.entries(data).reduce(function (a, _a) {
             var k = _a[0], v = _a[1];
-            a["data-" + k] = v;
+            a["data-".concat(k)] = v;
             return a;
         }, {})
         : {};
-    return (preact_1.factory("div", __assign({ className: className, name: name, style: deleteUndef(__assign({}, props)) }, dataProps),
+    return ((0, preact_1.factory)("div", __assign({ className: className, name: name, style: deleteUndef(__assign({}, props)) }, dataProps),
         children,
-        marker && (preact_1.factory(exports.TableCell, { className: "table-marker", name: className, position: "absolute", zIndex: props.zIndex || 0, width: 100, height: 24, left: 0, top: 0 }))));
+        marker && ((0, preact_1.factory)(exports.TableCell, { className: "table-marker", name: className, position: "absolute", zIndex: props.zIndex || 0, width: 100, height: 24, left: 0, top: 0 }))));
 };
 exports.TableCell = TableCell;
 var ThumbCell = function (props) {
@@ -112,11 +112,11 @@ var ThumbCell = function (props) {
     var dataProps = data
         ? Object.entries(data).reduce(function (a, _a) {
             var k = _a[0], v = _a[1];
-            a["data-" + k] = v;
+            a["data-".concat(k)] = v;
             return a;
         }, {})
         : {};
-    return (preact_1.factory("div", __assign({ className: className, name: name, style: deleteUndef(__assign({ position: "absolute" }, props)) }, dataProps), children));
+    return ((0, preact_1.factory)("div", __assign({ className: className, name: name, style: deleteUndef(__assign({ position: "absolute" }, props)) }, dataProps), children));
 };
 exports.ThumbCell = ThumbCell;
 var CsvTable = function (_a) {
@@ -183,14 +183,14 @@ var CsvTable = function (_a) {
         delete macroStyle["borderRadius"];
         delete macroStyle["marginTop"];
         delete macroStyle["border"];
-        return (preact_1.factory(exports.TableCell, __assign({ className: className.join(" "), data: {
+        return ((0, preact_1.factory)(exports.TableCell, __assign({ className: className.join(" "), data: {
                 x: cell.x,
                 y: cell.y,
                 top: top,
                 left: left,
                 backgroundColor: props.backgroundColor,
             }, left: left + cell.ox, top: top + cell.oy, width: rowWidth[cell.x] - 1, height: colHeight[cell.y] - 1 }, props, macroStyle, { color: "lightgray" }),
-            preact_1.factory("div", { style: __assign({ color: color, top: 1 }, textStyle) }, utils_1.escapeHtml(cell.value).replace(/\n/g, "<br>"))));
+            (0, preact_1.factory)("div", { style: __assign({ color: color, top: 1 }, textStyle) }, (0, utils_1.escapeHtml)(cell.value).replace(/\n/g, "<br>"))));
     };
     var leftOffset = rowWidth.reduce(function (a, v, i) { return (i <= fixedPoint.x ? a + v : a); }, 0) * 2;
     var topOffset = colHeight.reduce(function (a, v, i) { return (i <= fixedPoint.y ? a + v : a); }, 0) * 2;
@@ -223,14 +223,14 @@ var CsvTable = function (_a) {
         })
             .filter(function (cell) { return cell.x > fixedPoint.x && cell.y > fixedPoint.y; });
     });
-    return (preact_1.factory("div", { id: id, className: "csv-table", style: {
+    return ((0, preact_1.factory)("div", { id: id, className: "csv-table", style: {
             left: left,
             top: top,
             height: sumTop(maxCol) + 1,
             width: sumLeft(maxRow) + 1,
             // backgroundColor: "pink",
         }, dataName: dataname },
-        preact_1.factory(exports.TableCell, { className: "table-top-left", position: "fixed", zIndex: 30, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(fixedPoint.y + 1), 
+        (0, preact_1.factory)(exports.TableCell, { className: "table-top-left", position: "fixed", zIndex: 30, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(fixedPoint.y + 1), 
             // height={0 /* sumTop(fixedPoint.y + 1)*/}
             left: left, top: top },
             topLeftCells.map(function (d) {
@@ -241,9 +241,9 @@ var CsvTable = function (_a) {
                     });
                 });
             }),
-            preact_1.factory(exports.TableThumbs, { direction: "horizontal vertical", cells: topLeftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft }),
-            preact_1.factory(exports.ResizeMarker, { topOffset: topOffset })),
-        preact_1.factory(exports.TableCell, { className: "table-top", position: "sticky", zIndex: 10, marker: true, width: sumLeft(maxRow) + 2, height: 0, left: 0, top: topOffset + top },
+            (0, preact_1.factory)(exports.TableThumbs, { direction: "horizontal vertical", cells: topLeftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft }),
+            (0, preact_1.factory)(exports.ResizeMarker, { topOffset: topOffset })),
+        (0, preact_1.factory)(exports.TableCell, { className: "table-top", position: "sticky", zIndex: 10, marker: true, width: sumLeft(maxRow) + 2, height: 0, left: 0, top: topOffset + top },
             topCells.map(function (d) {
                 return d.map(function (cell) {
                     return DataCell(cell, {
@@ -253,8 +253,8 @@ var CsvTable = function (_a) {
                     });
                 });
             }),
-            preact_1.factory(exports.TableThumbs, { direction: "vertical", topOffset: topOffset, cells: topCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
-        preact_1.factory(exports.TableCell, { className: "table-left", position: "sticky", zIndex: 20, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(maxCol) - topOffset + 1, marginLeft: 0, left: left, top: topOffset + top },
+            (0, preact_1.factory)(exports.TableThumbs, { direction: "vertical", topOffset: topOffset, cells: topCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
+        (0, preact_1.factory)(exports.TableCell, { className: "table-left", position: "sticky", zIndex: 20, marker: true, width: sumLeft(fixedPoint.x + 1), height: sumTop(maxCol) - topOffset + 1, marginLeft: 0, left: left, top: topOffset + top },
             leftCells.map(function (d) {
                 return d.map(function (cell) {
                     return DataCell(cell, {
@@ -263,8 +263,8 @@ var CsvTable = function (_a) {
                     });
                 });
             }),
-            preact_1.factory(exports.TableThumbs, { direction: "horizontal", topOffset: topOffset, cells: leftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
-        preact_1.factory(exports.TableCell, { className: "table-right-bottom", zIndex: 0, marker: true, width: sumLeft(maxRow) + 2, height: 0 /*sumTop(maxCol) + 1*/, left: 0, top: 0 }, rightBottomCells.map(function (d, y) {
+            (0, preact_1.factory)(exports.TableThumbs, { direction: "horizontal", topOffset: topOffset, cells: leftCells, rowWidth: rowWidth, colHeight: colHeight, sumTop: sumTop, sumLeft: sumLeft })),
+        (0, preact_1.factory)(exports.TableCell, { className: "table-right-bottom", zIndex: 0, marker: true, width: sumLeft(maxRow) + 2, height: 0 /*sumTop(maxCol) + 1*/, left: 0, top: 0 }, rightBottomCells.map(function (d, y) {
             return d.map(function (cell) {
                 return DataCell(cell, {
                     backgroundColor: cell.backgroundColor || "white",
