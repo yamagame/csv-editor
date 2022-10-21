@@ -1,3 +1,6 @@
 {
+  "defaultCellSize": { "width": 80, "height": 40 },
+  "rowSize": [40, 200, 100],
+  "colSize": [0, 145],
   "command": "echo hello"
 }

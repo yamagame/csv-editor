@@ -1,10 +1,13 @@
 {
+  "options": {
+    "fruit": ["apple", "orange", "grape"]
+  },
   "directories": [
     {
       "name": "CSVファイル1",
       "path": "./test-csv/data1",
       "fixedV": 0,
-      "edit": false,
+      "edit": true,
       "form": [
         {
           "range": "B1",
@@ -37,6 +40,8 @@
     {
       "name": "CSVファイル",
       "path": "./test-csv",
+      "edit": true,
+      "password": true,
       "fixedH": 0,
       "fixedV": 2,
       "form": [
@@ -55,7 +60,7 @@
           }
         }
       ],
-      "execute": "echo"
+      "script": "echo"
     },
     {
       "name": "ENVファイル",

@@ -1,0 +1,6 @@
+{
+  "defaultCellSize": { "width": 230, "height": 28 },
+  "cellWidth": [40, 40, 100],
+  "cellHeight": [100],
+  "edit": true
+}
